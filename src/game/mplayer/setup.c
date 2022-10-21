@@ -112,7 +112,7 @@ struct mparena g_MpArenas[] = {
 	{ STAGE_MP_TEMPLE,     MPFEATURE_STAGE_TEMPLE,     L_MPMENU_133 },
 	{ STAGE_MP_COMPLEX,    MPFEATURE_STAGE_COMPLEX,    L_MPMENU_134 },
 	{ STAGE_MP_FELICITY,   MPFEATURE_STAGE_FELICITY,   L_MPMENU_135 },
-	{ 1,                   0,                          L_MPMENU_136 }, // "Random"
+	{ STAGE_MP_RANDOM,     0,                          L_MPMENU_136 },
 };
 
 s32 mpGetNumStages(void)
