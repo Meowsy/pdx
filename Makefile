@@ -550,6 +550,9 @@ $(B_DIR)/pd.z64: $(B_DIR)/stage1.bin tools/mkrom/mkrom
 	tools/mkrom/mkrom $(B_DIR)/stage1.bin $(B_DIR)/pd.map $(PIRACYCHECKS) $(ZIPMAGIC) $(COPYLEN) $@
 	@echo -e "\033[0;32mROM written to $@\033[0m"
 
+$(B_DIR)/pd.xdelta: $(B_DIR)/pd.z64
+	xdelta3 -f -S djw -9 -s pd.${ROMID}.z64 $(B_DIR)/pd.z64 $(B_DIR)/pd.xdelta
+
 tools/mkrom/mkrom:
 	$(MAKE) -C tools/mkrom
 
@@ -777,7 +780,7 @@ $(B_DIR)/assets/%.o: $(A_DIR)/%.c $(RECOMP_FILES)
 extract:
 	ROMID=$(ROMID) tools/extract
 
-rom: $(B_DIR)/pd.z64
+rom: $(B_DIR)/pd.z64 $(B_DIR)/pd.xdelta
 
 clean:
 	rm -rf build/$(ROMID)
