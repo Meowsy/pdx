@@ -96,28 +96,28 @@ struct menudialogdef g_MpDropOutMenuDialog = {
 
 struct mparena g_MpArenas[] = {
 	// Stage, unlock, name
-	{ STAGE_MP_SKEDAR,     0,                          L_MPMENU_119 },
-	{ STAGE_MP_PIPES,      0,                          L_MPMENU_120 },
-	{ STAGE_MP_RAVINE,     MPFEATURE_STAGE_RAVINE,     L_MPMENU_121 },
-	{ STAGE_MP_G5BUILDING, MPFEATURE_STAGE_G5BUILDING, L_MPMENU_122 },
-	{ STAGE_MP_SEWERS,     MPFEATURE_STAGE_SEWERS,     L_MPMENU_123 },
-	{ STAGE_MP_WAREHOUSE,  MPFEATURE_STAGE_WAREHOUSE,  L_MPMENU_124 },
-	{ STAGE_MP_GRID,       MPFEATURE_STAGE_GRID,       L_MPMENU_125 },
-	{ STAGE_MP_RUINS,      MPFEATURE_STAGE_RUINS,      L_MPMENU_126 },
-	{ STAGE_MP_AREA52,     0,                          L_MPMENU_127 },
-	{ STAGE_MP_BASE,       MPFEATURE_STAGE_BASE,       L_MPMENU_128 },
-	{ STAGE_MP_FORTRESS,   MPFEATURE_STAGE_FORTRESS,   L_MPMENU_130 },
-	{ STAGE_MP_VILLA,      MPFEATURE_STAGE_VILLA,      L_MPMENU_131 },
-	{ STAGE_MP_CARPARK,    MPFEATURE_STAGE_CARPARK,    L_MPMENU_132 },
-	{ STAGE_MP_TEMPLE,     MPFEATURE_STAGE_TEMPLE,     L_MPMENU_133 },
-	{ STAGE_MP_COMPLEX,    MPFEATURE_STAGE_COMPLEX,    L_MPMENU_134 },
-	{ STAGE_MP_FELICITY,   MPFEATURE_STAGE_FELICITY,   L_MPMENU_135 },
-	{ STAGE_MP_RANDOM,     0,                          L_MPMENU_136 },
+	{ STAGE_MP_SKEDAR,     0,                          L_MPMENU_119, THUMBNAIL_MP_SKEDAR     },
+	{ STAGE_MP_PIPES,      0,                          L_MPMENU_120, THUMBNAIL_MP_PIPES      },
+	{ STAGE_MP_RAVINE,     MPFEATURE_STAGE_RAVINE,     L_MPMENU_121, THUMBNAIL_MP_RAVINE     },
+	{ STAGE_MP_G5BUILDING, MPFEATURE_STAGE_G5BUILDING, L_MPMENU_122, THUMBNAIL_MP_G5BUILDING },
+	{ STAGE_MP_SEWERS,     MPFEATURE_STAGE_SEWERS,     L_MPMENU_123, THUMBNAIL_MP_SEWERS     },
+	{ STAGE_MP_WAREHOUSE,  MPFEATURE_STAGE_WAREHOUSE,  L_MPMENU_124, THUMBNAIL_MP_WAREHOUSE  },
+	{ STAGE_MP_GRID,       MPFEATURE_STAGE_GRID,       L_MPMENU_125, THUMBNAIL_MP_GRID       },
+	{ STAGE_MP_RUINS,      MPFEATURE_STAGE_RUINS,      L_MPMENU_126, THUMBNAIL_MP_RUINS      },
+	{ STAGE_MP_AREA52,     0,                          L_MPMENU_127, THUMBNAIL_MP_AREA52     },
+	{ STAGE_MP_BASE,       MPFEATURE_STAGE_BASE,       L_MPMENU_128, THUMBNAIL_MP_BASE       },
+	{ STAGE_MP_FORTRESS,   MPFEATURE_STAGE_FORTRESS,   L_MPMENU_130, THUMBNAIL_MP_FORTRESS   },
+	{ STAGE_MP_VILLA,      MPFEATURE_STAGE_VILLA,      L_MPMENU_131, THUMBNAIL_MP_VILLA      },
+	{ STAGE_MP_CARPARK,    MPFEATURE_STAGE_CARPARK,    L_MPMENU_132, THUMBNAIL_MP_CARPARK    },
+	{ STAGE_MP_TEMPLE,     MPFEATURE_STAGE_TEMPLE,     L_MPMENU_133, THUMBNAIL_MP_TEMPLE     },
+	{ STAGE_MP_COMPLEX,    MPFEATURE_STAGE_COMPLEX,    L_MPMENU_134, THUMBNAIL_MP_COMPLEX    },
+	{ STAGE_MP_FELICITY,   MPFEATURE_STAGE_FELICITY,   L_MPMENU_135, THUMBNAIL_MP_FELICITY   },
+	{ STAGE_MP_RANDOM,     0,                          L_MPMENU_136, THUMBNAIL_MP_RANDOM     },
 };
 
 s32 mpGetNumStages(void)
 {
-	return 17;
+	return ARRAYCOUNT(g_MpArenas);
 }
 
 s16 mpChooseRandomStage(void)
@@ -158,6 +158,11 @@ s32 mpArenaMenuHandler(s32 operation, struct menuitem *item, union handlerdata *
 	s32 i;
 	s32 count = 0;
 	s32 groupindex;
+	Gfx *gdl;
+	struct menuitemrenderdata *renderdata;
+	s32 x;
+	s32 y;
+	char text[50];
 
 	switch (operation) {
 	case MENUOP_GETOPTIONCOUNT:
@@ -239,6 +244,57 @@ s32 mpArenaMenuHandler(s32 operation, struct menuitem *item, union handlerdata *
 			}
 		}
 		data->list.groupstartindex = count;
+		break;
+	case MENUOP_RENDER:
+		gdl = data->type19.gdl;
+		renderdata = data->type19.renderdata2;
+		
+		for (i = 0; i < ARRAYCOUNT(g_MpArenas); i++) {
+			if (challengeIsFeatureUnlocked(g_MpArenas[i].requirefeature)) {
+				if (count == data->type19.unk04) {
+					break;
+				}
+
+				count++;
+			}
+		}
+
+		// Draw the thumbnail
+		gDPPipeSync(gdl++);
+		gDPSetTexturePersp(gdl++, G_TP_NONE);
+		gDPSetAlphaCompare(gdl++, G_AC_NONE);
+		gDPSetTextureLOD(gdl++, G_TL_TILE);
+		gDPSetTextureConvert(gdl++, G_TC_FILT);
+
+		texSelect(&gdl, &g_TexGeneralConfigs[g_MpArenas[i].thumbnail], 2, 0, 2, 1, 0);
+
+		gDPSetCycleType(gdl++, G_CYC_1CYCLE);
+		gDPSetCombineLERP(gdl++, TEXEL0, 0, ENVIRONMENT, 0, TEXEL0, 0, ENVIRONMENT, 0, TEXEL0, 0, ENVIRONMENT, 0, TEXEL0, 0, ENVIRONMENT, 0);
+		gDPSetTextureFilter(gdl++, G_TF_POINT);
+
+		gDPSetEnvColorViaWord(gdl++, 0xffffff00 | ((renderdata->colour & 0xff) * 255 / 256));
+
+		gSPTextureRectangle(gdl++,
+				((renderdata->x + 4) << 2) * g_ScaleX, (renderdata->y + 3) << 2,
+				((renderdata->x + 60) << 2) * g_ScaleX, (renderdata->y + 39) << 2,
+				G_TX_RENDERTILE, 0, 0x0480, 1024 / g_ScaleX, -1024);
+
+		x = renderdata->x + 62;
+		y = renderdata->y + 3;
+
+		gdl = text0f153628(gdl);
+
+		strcpy(text, langGet(g_MpArenas[i].name));
+		strcat(text, "\n");
+
+		gdl = textRenderProjected(gdl, &x, &y, text, g_CharsHandelGothicMd, g_FontHandelGothicMd,
+				renderdata->colour, viGetWidth(), viGetHeight(), 0, 0);
+
+		gdl = text0f153780(gdl);
+
+		return (s32)gdl;
+	case MENUOP_GETOPTIONHEIGHT:
+		data->list.value = 42;
 		break;
 	}
 
@@ -2475,9 +2531,9 @@ struct menuitem g_MpArenaMenuItems[] = {
 	{
 		MENUITEMTYPE_LIST,
 		0,
-		MENUITEMFLAG_LOCKABLEMINOR,
-		0x00000078,
-		0x0000004d,
+		MENUITEMFLAG_LIST_CUSTOMRENDER | MENUITEMFLAG_LOCKABLEMINOR,
+		0x000000eb,
+		0,
 		mpArenaMenuHandler,
 	},
 	{ MENUITEMTYPE_END },

@@ -6,6 +6,7 @@
 #include "files.h"
 #include "sequences.h"
 #include "sfx.h"
+#include "textures.h"
 
 #define FALSE 0
 #define TRUE  1
@@ -3008,7 +3009,7 @@
 #define NUM_SOLONORMALSTAGES  17
 #define NUM_SOLOSTAGES        21
 #define NUM_STAGES            90
-#define NUM_TEXTURES          (VERSION == VERSION_JPN_FINAL ? 3511 : 3503)
+#define NUM_TEXTURES          TEXTURE_END
 
 #define OBJECTIVE_INCOMPLETE 0
 #define OBJECTIVE_COMPLETE   1
@@ -4059,6 +4060,47 @@
 #define THREADPRI_SCHED 30
 #define THREADPRI_FAULT 40
 #define THREADPRI_RMON  250
+
+#define THUMBNAIL_STATIC              11
+#define THUMBNAIL_JOANNA              12
+#define THUMBNAIL_STAGE_DEFECTION     13
+#define THUMBNAIL_STAGE_INVESTIGATION 14
+#define THUMBNAIL_STAGE_EXTRACTION    15
+#define THUMBNAIL_STAGE_VILLA         16
+#define THUMBNAIL_STAGE_CHICAGO       17
+#define THUMBNAIL_STAGE_G5BUILDING    18
+#define THUMBNAIL_STAGE_INFILTRATION  19
+#define THUMBNAIL_STAGE_RESCUE        20
+#define THUMBNAIL_STAGE_ESCAPE        21
+#define THUMBNAIL_STAGE_AIRBASE       22
+#define THUMBNAIL_STAGE_AIRFORCEONE   23
+#define THUMBNAIL_STAGE_CRASHSITE     24
+#define THUMBNAIL_STAGE_PELAGIC       25
+#define THUMBNAIL_STAGE_DEEPSEA       26
+#define THUMBNAIL_STAGE_DEFENSE       27
+#define THUMBNAIL_STAGE_ATTACKSHIP    28
+#define THUMBNAIL_STAGE_SKEDARRUINS   29
+#define THUMBNAIL_STAGE_MBR           30
+#define THUMBNAIL_STAGE_MAIANSOS      31
+#define THUMBNAIL_STAGE_WAR           32
+#define THUMBNAIL_STAGE_DUEL          33
+#define THUMBNAIL_MP_RANDOM           56
+#define THUMBNAIL_MP_SKEDAR           57
+#define THUMBNAIL_MP_PIPES            58
+#define THUMBNAIL_MP_RAVINE           59
+#define THUMBNAIL_MP_G5BUILDING       60
+#define THUMBNAIL_MP_SEWERS           61
+#define THUMBNAIL_MP_WAREHOUSE        62
+#define THUMBNAIL_MP_GRID             63
+#define THUMBNAIL_MP_RUINS            64
+#define THUMBNAIL_MP_AREA52           65
+#define THUMBNAIL_MP_BASE             66
+#define THUMBNAIL_MP_FORTRESS         67
+#define THUMBNAIL_MP_VILLA            68
+#define THUMBNAIL_MP_CARPARK          69
+#define THUMBNAIL_MP_TEMPLE           70
+#define THUMBNAIL_MP_COMPLEX          71
+#define THUMBNAIL_MP_FELICITY         72
 
 #define TICKMODE_GE_FADEIN  0
 #define TICKMODE_NORMAL     1

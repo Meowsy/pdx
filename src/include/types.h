@@ -4319,6 +4319,7 @@ struct mparena {
 	s16 stagenum;
 	u8 requirefeature;
 	u16 name;
+	u8 thumbnail;
 };
 
 struct filelistfile {

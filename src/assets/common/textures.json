@@ -1,0 +1,104 @@
+[
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_RANDOM",
+        "file": "thumbnails/Random.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_SKEDAR",
+        "file": "thumbnails/Skedar.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_PIPES",
+        "file": "thumbnails/Pipes.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_RAVINE",
+        "file": "thumbnails/Ravine.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_G5BUILDING",
+        "file": "thumbnails/G5 Building.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_SEWERS",
+        "file": "thumbnails/Sewers.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_WAREHOUSE",
+        "file": "thumbnails/Warehouse.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_GRID",
+        "file": "thumbnails/Grid.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_RUINS",
+        "file": "thumbnails/Ruins.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_AREA52",
+        "file": "thumbnails/Area 52.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_BASE",
+        "file": "thumbnails/Base.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_FORTRESS",
+        "file": "thumbnails/Fortress.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_VILLA",
+        "file": "thumbnails/Villa.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_CARPARK",
+        "file": "thumbnails/Car Park.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_TEMPLE",
+        "file": "thumbnails/Temple.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_COMPLEX",
+        "file": "thumbnails/Complex.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    },
+    {
+        "id": "TEXTURE_THUMBNAIL_MP_FELICITY",
+        "file": "thumbnails/Felicity.bin",
+        "flag00": 0,
+        "surfacetype": 0
+    }
+]

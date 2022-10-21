@@ -8,26 +8,42 @@ def main():
     fd = open('src/assets/%s/textures.json' % os.environ['ROMID'], 'r')
     data = fd.read()
     fd.close()
+    fd = open('src/assets/common/textures.json', 'r')
+    datacommon = fd.read()
+    fd.close()
 
     rows = json.loads(data)
+    rowscommon = json.loads(datacommon)
 
-    make_objects(rows)
-    make_header(rows)
+    make_objects(rows, rowscommon)
+    make_header(rows, rowscommon)
 
-def make_header(rows):
+def make_header(rows, rowscommon):
     typename = 'texturenum'
-    enums = [row['id'] for row in rows]
+    enums = [row['id'] for row in rows] + [row['id'] for row in rowscommon]
     filename = 'textures.h'
     terminator = 'TEXTURE_END'
     assetmgr.write_enums(typename, enums, filename, terminator)
 
-def make_objects(rows):
+def make_objects(rows, rowscommon):
     databinary = bytes()
     listbinary = bytes()
     pos = 0
 
     for row in rows:
         contents = getcontents('src/assets/%s/textures/%s' % (os.environ['ROMID'], row['file']))
+        flags = ((row['flag00'] & 0x0f) << 4) | (row['surfacetype'] & 0x0f)
+
+        databinary += contents
+
+        listbinary += flags.to_bytes(1, 'big')
+        listbinary += pos.to_bytes(3, 'big')
+        listbinary += b'\x00\x00\x00\x00'
+
+        pos += len(contents)
+
+    for row in rowscommon:
+        contents = getcontents('src/assets/common/textures/%s' % (row['file']))
         flags = ((row['flag00'] & 0x0f) << 4) | (row['surfacetype'] & 0x0f)
 
         databinary += contents

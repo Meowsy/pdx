@@ -6,7 +6,6 @@
 #include "bss.h"
 #include "data.h"
 #include "gbiex.h"
-#include "textures.h"
 #include "types.h"
 
 s32 g_TexLutMode;

@@ -165,6 +165,7 @@ C_DEFINES := $(foreach d,$(DEFINES),-D$(d))
 AS_DEFINES := $(foreach d,$(DEFINES),--defsym $(d)) --defsym _LANGUAGE_ASSEMBLY=1
 
 A_DIR := src/assets/$(ROMID)
+C_DIR := src/assets/common
 B_DIR := build/$(ROMID)
 E_DIR := extracted/$(ROMID)
 
@@ -641,7 +642,7 @@ $(B_DIR)/assets/sequences.o: $(A_DIR)/sequences.json
 	tools/assetmgr/mksequences
 
 # Textures
-$(B_DIR)/assets/textureslist.o: $(A_DIR)/textures.json
+$(B_DIR)/assets/textureslist.o: $(A_DIR)/textures.json $(C_DIR)/textures.json
 	tools/assetmgr/mktextures
 
 # Tiles
