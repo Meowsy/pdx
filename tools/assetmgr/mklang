@@ -33,6 +33,9 @@ def make_header(rows, shortname):
     assetmgr.write_enums(typename, enums, filename, terminator, start=start)
 
 def make_object(rows, basename, key):
+    if len(rows) > 512:
+        raise Exception(f"Text overflow; \"{basename}.json\" has {len(rows)} rows, which is {len(rows) - 512} more than supported.")
+
     binary = make_binary(rows, key)
     zipped = assetmgr.zip(binary)
 
