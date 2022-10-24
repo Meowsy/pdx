@@ -1,5 +1,6 @@
 #include <ultra64.h>
 #include "constants.h"
+#include "game/cheats.h"
 #include "game/chrai.h"
 #include "game/chraicommands.h"
 #include "game/prop.h"
@@ -66,7 +67,7 @@ bool challengeIsAvailable(s32 challengeindex)
 bool ChallengeIsAvailableToPlayer(s32 chrnum, s32 challengeindex)
 {
 	if ((g_MpSetup.chrslots & (1 << chrnum)) == 0) {
-		return 0;
+		return false;
 	}
 
 	return ((g_MpChallenges[challengeindex].availability & (2 << chrnum)) != 0);
@@ -116,6 +117,8 @@ void challengeDetermineUnlockedFeatures(void)
 			// Challenges are available if their previous one is complete
 			flag = 1;
 			numgifted++;
+		} else if (cheatIsActive(CHEAT_UNLOCKALLCONTENT)) {
+			flag = 1;
 		}
 #if VERSION == VERSION_NTSC_BETA || VERSION == VERSION_PAL_BETA
 		else if (debugIsAllChallengesEnabled()) {
@@ -813,11 +816,11 @@ void challengeConsiderMarkingComplete(void)
 	bool result = challengeIsCompleteForEndscreen();
 
 #if VERSION == VERSION_PAL_BETA
-	if ((g_CheatsActiveBank0 == 0 && g_CheatsActiveBank1 == 0) && (result || debugIsSetCompleteEnabled()))
+	if (!cheatAreInvalidatingCheatsActive() && (result || debugIsSetCompleteEnabled()))
 #elif VERSION >= VERSION_NTSC_1_0
-	if (g_CheatsActiveBank0 == 0 && g_CheatsActiveBank1 == 0 && result)
+	if (!cheatAreInvalidatingCheatsActive() && result)
 #else
-	if (result && g_CheatsActiveBank0 == 0 && g_CheatsActiveBank1 == 0)
+	if (result && !cheatAreInvalidatingCheatsActive())
 #endif
 	{
 		u32 prevplayernum;
@@ -838,7 +841,7 @@ void challengeConsiderMarkingComplete(void)
 
 bool challengeIsFeatureUnlocked(s32 featurenum)
 {
-	if (featurenum == 0) {
+	if (featurenum == MPFEATURE_ALWAYSUNLOCKED || cheatIsActive(CHEAT_UNLOCKALLCONTENT)) {
 		return true;
 	}
 
@@ -847,7 +850,7 @@ bool challengeIsFeatureUnlocked(s32 featurenum)
 
 bool challengeIsFeatureUnlockedByPlayer(u32 numplayers, s32 featurenum)
 {
-	if (featurenum == 0) {
+	if (featurenum == MPFEATURE_ALWAYSUNLOCKED || cheatIsActive(CHEAT_UNLOCKALLCONTENT)) {
 		return true;
 	}
 
@@ -856,7 +859,7 @@ bool challengeIsFeatureUnlockedByPlayer(u32 numplayers, s32 featurenum)
 
 bool challengeIsFeatureUnlockedByDefault(s32 featurenum)
 {
-	if (featurenum) {
+	if (featurenum != MPFEATURE_ALWAYSUNLOCKED) {
 		return false;
 	}
 

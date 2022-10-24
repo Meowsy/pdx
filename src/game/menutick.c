@@ -1,6 +1,7 @@
 #include <ultra64.h>
 #include "constants.h"
 #include "game/bossfile.h"
+#include "game/cheats.h"
 #include "game/game_006900.h"
 #include "game/title.h"
 #include "game/pdmode.h"
@@ -628,7 +629,7 @@ void menuTick(void)
 
 				if (g_Vars.coopplayernum >= 0
 						&& g_MissionConfig.stageindex <= SOLOSTAGEINDEX_SKEDARRUINS
-						&& ((!g_CheatsActiveBank0 && !g_CheatsActiveBank1) || isStageDifficultyUnlocked(g_MissionConfig.stageindex + 1, g_MissionConfig.difficulty))) {
+						&& ((!cheatAreInvalidatingCheatsActive()) || isStageDifficultyUnlocked(g_MissionConfig.stageindex + 1, g_MissionConfig.difficulty))) {
 					endscreenPushSolo();
 				} else if (g_Vars.restartlevel) {
 					mainChangeToStage(mainGetStageNum());
