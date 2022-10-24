@@ -101,6 +101,7 @@ void playerLaunchSlayerRocket(struct weaponobj *rocket);
 void playerSetGlobalDrawWorldOffset(s32 room);
 void playerSetGlobalDrawCameraOffset(void);
 bool playerIsHealthVisible(void);
+void playerSetBondCollisionsEnabled(bool enabled);
 void playerSetCameraMode(s32 mode);
 void playerSetCamPropertiesWithRoom(struct coord *pos, struct coord *up, struct coord *look, s32 room);
 void playerSetCamPropertiesWithoutRoom(struct coord *pos, struct coord *up, struct coord *look, s32 room);

@@ -1471,6 +1471,7 @@ s32 bgunTickIncReload(struct handweaponinfo *info, s32 handnum, struct hand *han
 {
 	u32 stack;
 	struct weaponfunc *func = gsetGetWeaponFunction(&hand->gset);
+	struct guncmd *reload_animation = weaponGetReloadAnim(info->weaponnum, (&hand->gset)->weaponfunc);
 
 	if (g_Vars.currentplayer->isdead) {
 		hand->animmode = HANDANIMMODE_IDLE;
@@ -1508,9 +1509,9 @@ s32 bgunTickIncReload(struct handweaponinfo *info, s32 handnum, struct hand *han
 	if (hand->stateminor == 0) {
 		if (hand->statecycles == 0) {
 			if (func && (func->ammoindex == 0 || func->ammoindex == 1)) {
-				if (info->definition->ammos[func->ammoindex]->reload_animation
+				if (reload_animation
 						&& info->weaponnum != WEAPON_COMBATKNIFE) {
-					bgunStartAnimation(info->definition->ammos[func->ammoindex]->reload_animation, handnum, hand);
+					bgunStartAnimation(reload_animation, handnum, hand);
 
 					hand->unk0d0e_07 = true;
 
@@ -1595,8 +1596,8 @@ s32 bgunTickIncReload(struct handweaponinfo *info, s32 handnum, struct hand *han
 		if (hand->count == 0) {
 			if (info->weaponnum == WEAPON_COMBATKNIFE
 					&& func->ammoindex >= 0
-					&& info->definition->ammos[func->ammoindex]->reload_animation) {
-				bgunStartAnimation(info->definition->ammos[func->ammoindex]->reload_animation, handnum, hand);
+					&& reload_animation) {
+				bgunStartAnimation(reload_animation, handnum, hand);
 				hand->unk0cc8_02 = true;
 			}
 

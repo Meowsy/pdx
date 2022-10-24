@@ -19670,6 +19670,10 @@ bool doorIsUnlocked(struct prop *playerprop, struct prop *doorprop)
 	struct doorobj *door = doorprop->door;
 	bool canopen = false;
 
+	if (cheatIsActive(CHEAT_UNLOCKALLDOORS)) {
+		return true;
+	}
+
 	if (door->keyflags == 0) {
 		canopen = true;
 	} else if (invHasKeyFlags(door->keyflags)) {

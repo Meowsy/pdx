@@ -68,5 +68,35 @@
         "fr": "Déverrouiller tout le contenu\n",
         "de": "Alle Inhalte freischalten\n",
         "es": "Desbloquear Todo el Contenido\n"
+    },
+    {
+        "id": "L_MPWEAPONS_CLASSICRELOADS",
+        "en": "Classic Reloads\n",
+        "gb": "Classic Reloads\n",
+        "jp": "クラシック リロード\n",
+        "it": "Ricariche classiche\n",
+        "fr": "Recharges classiques\n",
+        "de": "Klassisches Nachladen\n",
+        "es": "Recargas Clásica\n"
+    },
+    {
+        "id": "L_MPWEAPONS_UNLOCKALLDOORS",
+        "en": "Unlock All Doors\n",
+        "gb": "Unlock All Doors\n",
+        "jp": "すべてのドアのロックを解除\n",
+        "it": "Sblocca tutte le porte\n",
+        "fr": "Déverrouiller toutes les portes\n",
+        "de": "Entriegeln Sie alle Türen\n",
+        "es": "Desbloquear todas las puertas\n"
+    },
+    {
+        "id": "L_MPWEAPONS_JOPHASE",
+        "en": "Jo Phase\n",
+        "gb": "Jo Phase\n",
+        "jp": "ゴーストジョアンナ\n",
+        "it": "Fantasma Jo\n",
+        "fr": "Fantôme Joanna\n",
+        "de": "Geist Jo\n",
+        "es": "Fantasma Joanna\n"
     }
 ]

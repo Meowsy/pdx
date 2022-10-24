@@ -705,3 +705,18 @@ struct guncmd *gsetGetSecToPriAnim(struct gset *gset)
 
 	return NULL;
 }
+
+struct guncmd *weaponGetReloadAnim(s32 weaponnum, u8 weaponfunc)
+{
+	if (cheatIsActive(CHEAT_CLASSICRELOADS)) {
+		return NULL;
+	} else {
+		struct inventory_ammo *ammo = weaponGetAmmoByFunction(weaponnum, weaponfunc);
+
+		if (!ammo) {
+			return NULL;
+		}
+
+		return ammo->reload_animation;
+	}
+}

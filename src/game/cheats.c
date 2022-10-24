@@ -55,6 +55,7 @@ struct cheat g_Cheats[NUM_CHEATS] = {
 	{ CHEATCAT_CLASSICWEAPONS,  CHEAT_AR53,                   L_MPWEAPONS_115,                0,                 0,                             0,                 CHEATFLAG_INVALIDATING | CHEATFLAG_FIRINGRANGE,                                         { CHEAT_NONE }, { { WEAPON_FARSIGHT,     FRDIFFICULTY_GOLD, }, { WEAPON_CROSSBOW,      FRDIFFICULTY_GOLD, }, { WEAPON_COMBATKNIFE,      FRDIFFICULTY_GOLD, }, { WEAPON_GRENADE,     FRDIFFICULTY_GOLD, },                                             }, }, // AR53
 	{ CHEATCAT_CLASSICWEAPONS,  CHEAT_RCP45,                  L_MPWEAPONS_116,                0,                 0,                             0,                 CHEATFLAG_INVALIDATING | CHEATFLAG_FIRINGRANGE,                                         { CHEAT_NONE }, { { WEAPON_TRANQUILIZER, FRDIFFICULTY_GOLD, }, { WEAPON_REAPER,        FRDIFFICULTY_GOLD, }, { WEAPON_DEVASTATOR,       FRDIFFICULTY_GOLD, },                                                                                         }, }, // RC-P45
 	{ CHEATCAT_WEAPONS,         CHEAT_CLASSICSIGHT,           L_MPWEAPONS_090,                0,                 SOLOSTAGEINDEX_DEFECTION,      DIFF_A,            CHEATFLAG_COMPLETION,                                                                   { CHEAT_NONE }, }, // Classic Sight
+	{ CHEATCAT_WEAPONS,         CHEAT_CLASSICRELOADS,         L_MPWEAPONS_CLASSICRELOADS,     0,                 SOLOSTAGEINDEX_DEFECTION,      DIFF_A,            CHEATFLAG_INVALIDATING | CHEATFLAG_COMPLETION,                                          { CHEAT_NONE }, }, // Classic Reloads
 	{ CHEATCAT_WEAPONS,         CHEAT_UNLIMITEDAMMOLAPTOP,    L_MPWEAPONS_094,                TIME(3 m, 55 s),   SOLOSTAGEINDEX_AIRFORCEONE,    DIFF_PA,           CHEATFLAG_INVALIDATING | CHEATFLAG_TIMED,                                               { CHEAT_NONE }, }, // Unlimited Ammo - Laptop Sentry Gun
 	{ CHEATCAT_WEAPONS,         CHEAT_HURRICANEFISTS,         L_MPWEAPONS_075,                TIME(2 m,  3 s),   SOLOSTAGEINDEX_EXTRACTION,     DIFF_A,            CHEATFLAG_INVALIDATING | CHEATFLAG_TIMED | CHEATFLAG_TRANSFERPAK,                       { CHEAT_NONE }, }, // Hurricane Fists
 	{ CHEATCAT_WEAPONS,         CHEAT_UNLIMITEDAMMO,          L_MPWEAPONS_079,                TIME(7 m,  7 s),   SOLOSTAGEINDEX_PELAGIC,        DIFF_SA,           CHEATFLAG_INVALIDATING | CHEATFLAG_TIMED,                                               { CHEAT_NONE }, }, // Unlimited Ammo
@@ -68,6 +69,8 @@ struct cheat g_Cheats[NUM_CHEATS] = {
 	{ CHEATCAT_BUDDIES,         CHEAT_HITANDRUN,              L_MPWEAPONS_099,                TIME(2 m, 30 s),   SOLOSTAGEINDEX_VILLA,          DIFF_SA,           CHEATFLAG_INVALIDATING | CHEATFLAG_TIMED,                                               { CHEAT_VELVETDARK, CHEAT_PUGILIST, CHEAT_HOTSHOT,   CHEAT_ALIEN,     CHEAT_NONE }, }, // Hit and Run
 	{ CHEATCAT_BUDDIES,         CHEAT_ALIEN,                  L_MPWEAPONS_100,                TIME(5 m, 17 s),   SOLOSTAGEINDEX_ATTACKSHIP,     DIFF_SA,           CHEATFLAG_INVALIDATING | CHEATFLAG_TIMED,                                               { CHEAT_VELVETDARK, CHEAT_PUGILIST, CHEAT_HOTSHOT,   CHEAT_HITANDRUN, CHEAT_NONE }, }, // Alien
 	{ CHEATCAT_DEBUG,           CHEAT_UNLOCKALLCONTENT,       L_MPWEAPONS_UNLOCKALLCONTENT,   0,                 0,                             0,                 CHEATFLAG_ALWAYSAVAILABLE,                                                              { CHEAT_NONE }, }, // Unlock All Content
+	{ CHEATCAT_DEBUG,           CHEAT_UNLOCKALLDOORS,         L_MPWEAPONS_UNLOCKALLDOORS,     0,                 0,                             0,                 CHEATFLAG_INVALIDATING | CHEATFLAG_ALWAYSAVAILABLE,                                     { CHEAT_NONE }, }, // Open Any Door
+	{ CHEATCAT_DEBUG,           CHEAT_JOPHASE,                L_MPWEAPONS_JOPHASE,            0,                 0,                             0,                 CHEATFLAG_INVALIDATING | CHEATFLAG_ALWAYSAVAILABLE,                                     { CHEAT_NONE }, }, // Jo Phase
 };
 
 u16 cheatcategorynames[NUM_CHEATCATS] = {
@@ -171,6 +174,9 @@ void cheatActivate(s32 cheat_id)
 
 		setCurrentPlayerNum(prevplayernum);
 		break;
+	case CHEAT_JOPHASE:
+		playerSetBondCollisionsEnabled(false);
+		break;
 	}
 
 	cheatGetFromCheatnum(cheat_id)->active = true;
@@ -203,6 +209,9 @@ void cheatDeactivate(s32 cheat_id)
 
 			setCurrentPlayerNum(prevplayernum);
 		}
+		break;
+	case CHEAT_JOPHASE:
+		playerSetBondCollisionsEnabled(true);
 		break;
 	}
 
