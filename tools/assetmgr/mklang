@@ -11,10 +11,17 @@ def main():
     data = fd.read()
     fd.close()
 
+    rows = json.loads(data)
+
+    commonpath = sys.argv[1].replace(os.environ['ROMID'], 'common')
+    if (os.path.exists(commonpath)):
+        fd = open(commonpath, 'r')
+        data = fd.read()
+        fd.close()
+        rows += json.loads(data)
+
     basename = os.path.basename(sys.argv[1]).replace('.json', '')
     shortname = get_shortname(basename)
-
-    rows = json.loads(data)
 
     if sys.argv[2] == 'en':
         make_header(rows, shortname)
