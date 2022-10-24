@@ -25,8 +25,14 @@ s32 cheatGetByCompletedStageIndex(s32 stage_index);
 s32 cheatGetTime(s32 cheat_id);
 char *cheatGetName(s32 cheat_id);
 s32 cheatMenuHandleDialog(s32 operation, struct menudialogdef *dialogdef, union handlerdata *data);
+struct cheat *cheatGetNthInCategory(u8 n, u8 category);
+s32 cheatGetCountForCategory(s32 category);
+struct cheat *cheatGetFromCheatnum(u8 cheatnum);
 s32 cheatCheckboxMenuHandler(s32 operation, struct menuitem *item, union handlerdata *data);
 s32 cheatMenuHandleBuddyCheckbox(s32 operation, struct menuitem *item, union handlerdata *data);
 s32 cheatMenuHandleTurnOffAllCheats(s32 operation, struct menuitem *item, union handlerdata *data);
+s32 menuhandlerCheatCategory(s32 operation, struct menuitem *item, union handlerdata *data);
+s32 cheatAreInvalidatingCheatsActive();
+s32 cheatAreInvalidatingCheatsEnabled();
 
 #endif

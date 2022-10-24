@@ -1,6 +1,7 @@
 #include <ultra64.h>
 #include "constants.h"
 #include "game/camdraw.h"
+#include "game/cheats.h"
 #include "game/title.h"
 #include "game/pdmode.h"
 #include "game/bondgun.h"
@@ -2282,7 +2283,7 @@ void mpCalculateAwards(void)
 
 		mpplayer->medals = 0;
 
-		if (!g_CheatsActiveBank0 && !g_CheatsActiveBank1) {
+		if (!cheatAreInvalidatingCheatsActive()) {
 			mpplayer->kills += metrics[i].numkills;
 			mpplayer->deaths += metrics[i].numdeaths;
 			mpplayer->gamesplayed++;
@@ -2549,7 +2550,7 @@ void mpCalculateAwards(void)
 			}
 		}
 
-		if (!g_CheatsActiveBank0 && !g_CheatsActiveBank1) {
+		if (!cheatAreInvalidatingCheatsActive()) {
 			if (mostkillsplayer < 4 && mostkillsplayer >= 0) {
 				struct mpplayerconfig *mpplayer = (struct mpplayerconfig *)MPCHR(mostkillsplayer);
 				mpplayer->medals |= MEDAL_KILLMASTER;
@@ -2565,7 +2566,7 @@ void mpCalculateAwards(void)
 	}
 
 	// Calculate Headshot and Accuracy medals
-	if (!g_CheatsActiveBank0 && !g_CheatsActiveBank1 && playercount >= 2) {
+	if (!cheatAreInvalidatingCheatsActive() && playercount >= 2) {
 		s32 mostheadshotvalue = 0;
 		f32 mostaccuratevalue = 0.5f;
 		s32 mostheadshotplayer = -1;
