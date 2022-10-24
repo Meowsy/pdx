@@ -585,6 +585,11 @@ s32 cheatMenuHandleTurnOffAllCheats(s32 operation, struct menuitem *item, union 
 		s32 i;
 		for (i = 0; i < NUM_CHEATS; i++) {
 			g_Cheats[i].enabled = false;
+			g_Cheats[i].active = false;
+		}
+
+		for (i = 0; i < NUM_CHEATS; i++) {
+			g_Cheats[i].unlocked = cheatIsUnlocked(g_Cheats[i].cheat_id);
 		}
 	}
 
