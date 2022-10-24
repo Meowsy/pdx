@@ -230,7 +230,7 @@ void gamefileLoadDefaults(struct gamefile *file)
 		}
 	}
 
-	for (i = 0; i < 30; i++) {
+	for (i = 0; i < ARRAYCOUNT(g_MpChallenges); i++) {
 		for (j = 1; j != 5; j++) {
 			challengeSetCompletedByAnyPlayerWithNumPlayers(i, j, false);
 		}
@@ -324,7 +324,7 @@ s32 gamefileLoad(s32 device)
 				}
 			}
 
-			for (i = 0; i < 30; i++) {
+			for (i = 0; i < ARRAYCOUNT(g_MpChallenges); i++) {
 				for (j = 1; j < 5; j++) {
 					challengeSetCompletedByAnyPlayerWithNumPlayers(i, j, savebufferReadBits(&buffer, 1));
 				}
@@ -493,7 +493,7 @@ s32 gamefileSave(s32 device, s32 fileid, u16 deviceserial)
 			}
 		}
 
-		for (i = 0; i < 30; i++) {
+		for (i = 0; i < ARRAYCOUNT(g_MpChallenges); i++) {
 			for (j = 1; j < 5; j++) {
 				savebufferOr(&buffer, challengeIsCompletedByAnyPlayerWithNumPlayers(i, j), 1);
 			}

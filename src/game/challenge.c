@@ -89,14 +89,14 @@ void challengeDetermineUnlockedFeatures(void)
 	s32 k;
 
 	// Clear all challenge availability
-	for (challengeindex = 0; challengeindex < 30; challengeindex++) {
+	for (challengeindex = 0; challengeindex < ARRAYCOUNT(g_MpChallenges); challengeindex++) {
 		g_MpChallenges[challengeindex].availability = 0;
 	}
 
 	numgifted = 0;
 
 	// Mark challenges completed by any player
-	for (challengeindex = 0; challengeindex < 30; challengeindex++) {
+	for (challengeindex = 0; challengeindex < ARRAYCOUNT(g_MpChallenges); challengeindex++) {
 		flag = 0;
 
 		if (challengeIsCompletedByAnyPlayerWithNumPlayers(challengeindex, 1)
@@ -130,7 +130,7 @@ void challengeDetermineUnlockedFeatures(void)
 	}
 
 	// Gift up to 4 challenges
-	for (challengeindex = 0; numgifted < 4 && challengeindex < 30; challengeindex++) {
+	for (challengeindex = 0; numgifted < 4 && challengeindex < ARRAYCOUNT(g_MpChallenges); challengeindex++) {
 		if ((g_MpChallenges[challengeindex].availability & 1) == 0) {
 			g_MpChallenges[challengeindex].availability |= 1;
 			numgifted++;
@@ -141,7 +141,7 @@ void challengeDetermineUnlockedFeatures(void)
 	for (j = 0; j < 4; j++) {
 		numgifted = 0;
 
-		for (challengeindex = 0; challengeindex < 30; challengeindex++) {
+		for (challengeindex = 0; challengeindex < ARRAYCOUNT(g_MpChallenges); challengeindex++) {
 			flag = 0;
 
 			if (challengeIsCompletedByPlayerWithNumPlayers(j, challengeindex, 1)
@@ -171,7 +171,7 @@ void challengeDetermineUnlockedFeatures(void)
 		}
 
 		// Gift up to 4 challenges
-		for (challengeindex = 0; numgifted < 4 && challengeindex < 30; challengeindex++) {
+		for (challengeindex = 0; numgifted < 4 && challengeindex < ARRAYCOUNT(g_MpChallenges); challengeindex++) {
 			if ((g_MpChallenges[challengeindex].availability & (2 << j)) == 0) {
 				g_MpChallenges[challengeindex].availability |= 2 << j;
 				numgifted++;
@@ -182,7 +182,7 @@ void challengeDetermineUnlockedFeatures(void)
 	for (j = 0; j < ARRAYCOUNT(g_MpFeaturesUnlocked); j++) {
 		flag = 0;
 
-		for (challengeindex = 0; challengeindex < 30; challengeindex++) {
+		for (challengeindex = 0; challengeindex < ARRAYCOUNT(g_MpChallenges); challengeindex++) {
 			if (challengeIsAvailableToAnyPlayer(challengeindex)) {
 				for (i = 0; i < 16; i++) {
 					if (g_MpChallenges[challengeindex].unlockfeatures[i] == j) {
@@ -198,7 +198,7 @@ void challengeDetermineUnlockedFeatures(void)
 			}
 		}
 
-		for (challengeindex = 0; challengeindex < 30; challengeindex++) {
+		for (challengeindex = 0; challengeindex < ARRAYCOUNT(g_MpChallenges); challengeindex++) {
 			for (prev = 0; prev < 4; prev++) {
 				if (ChallengeIsAvailableToPlayer(prev, challengeindex)) {
 					for (i = 0; i < 16; i++) {
@@ -296,7 +296,7 @@ char *challengeGetNameBySlot(s32 slot)
 	s32 index = 0;
 	s32 i;
 
-	for (i = 0; i < 30; i++) {
+	for (i = 0; i < ARRAYCOUNT(g_MpChallenges); i++) {
 		if (challengeIsAvailableToAnyPlayer(i)) {
 			if (index == slot) {
 				return challengeGetName(i);
@@ -338,7 +338,7 @@ bool challengeIsCompletedByAnyChrWithNumPlayersBySlot(s32 slot, s32 numplayers)
 	s32 availableindex = 0;
 	s32 i;
 
-	for (i = 0; i < 30; i++) {
+	for (i = 0; i < ARRAYCOUNT(g_MpChallenges); i++) {
 		if (challengeIsAvailableToAnyPlayer(i)) {
 			if (availableindex == slot) {
 				return challengeIsCompletedByAnyPlayerWithNumPlayers(i, numplayers);
@@ -356,7 +356,7 @@ bool challengeIsCompletedByChrWithNumPlayersBySlot(s32 mpchrnum, s32 slot, s32 n
 	s32 availableindex = 0;
 	s32 i;
 
-	for (i = 0; i < 30; i++) {
+	for (i = 0; i < ARRAYCOUNT(g_MpChallenges); i++) {
 		if (challengeIsAvailableToAnyPlayer(i)) {
 			if (availableindex == slot) {
 				return challengeIsCompletedByPlayerWithNumPlayers(mpchrnum, i, numplayers);

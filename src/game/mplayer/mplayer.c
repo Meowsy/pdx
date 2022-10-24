@@ -435,7 +435,7 @@ void mpPlayerSetDefaults(s32 playernum, bool autonames)
 	g_PlayerConfigsArray[playernum].title = MPPLAYERTITLE_BEGINNER;
 
 	if (playernum < 4) {
-		for (i = 0; i < 30; i++) {
+		for (i = 0; i < ARRAYCOUNT(g_MpChallenges); i++) {
 			for (j = 1; j <= 4; j++) {
 				challengeSetCompletedByPlayerWithNumPlayers(playernum, i, j, false);
 			}
@@ -4953,7 +4953,7 @@ void mpplayerfileLoadWad(s32 playernum, struct savebuffer *buffer, s32 arg2)
 	g_PlayerConfigsArray[playernum].controlmode = savebufferReadBits(buffer, 2);
 	g_PlayerConfigsArray[playernum].options = savebufferReadBits(buffer, 12);
 
-	for (i = 0; i < 30; i++) {
+	for (i = 0; i < ARRAYCOUNT(g_MpChallenges); i++) {
 		for (j = 1; j < 5; j++) {
 			challengeSetCompletedByPlayerWithNumPlayers(playernum, i, j, savebufferReadBits(buffer, 1));
 		}
@@ -5086,7 +5086,7 @@ void mpplayerfileSaveWad(s32 playernum, struct savebuffer *buffer)
 	savebufferOr(buffer, g_PlayerConfigsArray[playernum].controlmode, 2);
 	savebufferOr(buffer, g_PlayerConfigsArray[playernum].options, 12);
 
-	for (i = 0; i < 30; i++) {
+	for (i = 0; i < ARRAYCOUNT(g_MpChallenges); i++) {
 		for (j = 1; j < 5; j++) {
 			savebufferOr(buffer, challengeIsCompletedByPlayerWithNumPlayers(playernum, i, j), 1);
 		}
