@@ -4659,7 +4659,11 @@ s32 menuhandlerCinema(s32 operation, struct menuitem *item, union handlerdata *d
 			// Play all
 			s32 index = getNumCompletedMissions();
 			g_Vars.autocutgroupcur = 0;
-			g_Vars.autocutgroupleft = g_CutsceneCountsByMission[index];
+			if (cheatIsActive(CHEAT_UNLOCKALLCONTENT)) {
+				g_Vars.autocutgroupleft = g_CutsceneCountsByMission[ARRAYCOUNT(g_CutsceneCountsByMission) - 1];
+			} else {
+				g_Vars.autocutgroupleft = g_CutsceneCountsByMission[index];
+			}
 			menuPopDialog();
 			menuStop();
 		} else {
