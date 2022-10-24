@@ -23,11 +23,11 @@
         "id": "L_MPWEAPONS_AND",
         "en": "and ",
         "gb": "and ",
-        "jp": "JAPANESE",
-        "it": "ITALIAN",
-        "fr": "FRENCH",
-        "de": "GERMAN",
-        "es": "SPANISH"
+        "jp": "と",
+        "it": "e ",
+        "fr": "et ",
+        "de": "und ",
+        "es": "y "
     },
     {
         "id": "L_MPWEAPONS_OXFORDAND",
@@ -43,11 +43,11 @@
         "id": "L_MPWEAPONS_COMMA",
         "en": ", ",
         "gb": ", ",
-        "jp": "JAPANESE",
-        "it": "ITALIAN",
-        "fr": "FRENCH",
-        "de": "GERMAN",
-        "es": "SPANISH"
+        "jp": ", ",
+        "it": ", ",
+        "fr": ", ",
+        "de": ", ",
+        "es": ", "
     },
     {
         "id": "L_MPWEAPONS_DEBUG",
