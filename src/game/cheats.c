@@ -173,15 +173,6 @@ void cheatActivate(s32 cheat_id)
 		break;
 	}
 
-	if (cheat_id < 32) {
-		g_CheatsActiveBank0 = g_CheatsActiveBank0 | (1 << cheat_id);
-	} else {
-		g_CheatsActiveBank1 = g_CheatsActiveBank1 | (1 << cheat_id);
-	}
-}
-
-	}
-
 	cheatGetFromCheatnum(cheat_id)->active = true;
 }
 
