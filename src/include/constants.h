@@ -363,6 +363,16 @@
 #define BRIEFINGTYPE_TEXT_SA  2
 #define BRIEFINGTYPE_TEXT_A   3
 
+enum buddies {
+	BUDDY_NONE,
+	BUDDY_VELVETDARK,
+	BUDDY_PUGILIST,
+	BUDDY_HOTSHOT,
+	BUDDY_HITANDRUN,
+	BUDDY_ALIEN,
+	NUM_BUDDIES
+};
+
 #define CAMERAMODE_DEFAULT     0
 #define CAMERAMODE_THIRDPERSON 1
 #define CAMERAMODE_EYESPY      2
@@ -484,6 +494,7 @@ enum cheatcats {
 #define CHRANIMFLAG_REVERSE       0x80
 
 // chr->flags
+#define CHRFLAG0_NONE               0x00000000
 #define CHRFLAG0_CANT_ALERT_GROUP   0x00000001 // Don't set group alertness when becoming aware
 #define CHRFLAG0_UNUSED_00000002    0x00000002
 #define CHRFLAG0_GP1                0x00000004 // General purpose
@@ -3041,6 +3052,7 @@ enum cheatcats {
 #define OBJECTIVEFLAG_AUTOCOMPLETE 0x01
 
 // obj->flags
+#define OBJFLAG_NONE                       0x00000000
 #define OBJFLAG_00000001                   0x00000001 // Editor: "Fall to Ground"
 #define OBJFLAG_00000002                   0x00000002 // Editor: "In Air Rotated 90 Deg Upside-Down"
 #define OBJFLAG_00000004                   0x00000004 // Editor: "In Air Upside-Down"

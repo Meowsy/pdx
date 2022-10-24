@@ -2,6 +2,7 @@
 #include "constants.h"
 #include "game/bondeyespy.h"
 #include "game/bondmove.h"
+#include "game/buddies.h"
 #include "game/cheats.h"
 #include "game/chraction.h"
 #include "game/floor.h"
@@ -4002,254 +4003,72 @@ void playerTick(bool arg0)
 
 		if (g_Vars.normmplayerisrunning == false
 				&& g_MissionConfig.iscoop
-				&& g_Vars.numaibuddies > 0
+				&& playerSimulantBuddiesCount() > 0
 				&& !g_Vars.aibuddiesspawned
 				&& g_Vars.stagenum != STAGE_CITRAINING
 				&& g_Vars.lvframenum > 20) {
 			g_Vars.aibuddiesspawned = true;
 
 			// Spawn coop bots
-			for (i = 0; i < g_Vars.numaibuddies; i++) {
+			for (i = 0; i < ARRAYCOUNT(g_Vars.aibuddies); i++) {
+				struct buddy buddy = g_Buddies[g_Vars.aibuddytype[i]];
+				if (g_Vars.aibuddytype[i] == BUDDY_NONE) {
+					continue;
+				}
+
 				prop = NULL;
 
-				// If no buddy cheats are active, spawn Velvet
-				if (!cheatIsActive(CHEAT_PUGILIST)
-						&& !cheatIsActive(CHEAT_HOTSHOT)
-						&& !cheatIsActive(CHEAT_HITANDRUN)
-						&& !cheatIsActive(CHEAT_ALIEN)) {
-					if (stageGetIndex(g_Vars.stagenum) == STAGEINDEX_AIRBASE) {
-						prop = chrSpawnAtCoord(BODY_DARK_COMBAT, HEAD_VD,
-								&g_Vars.currentplayer->prop->pos,
-								g_Vars.currentplayer->prop->rooms,
-								BADDEG2RAD(g_Vars.currentplayer->vv_theta / 2),
-								ailistFindById(GAILIST_INIT_DEFAULT_BUDDY),
-								SPAWNFLAG_00000010);
-					} else if (stageGetIndex(g_Vars.stagenum) == STAGEINDEX_MBR) {
-						prop = chrSpawnAtCoord(BODY_MRBLONDE, HEAD_MRBLONDE,
-								&g_Vars.currentplayer->prop->pos,
-								g_Vars.currentplayer->prop->rooms,
-								BADDEG2RAD(g_Vars.currentplayer->vv_theta),
-								ailistFindById(GAILIST_INIT_DEFAULT_BUDDY),
-								SPAWNFLAG_00000010);
-					} else {
-						prop = chrSpawnAtCoord(BODY_DARK_COMBAT, HEAD_VD,
-								&g_Vars.currentplayer->prop->pos,
-								g_Vars.currentplayer->prop->rooms,
-								BADDEG2RAD(g_Vars.currentplayer->vv_theta / 2),
-								ailistFindById(GAILIST_INIT_DEFAULT_BUDDY),
-								SPAWNFLAG_00000010);
-					}
-
-					if (prop) {
-						chr = prop->chr;
-						chr->flags |= CHRFLAG0_SKIPSAFETYCHECKS;
-						chr->flags2 |= CHRFLAG1_IGNORECOVER | CHRFLAG1_NOOP_00200000 | CHRFLAG1_AIVSAI_ADVANTAGED;
-						chr->team = TEAM_ALLY;
-						chr->squadron = SQUADRON_01;
-						chr->hidden |= CHRHFLAG_DETECTED;
-						chr->voicebox = VOICEBOX_FEMALE;
-						chr->teamscandist = 50;
-						chr->accuracyrating = 100;
-						chr->speedrating = 100;
-
-						if (stageGetIndex(g_Vars.stagenum) == STAGEINDEX_AIRBASE) {
-							chrAddHealth(chr, 40);
-						} else {
-							chrAddHealth(chr, 20);
-						}
-
-						chrSetMaxDamage(chr, 4);
-
-						chr->chrflags |= CHRCFLAG_00040000;
-						chr->hidden |= CHRHFLAG_CLOAKED;
-						chr->cloakfadefinished = true;
-						chr->cloakfadefrac = 0;
-
-						chrGiveWeapon(chr, MODEL_CHRFALCON2, WEAPON_FALCON2, 0);
-					}
+				if (stageGetIndex(g_Vars.stagenum) == STAGEINDEX_MBR) {
+					prop = chrSpawnAtCoord(BODY_MRBLONDE, HEAD_MRBLONDE,
+							&g_Vars.currentplayer->prop->pos,
+							g_Vars.currentplayer->prop->rooms,
+							BADDEG2RAD(g_Vars.currentplayer->vv_theta),
+							ailistFindById(GAILIST_INIT_DEFAULT_BUDDY),
+							SPAWNFLAG_00000010);
 				}
 
-				if (cheatIsActive(CHEAT_PUGILIST)) {
-					if (stageGetIndex(g_Vars.stagenum) == STAGEINDEX_MBR) {
-						prop = chrSpawnAtCoord(BODY_MRBLONDE, HEAD_MRBLONDE,
+				if (!prop) {
+					prop = chrSpawnAtCoord(buddy.body, buddy.head,
 								&g_Vars.currentplayer->prop->pos,
 								g_Vars.currentplayer->prop->rooms,
 								BADDEG2RAD(g_Vars.currentplayer->vv_theta),
-								ailistFindById(GAILIST_INIT_DEFAULT_BUDDY),
+								ailistFindById(buddy.ailist),
 								SPAWNFLAG_00000010);
-					} else {
-						prop = chrSpawnAtCoord(BODY_CARRINGTON, HEAD_JAMIE,
-								&g_Vars.currentplayer->prop->pos,
-								g_Vars.currentplayer->prop->rooms,
-								BADDEG2RAD(g_Vars.currentplayer->vv_theta),
-								ailistFindById(GAILIST_INIT_PUGILIST_BUDDY),
-								SPAWNFLAG_00000010);
-					}
-
-					if (prop) {
-						chr = prop->chr;
-						chr->flags |= CHRFLAG0_SKIPSAFETYCHECKS | CHRFLAG0_CHUCKNORRIS;
-						chr->flags2 |= CHRFLAG1_IGNORECOVER | CHRFLAG1_NOOP_00200000 | CHRFLAG1_AIVSAI_ADVANTAGED | CHRFLAG1_ADJUSTPUNCHSPEED | CHRFLAG1_HANDCOMBATONLY;
-						chr->team = TEAM_ALLY;
-						chr->squadron = SQUADRON_01;
-						chr->teamscandist = 100;
-						chr->hidden |= CHRHFLAG_DETECTED;
-						chr->voicebox = VOICEBOX_MALE1;
-						chr->accuracyrating = 100;
-						chr->speedrating = 100;
-
-						if (stageGetIndex(g_Vars.stagenum) == STAGEINDEX_AIRBASE) {
-							chrAddHealth(chr, 40);
-						} else {
-							chrAddHealth(chr, 20);
-						}
-
-						chr->chrflags |= CHRCFLAG_00040000;
-						chr->hidden |= CHRHFLAG_CLOAKED;
-						chr->cloakfadefinished = true;
-						chr->cloakfadefrac = 0;
-
-						chrSetMaxDamage(chr, 20);
-					}
 				}
 
-				if (cheatIsActive(CHEAT_HITANDRUN)) {
-					if (stageGetIndex(g_Vars.stagenum) == STAGEINDEX_MBR) {
-						prop = chrSpawnAtCoord(BODY_MRBLONDE, HEAD_MRBLONDE,
-								&g_Vars.currentplayer->prop->pos,
-								g_Vars.currentplayer->prop->rooms,
-								BADDEG2RAD(g_Vars.currentplayer->vv_theta),
-								ailistFindById(GAILIST_INIT_DEFAULT_BUDDY),
-								SPAWNFLAG_00000010);
-					} else {
-						prop = chrSpawnAtCoord(BODY_MRBLONDE, HEAD_MARK2,
-								&g_Vars.currentplayer->prop->pos,
-								g_Vars.currentplayer->prop->rooms,
-								BADDEG2RAD(g_Vars.currentplayer->vv_theta),
-								ailistFindById(GAILIST_INIT_DEFAULT_BUDDY),
-								SPAWNFLAG_00000010);
-					}
-
-					if (prop) {
-						chr = prop->chr;
-						chr->flags |= CHRFLAG0_SKIPSAFETYCHECKS;
-						chr->flags2 |= CHRFLAG1_PUNCHHARDER | CHRFLAG1_NOOP_00200000 | CHRFLAG1_AIVSAI_ADVANTAGED;
-						chr->team = TEAM_ALLY;
-						chr->squadron = SQUADRON_01;
-						chr->hidden |= CHRHFLAG_DETECTED;
-						chr->voicebox = VOICEBOX_MALE2;
-						chr->teamscandist = 50;
-						chr->accuracyrating = 50;
-						chr->speedrating = 100;
-
-						if (stageGetIndex(g_Vars.stagenum) == STAGEINDEX_AIRBASE) {
-							chrAddHealth(chr, 20);
-						} else {
-							chrAddHealth(chr, 10);
-						}
-
-						chrSetMaxDamage(chr, 10);
-
-						chr->chrflags |= CHRCFLAG_00040000;
-						chr->hidden |= CHRHFLAG_CLOAKED;
-						chr->cloakfadefinished = true;
-						chr->cloakfadefrac = 0;
-
-						chrGiveWeapon(chr, MODEL_CHRAVENGER, WEAPON_K7AVENGER, 0);
-					}
+				if (!prop) {
+					continue;
 				}
 
-				if (cheatIsActive(CHEAT_HOTSHOT)) {
-					if (stageGetIndex(g_Vars.stagenum) == STAGEINDEX_MBR) {
-						prop = chrSpawnAtCoord(BODY_MRBLONDE, HEAD_MRBLONDE,
-								&g_Vars.currentplayer->prop->pos,
-								g_Vars.currentplayer->prop->rooms,
-								BADDEG2RAD(g_Vars.currentplayer->vv_theta),
-								ailistFindById(GAILIST_INIT_DEFAULT_BUDDY),
-								SPAWNFLAG_00000010);
-					} else {
-						prop = chrSpawnAtCoord(BODY_CISOLDIER, HEAD_CHRIST,
-								&g_Vars.currentplayer->prop->pos,
-								g_Vars.currentplayer->prop->rooms,
-								BADDEG2RAD(g_Vars.currentplayer->vv_theta),
-								ailistFindById(GAILIST_INIT_DEFAULT_BUDDY),
-								SPAWNFLAG_00000010);
-					}
+				chr = prop->chr;
+				chr->flags |= CHRFLAG0_SKIPSAFETYCHECKS | buddy.flags1;
+				chr->flags2 |= CHRFLAG1_NOOP_00200000 | CHRFLAG1_AIVSAI_ADVANTAGED | buddy.flags2;
+				chr->team = TEAM_ALLY;
+				chr->squadron = SQUADRON_01;
+				chr->hidden |= CHRHFLAG_DETECTED;
+				chr->voicebox = buddy.voicebox;
+				chr->teamscandist = buddy.teamscandist;
+				chr->accuracyrating = buddy.accuracyrating;
+				chr->speedrating = buddy.speedrating;
+				chr->chrflags |= CHRCFLAG_00040000;
+				chr->hidden |= CHRHFLAG_CLOAKED;
+				chr->cloakfadefinished = true;
+				chr->cloakfadefrac = 0;
 
-					if (prop) {
-						chr = prop->chr;
-						chr->flags |= CHRFLAG0_SKIPSAFETYCHECKS;
-						chr->flags2 |= CHRFLAG1_IGNORECOVER | CHRFLAG1_NOOP_00200000 | CHRFLAG1_AIVSAI_ADVANTAGED;
-						chr->team = TEAM_ALLY;
-						chr->squadron = SQUADRON_01;
-						chr->hidden |= CHRHFLAG_DETECTED;
-						chr->voicebox = VOICEBOX_MALE0;
-						chr->teamscandist = 100;
-						chr->accuracyrating = 50;
-						chr->speedrating = 100;
+				chrSetMaxDamage(chr, buddy.maxdamage);
 
-						if (stageGetIndex(g_Vars.stagenum) == STAGEINDEX_AIRBASE) {
-							chrAddHealth(chr, 40);
-						} else {
-							chrAddHealth(chr, 20);
-						}
-
-						chrSetMaxDamage(chr, 10);
-
-						chr->chrflags |= CHRCFLAG_00040000;
-						chr->hidden |= CHRHFLAG_CLOAKED;
-						chr->cloakfadefinished = true;
-						chr->cloakfadefrac = 0;
-
-						chrGiveWeapon(chr, MODEL_CHRDY357TRENT, WEAPON_DY357LX, 0);
-						chrGiveWeapon(chr, MODEL_CHRDY357, WEAPON_DY357MAGNUM, OBJFLAG_WEAPON_LEFTHANDED);
-					}
+				if (stageGetIndex(g_Vars.stagenum) == STAGEINDEX_AIRBASE) {
+					chrAddHealth(chr, buddy.health * 2);
+				} else {
+					chrAddHealth(chr, buddy.health);
 				}
 
-				if (cheatIsActive(CHEAT_ALIEN)) {
-					if (stageGetIndex(g_Vars.stagenum) == STAGEINDEX_MBR) {
-						prop = chrSpawnAtCoord(BODY_MRBLONDE, HEAD_MRBLONDE,
-								&g_Vars.currentplayer->prop->pos,
-								g_Vars.currentplayer->prop->rooms,
-								BADDEG2RAD(g_Vars.currentplayer->vv_theta),
-								ailistFindById(GAILIST_INIT_DEFAULT_BUDDY),
-								SPAWNFLAG_00000010);
-					} else {
-						prop = chrSpawnAtCoord(BODY_ELVIS1, HEAD_MAIAN_S,
-								&g_Vars.currentplayer->prop->pos,
-								g_Vars.currentplayer->prop->rooms,
-								BADDEG2RAD(g_Vars.currentplayer->vv_theta),
-								ailistFindById(GAILIST_INIT_DEFAULT_BUDDY),
-								SPAWNFLAG_00000010);
-					}
+				if (buddy.weapon1 != WEAPON_NONE) {
+					chrGiveWeapon(chr, playermgrGetModelOfWeapon(buddy.weapon1), buddy.weapon1, OBJFLAG_NONE);
+				}
 
-					if (prop) {
-						chr = prop->chr;
-						chr->flags |= CHRFLAG0_SKIPSAFETYCHECKS;
-						chr->flags2 |= CHRFLAG1_PUNCHHARDER | CHRFLAG1_IGNORECOVER | CHRFLAG1_NOOP_00200000 | CHRFLAG1_AIVSAI_ADVANTAGED;
-						chr->team = TEAM_ALLY;
-						chr->squadron = SQUADRON_01;
-						chr->hidden |= CHRHFLAG_DETECTED;
-						chr->voicebox = VOICEBOX_MALE0;
-						chr->teamscandist = 150;
-						chr->accuracyrating = 100;
-						chr->speedrating = 100;
-
-						if (stageGetIndex(g_Vars.stagenum) == STAGEINDEX_AIRBASE) {
-							chrAddHealth(chr, 40);
-						} else {
-							chrAddHealth(chr, 20);
-						}
-
-						chrSetMaxDamage(chr, 10);
-
-						chr->chrflags |= CHRCFLAG_00040000;
-						chr->hidden |= CHRHFLAG_CLOAKED;
-						chr->cloakfadefinished = true;
-						chr->cloakfadefrac = 0;
-
-						chrGiveWeapon(chr, MODEL_CHRRCP120, WEAPON_RCP120, 0);
-					}
+				if (buddy.weapon2 != WEAPON_NONE) {
+					chrGiveWeapon(chr, playermgrGetModelOfWeapon(buddy.weapon2), buddy.weapon2, OBJFLAG_WEAPON_LEFTHANDED);
 				}
 
 				g_Vars.aibuddies[i] = prop;

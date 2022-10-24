@@ -1,2 +1,52 @@
 [
+    {
+        "id": "L_OPTIONS_HUMAN",
+        "en": "Human\n",
+        "gb": "Human\n",
+        "jp": "プレイヤ\\h8284２\n",
+        "it": "Umano\n",
+        "fr": "Humain\n",
+        "de": "Menschlich\n",
+        "es": "Humano\n"
+    },
+    {
+        "id": "L_OPTIONS_BUDDY1",
+        "en": "Simulant 1\n",
+        "gb": "Simulant 1\n",
+        "jp": "シミュラントの１\n",
+        "it": "Replicante 1\n",
+        "fr": "Simulant 1\n",
+        "de": "Simulant 1\n",
+        "es": "Simulante 1\n"
+    },
+    {
+        "id": "L_OPTIONS_BUDDY2",
+        "en": "Simulant 2\n",
+        "gb": "Simulant 2\n",
+        "jp": "シミュラントの２\n",
+        "it": "Replicante 1\n",
+        "fr": "Simulant 1\n",
+        "de": "Simulant 1\n",
+        "es": "Simulante 1\n"
+    },
+    {
+        "id": "L_OPTIONS_BUDDY3",
+        "en": "Simulant 3\n",
+        "gb": "Simulant 3\n",
+        "jp": "シミュラントの３\n",
+        "it": "Replicante 3\n",
+        "fr": "Simulant 3\n",
+        "de": "Simulant 3\n",
+        "es": "Simulante 3\n"
+    },
+    {
+        "id": "L_OPTIONS_BUDDY4",
+        "en": "Simulant 4\n",
+        "gb": "Simulant 4\n",
+        "jp": "シミュラントの４\n",
+        "it": "Replicante 4\n",
+        "fr": "Simulant 4\n",
+        "de": "Simulant 4\n",
+        "es": "Simulante 4\n"
+    }
 ]

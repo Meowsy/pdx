@@ -1,6 +1,7 @@
 #include <ultra64.h>
 #include "constants.h"
 #include "game/activemenu.h"
+#include "game/buddies.h"
 #include "game/pdmode.h"
 #include "game/bondgun.h"
 #include "game/game_0b0fd0.h"
@@ -1225,9 +1226,9 @@ void amTick(void)
 
 				if (toggle) {
 					if (g_AmMenus[g_AmIndex].screenindex >= 2) {
-						if (g_Vars.numaibuddies && g_MissionConfig.iscoop) {
+						if (g_MissionConfig.iscoop && playerSimulantBuddiesCount()) {
 							// Bot command screen, in coop with AI buddies
-							if (g_AmMenus[g_AmIndex].slotnum == 4) {
+							if (g_AmMenus[g_AmIndex].slotnum == ARRAYCOUNT(g_Vars.aibuddies)) {
 								gotonextscreen = true;
 							} else {
 								amApply(g_AmMenus[g_AmIndex].slotnum);

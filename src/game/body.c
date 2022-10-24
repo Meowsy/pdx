@@ -1,5 +1,6 @@
 #include <ultra64.h>
 #include "constants.h"
+#include "game/buddies.h"
 #include "game/cheats.h"
 #include "game/chraction.h"
 #include "game/chr.h"
@@ -515,7 +516,7 @@ void bodyAllocateChr(s32 stagenum, struct packedchr *packed, s32 cmdindex)
 				chr->chrflags |= CHRCFLAG_CLONEABLE;
 			}
 
-			if (!g_Vars.normmplayerisrunning && g_MissionConfig.iscoop && g_Vars.numaibuddies > 0) {
+			if (!g_Vars.normmplayerisrunning && g_MissionConfig.iscoop && playerSimulantBuddiesCount() > 0) {
 				chr->flags |= CHRFLAG0_AIVSAI;
 			}
 

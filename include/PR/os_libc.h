@@ -88,6 +88,7 @@ extern void     bzero(void *, int);
 
 extern int		sprintf(char *s, const char *fmt, ...);
 extern void		osSyncPrintf(const char *fmt, ...);
+extern void		pdxOsSyncPrintf(const char* fmt, ...);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */

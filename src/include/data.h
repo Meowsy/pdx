@@ -530,5 +530,6 @@ extern struct menudialogdef g_HtDetailsMenuDialog;
 extern struct menudialogdef g_HtFailedMenuDialog;
 extern struct menudialogdef g_HtCompletedMenuDialog;
 extern struct menudialogdef g_HangarListMenuDialog;
+extern struct buddy g_Buddies[NUM_BUDDIES];
 
 #endif

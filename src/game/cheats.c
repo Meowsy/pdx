@@ -86,6 +86,10 @@ u32 cheatIsUnlocked(s32 cheat_id)
 	struct cheat *cheat;
 	u32 unlocked = 0;
 
+	if (cheat_id == CHEAT_NONE) {
+		return true;
+	}
+
 	if (cheatIsActive(CHEAT_UNLOCKALLCONTENT)) {
 		return true;
 	}
@@ -306,11 +310,11 @@ s32 cheatCheckboxMenuHandler(s32 operation, struct menuitem *item, union handler
 	case MENUOP_GET:
 		cheat = cheatGetNthInCategory(item->param, g_CurCheatCategory);
 		if (cheat->cheat_id == CHEAT_VELVETDARK
-				&& !cheatIsActive(CHEAT_PUGILIST)
-				&& !cheatIsActive(CHEAT_HOTSHOT)
-				&& !cheatIsActive(CHEAT_HITANDRUN)
-				&& !cheatIsActive(CHEAT_ALIEN)) {
-			return true;
+				|| cheat->cheat_id == CHEAT_PUGILIST
+				|| cheat->cheat_id == CHEAT_HOTSHOT
+				|| cheat->cheat_id == CHEAT_HITANDRUN
+				|| cheat->cheat_id == CHEAT_ALIEN) {
+			return cheat->unlocked;
 		}
 		return cheat->enabled;
 	case MENUOP_SET:

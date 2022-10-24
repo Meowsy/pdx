@@ -2,6 +2,7 @@
 #include "constants.h"
 #include "constants.h"
 #include "game/bondmove.h"
+#include "game/buddies.h"
 #include "game/cheats.h"
 #include "game/chraction.h"
 #include "game/chrai.h"
@@ -4312,7 +4313,7 @@ bool aiDuplicateChr(void)
 
 			if (g_Vars.normmplayerisrunning == false
 					&& g_MissionConfig.iscoop
-					&& g_Vars.numaibuddies > 0) {
+					&& playerSimulantBuddiesCount() > 0) {
 				clone->flags |= CHRFLAG0_AIVSAI;
 			}
 

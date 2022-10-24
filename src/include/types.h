@@ -195,7 +195,6 @@ struct g_vars {
 	/*0x468*/ bool speedpillon;
 	/*0x46c*/ s32 restartlevel;
 	/*0x470*/ s32 perfectbuddynum;
-	/*0x474*/ s32 numaibuddies;
 	/*0x478*/ bool aibuddiesspawned;
 	/*0x47c*/ s32 bossfileid;
 	/*0x480*/ u16 bossdeviceserial;
@@ -247,6 +246,9 @@ struct g_vars {
 	/*0x508*/ u32 unk000508;
 	/*0x50c*/ u32 unk00050c;
 	/*0x510*/ f32 unk000510;
+	
+              s32 hashumanbuddy;
+              s32 aibuddytype[4];
 };
 
 struct weaponobj;
@@ -6396,6 +6398,25 @@ struct widthxz {
 struct xz {
 	f32 x;
 	f32 z;
+};
+
+struct buddy {
+	u32 buddy_id;
+	s32 cheat_id;
+	u16 nametextid;
+	u8 ailist;
+	s32 body;
+	s32 head;
+	u32 flags1;
+	u32 flags2;
+	u8 voicebox;
+	u8 teamscandist;
+	s8 accuracyrating;
+	s8 speedrating;
+	f32 maxdamage;
+	f32 health;
+	u32 weapon1;
+	u32 weapon2;
 };
 
 #endif

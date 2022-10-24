@@ -1,5 +1,6 @@
 #include <ultra64.h>
 #include "constants.h"
+#include "game/buddies.h"
 #include "game/cheats.h"
 #include "game/game_00b820.h"
 #include "game/setup.h"
@@ -1394,10 +1395,18 @@ void setupLoadFiles(s32 stagenum)
 		// Count the number of chrs and objects so enough model slots can be allocated
 		numchrs += setupCountCommandType(OBJTYPE_CHR);
 
-		if (!g_Vars.normmplayerisrunning && g_MissionConfig.iscoop && g_Vars.numaibuddies > 0) {
-			// @bug? The Hotshot buddy has two guns, but only one is counted here.
-			numchrs += g_Vars.numaibuddies;
-			numobjs += g_Vars.numaibuddies; // the buddy's weapon
+		if (!g_Vars.normmplayerisrunning && g_MissionConfig.iscoop && playerSimulantBuddiesCount() > 0) {
+			for (i = 0; i < ARRAYCOUNT(g_Vars.aibuddies); i++) {
+				if (g_Vars.aibuddytype[i] != BUDDY_NONE) {
+					numchrs++;
+					if (g_Buddies[g_Vars.aibuddytype[i]].weapon1 != WEAPON_NONE) {
+						numobjs++;
+					}
+					if (g_Buddies[g_Vars.aibuddytype[i]].weapon2 != WEAPON_NONE) {
+						numobjs++;
+					}
+				}
+			}
 		}
 
 		numobjs += setupCountCommandType(OBJTYPE_WEAPON);
@@ -1499,8 +1508,8 @@ void setupCreateProps(s32 stagenum)
 
 			if (g_Vars.normmplayerisrunning == false
 					&& g_MissionConfig.iscoop
-					&& g_Vars.numaibuddies > 0) {
-				numchrs += g_Vars.numaibuddies;
+					&& playerSimulantBuddiesCount() > 0) {
+				numchrs += playerSimulantBuddiesCount();
 			}
 
 			chrmgrConfigure(numchrs);
