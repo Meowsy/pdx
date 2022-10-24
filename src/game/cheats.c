@@ -12,6 +12,7 @@
 #include "game/menu.h"
 #include "game/lang.h"
 #include "game/pak.h"
+#include "game/player.h"
 #include "bss.h"
 #include "data.h"
 #include "types.h"
