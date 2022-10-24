@@ -68,6 +68,11 @@ ROMALLOCATION_GAME = 0x144ee0
 
 ROM_SIZE := 32
 
+# ISV64 - Whether to support the IS-Viewer for logging.
+# Does not enable any of the original logging messages, only new ones added by PDX.
+
+ISV64 ?= 1
+
 ################################################################################
 
 # The VERSION constant is used in the source to handle version-specific code.
@@ -159,7 +164,8 @@ DEFINES := \
     MATCHING=$(MATCHING) \
     PAL=$(PAL) \
     PIRACYCHECKS=$(PIRACYCHECKS) \
-    ROM_SIZE=$(ROM_SIZE)
+    ROM_SIZE=$(ROM_SIZE) \
+    ISV64=$(ISV64)
 
 C_DEFINES := $(foreach d,$(DEFINES),-D$(d))
 AS_DEFINES := $(foreach d,$(DEFINES),--defsym $(d)) --defsym _LANGUAGE_ASSEMBLY=1
@@ -382,6 +388,10 @@ ifeq ($(COMPILER), ido)
 
     ifeq ($(ROMID), ntsc-beta)
         O1_C_FILES := $(O1_C_FILES) src/lib/ultra/io/pfsisplug.c
+    endif
+
+    ifeq ($(ISV64), 1)
+        O1_C_FILES := $(O1_C_FILES) src/lib/ultra/io/is_debug.c
     endif
 
     O3_C_FILES := \

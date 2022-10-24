@@ -32,6 +32,8 @@ u32 var8005cf78 = 0;
 u32 var8005cf7c = 0;
 #endif
 
+void isPrintfInit(void);
+
 void osInitialize(void)
 {
 	u32 pifdata;
@@ -52,6 +54,9 @@ void osInitialize(void)
 	osWritebackDCache((void *)UT_VEC, E_VEC - UT_VEC + sizeof(__osExceptionVector));
 	osInvalICache((void *)UT_VEC, E_VEC - UT_VEC + sizeof(__osExceptionVector));
 	osCartRomInit();
+#if ISV64
+	isPrintfInit();
+#endif
 	osMapTLBRdb();
 
 #if VERSION < VERSION_PAL_BETA

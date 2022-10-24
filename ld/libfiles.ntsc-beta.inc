@@ -46,6 +46,7 @@
 	build/ROMID/lib/args.o (section); \
 	build/ROMID/lib/str.o (section); \
 	build/ROMID/lib/ultra/libc/sprintf.o (section); \
+	build/ROMID/lib/ultra/io/is_debug.o (section); \
 	build/ROMID/lib/pimgr.o (section); \
 	build/ROMID/lib/videbug.o (section); \
 	build/ROMID/lib/debughud.o (section); \

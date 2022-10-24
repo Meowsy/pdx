@@ -27,6 +27,7 @@ u32 var80060fecpf = 0;
 u32 var80060ff0pf = OS_IM_ALL;
 
 OSPiHandle *osCartRomInit2(void);
+void isPrintfInit(void);
 
 void osInitialize2()
 {
@@ -48,6 +49,9 @@ void osInitialize2()
 	osInvalICache((void *)UT_VEC, E_VEC - UT_VEC + sizeof(__osExceptionVector));
 
 	osCartRomInit2();
+#if ISV64
+	isPrintfInit();
+#endif
 	osUnmapTLBAll();
 	osMapTLBRdb();
 
