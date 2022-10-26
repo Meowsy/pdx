@@ -327,7 +327,7 @@ void kohTick(void)
 			prop = prop->next;
 		}
 
-		// Use the chrshillhill array to build an array of all teams who have
+		// Use the chrsinhill array to build an array of all teams who have
 		// chrs in the hill. During development, this array likely stored a
 		// count of that team's chrs but was later changed to just be 0 or 1
 		// to denote if they have any chrs in the hill.
