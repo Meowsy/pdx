@@ -469,7 +469,7 @@ s32 challengeForceUnlockSetupFeatures(struct mpsetup *setup, u8 *array, s32 len)
 	s32 i;
 
 	// Force unlock the weapons (if never held before)
-	for (i = 0; i < 6; i++) {
+	for (i = 0; i < ARRAYCOUNT(g_MpSetup.weapons); i++) {
 		s32 featurenum = g_MpWeapons[setup->weapons[i]].unlockfeature;
 
 		if (featurenum) {

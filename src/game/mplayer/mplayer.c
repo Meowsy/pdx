@@ -1111,7 +1111,7 @@ void mpApplyWeaponSet(void)
 		}
 
 		if (ptr != NULL) {
-			for (i = 0; i < 6; i++) {
+			for (i = 0; i < ARRAYCOUNT(g_MpSetup.weapons); i++) {
 				u32 j;
 				bool done = false;
 				s32 mpweaponnum = MPWEAPON_NONE;
@@ -1136,7 +1136,7 @@ void mpApplyWeaponSet(void)
 	} else if (g_MpWeaponSetNum == WEAPONSET_RANDOM) {
 		s32 numoptions = mpGetNumWeaponOptions();
 
-		for (i = 0; i < 6; i++) {
+		for (i = 0; i < ARRAYCOUNT(g_MpSetup.weapons); i++) {
 			mpSetWeaponSlot(i, random() % numoptions);
 		}
 	} else if (g_MpWeaponSetNum == WEAPONSET_RANDOMFIVE) {
