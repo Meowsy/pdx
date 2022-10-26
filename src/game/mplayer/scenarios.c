@@ -71,6 +71,7 @@ struct mpscenario {
 	void *unk3c; // never hooked into nor fired
 	void (*readsavefunc)(struct savebuffer *buffer);
 	void (*writesavefunc)(struct savebuffer *buffer);
+	void (*handledeathfunc)(s32 aplayernum, s32 vplayernum);
 };
 
 #if VERSION >= VERSION_JPN_FINAL
