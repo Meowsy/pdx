@@ -175,78 +175,125 @@ s32 menuhandlerMpSlowMotion(s32 operation, struct menuitem *item, union handlerd
 // Define the scenario callbacks
 struct mpscenario g_MpScenarios[] = {
 	{
-		&g_MpCombatOptionsMenuDialog,
+		&g_MpCombatOptionsMenuDialog, // Options Dialog
+		NULL,                         // Init Scenario
+		NULL,                         // Number of Props
+		NULL,                         // Init Props
+		NULL,                         // Tick Scenario
+		NULL,                         // Tick Chr
+		NULL,                         // Render HUD
+		NULL,                         // Calculate Player Score
+		NULL,                         // Radar Extra
+		NULL,                         // Radar Chr
+		NULL,                         // Highlight Prop
+		NULL,                         // Choose Spawn Location
+		NULL,                         // Get Max Teams
+		NULL,                         // Is Room Highlighted?
+		NULL,                         // Highlight Room
+		NULL,                         // Never hooked into nor fired
+		NULL,                         // Read Save
+		NULL,                         // Write Save
+		NULL,                         // Handle Death
 	}, {
-		&g_HtbOptionsMenuDialog,
-		htbInit,
-		htbNumProps,
-		htbInitProps,
-		htbTick,
-		htbTickChr,
-		htbRenderHud,
-		htbCalculatePlayerScore,
-		htbRadarExtra,
-		htbRadarChr,
-		htbHighlightProp,
+		&g_HtbOptionsMenuDialog,      // Options Dialog
+		htbInit,                      // Init Scenario
+		htbNumProps,                  // Number of Props
+		htbInitProps,                 // Init Props
+		htbTick,                      // Tick Scenario
+		htbTickChr,                   // Tick Chr
+		htbRenderHud,                 // Render HUD
+		htbCalculatePlayerScore,      // Calculate Player Score
+		htbRadarExtra,                // Radar Extra
+		htbRadarChr,                  // Radar Chr
+		htbHighlightProp,             // Highlight Prop
+		NULL,                         // Choose Spawn Location
+		NULL,                         // Get Max Teams
+		NULL,                         // Is Room Highlighted?
+		NULL,                         // Highlight Room
+		NULL,                         // Never hooked into nor fired
+		NULL,                         // Read Save
+		NULL,                         // Write Save
+		NULL,                         // Handle Death
 	}, {
-		&g_HtmOptionsMenuDialog,
-		htmInit,
-		htmNumProps,
-		htmInitProps,
-		htmTick,
-		htmTickChr,
-		htmRenderHud,
-		htmCalculatePlayerScore,
-		htmRadarExtra,
-		htmRadarChr,
-		htmHighlightProp,
+		&g_HtmOptionsMenuDialog,      // Options Dialog
+		htmInit,                      // Init Scenario
+		htmNumProps,                  // Number of Props
+		htmInitProps,                 // Init Props
+		htmTick,                      // Tick Scenario
+		htmTickChr,                   // Tick Chr
+		htmRenderHud,                 // Render HUD
+		htmCalculatePlayerScore,      // Calculate Player Score
+		htmRadarExtra,                // Radar Extra
+		htmRadarChr,                  // Radar Chr
+		htmHighlightProp,             // Highlight Prop
+		NULL,                         // Choose Spawn Location
+		NULL,                         // Get Max Teams
+		NULL,                         // Is Room Highlighted?
+		NULL,                         // Highlight Room
+		NULL,                         // Never hooked into nor fired
+		NULL,                         // Read Save
+		NULL,                         // Write Save
+		NULL,                         // Handle Death
 	}, {
-		&g_PacOptionsMenuDialog,
-		pacInit,
-		NULL,
-		pacInitProps,
-		pacTick,
-		NULL,
-		pacRenderHud,
-		pacCalculatePlayerScore,
-		pacRadarExtra,
-		pacRadarChr,
-		pacHighlightProp,
+		&g_PacOptionsMenuDialog,      // Options Dialog
+		pacInit,                      // Init Scenario
+		NULL,                         // Number of Props
+		pacInitProps,                 // Init Props
+		pacTick,                      // Tick Scenario
+		NULL,                         // Tick Chr
+		pacRenderHud,                 // Render HUD
+		pacCalculatePlayerScore,      // Calculate Player Score
+		pacRadarExtra,                // Radar Extra
+		pacRadarChr,                  // Radar Chr
+		pacHighlightProp,             // Highlight Prop
+		NULL,                         // Choose Spawn Location
+		NULL,                         // Get Max Teams
+		NULL,                         // Is Room Highlighted?
+		NULL,                         // Highlight Room
+		NULL,                         // Never hooked into nor fired
+		NULL,                         // Read Save
+		NULL,                         // Write Save
+		pacHandleDeath,               // Handle Death
 	}, {
-		&g_KohOptionsMenuDialog,
-		kohInit,
-		NULL,
-		kohInitProps,
-		kohTick,
-		NULL,
-		kohRenderHud,
-		kohCalculatePlayerScore,
-		kohRadarExtra,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		kohIsRoomHighlighted,
-		kohHighlightRoom,
-		NULL,
-		kohReadSave,
-		kohWriteSave
+		&g_KohOptionsMenuDialog,      // Options Dialog
+		kohInit,                      // Init Scenario
+		NULL,                         // Number of Props
+		kohInitProps,                 // Init Props
+		kohTick,                      // Tick Scenario
+		NULL,                         // Tick Chr
+		kohRenderHud,                 // Render HUD
+		kohCalculatePlayerScore,      // Calculate Player Score
+		kohRadarExtra,                // Radar Extra
+		NULL,                         // Radar Chr
+		NULL,                         // Highlight Prop
+		NULL,                         // Choose Spawn Location
+		NULL,                         // Get Max Teams
+		kohIsRoomHighlighted,         // Is Room Highlighted?
+		kohHighlightRoom,             // Highlight Room
+		NULL,                         // Never hooked into nor fired
+		kohReadSave,                  // Read Save
+		kohWriteSave,                 // Write Save
+		NULL,                         // Handle Death
 	}, {
-		&g_CtcOptionsMenuDialog,
-		ctcInit,
-		ctcNumProps,
-		ctcInitProps,
-		ctcTick,
-		ctcTickChr,
-		NULL,
-		ctcCalculatePlayerScore,
-		ctcRadarExtra,
-		ctcRadarChr,
-		ctcHighlightProp,
-		ctcChooseSpawnLocation,
-		ctcGetMaxTeams,
-		ctcIsRoomHighlighted,
-		ctcHighlightRoom,
+		&g_CtcOptionsMenuDialog,      // Options Dialog
+		ctcInit,                      // Init Scenario
+		ctcNumProps,                  // Number of Props
+		ctcInitProps,                 // Init Props
+		ctcTick,                      // Tick Scenario
+		ctcTickChr,                   // Tick Chr
+		NULL,                         // Render HUD
+		ctcCalculatePlayerScore,      // Calculate Player Score
+		ctcRadarExtra,                // Radar Extra
+		ctcRadarChr,                  // Radar Chr
+		ctcHighlightProp,             // Highlight Prop
+		ctcChooseSpawnLocation,       // Choose Spawn Location
+		ctcGetMaxTeams,               // Get Max Teams
+		ctcIsRoomHighlighted,         // Is Room Highlighted?
+		ctcHighlightRoom,             // Highlight Room
+		NULL,                         // Never hooked into nor fired
+		NULL,                         // Read Save
+		NULL,                         // Write Save
+		NULL,                         // Handle Death
 	},
 };
 
@@ -1482,3 +1529,14 @@ void scenarioHandleActivatedProp(struct chrdata *chr, struct prop *prop)
 		}
 	}
 }
+
+/**
+ * Handle a player or bot dying.
+ */
+void scenarioHandleDeath(s32 aplayernum, s32 vplayernum)
+{
+	if (g_MpScenarios[g_MpSetup.scenario].handledeathfunc) {
+		g_MpScenarios[g_MpSetup.scenario].handledeathfunc(aplayernum, vplayernum);
+	}
+}
+

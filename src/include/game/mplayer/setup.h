@@ -116,6 +116,7 @@ s32 scenarioPickUpBriefcase(struct chrdata *chr, struct prop *prop);
 void scenarioHandleDroppedToken(struct chrdata *chr, struct prop *prop);
 s32 scenarioPickUpUplink(struct chrdata *chr, struct prop *prop);
 void scenarioHandleActivatedProp(struct chrdata *chr, struct prop *prop);
+void scenarioHandleDeath(s32 aplayernum, s32 vplayernum);
 s32 menuhandlerMpDropOut(s32 operation, struct menuitem *item, union handlerdata *data);
 s32 menuhandlerMpTeamsLabel(s32 operation, struct menuitem *item, union handlerdata *data);
 s32 mpGetNumStages(void);
