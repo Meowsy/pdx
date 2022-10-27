@@ -1471,7 +1471,7 @@ s32 bgunTickIncReload(struct handweaponinfo *info, s32 handnum, struct hand *han
 {
 	u32 stack;
 	struct weaponfunc *func = gsetGetWeaponFunction(&hand->gset);
-	struct guncmd *reload_animation = weaponGetReloadAnim(info->weaponnum, (&hand->gset)->weaponfunc);
+	struct guncmd *reload_animation = weaponGetReloadAnim(hand->gset.weaponnum, hand->gset.weaponfunc);
 
 	if (g_Vars.currentplayer->isdead) {
 		hand->animmode = HANDANIMMODE_IDLE;
