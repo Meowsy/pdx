@@ -341,7 +341,7 @@ s32 cheatCheckboxMenuHandler(s32 operation, struct menuitem *item, union handler
 
 		for (i = 0; i < NUM_CHEATS; i++) {
 			if (g_Cheats[i].enabled) {
-				cheatActivate(i);
+				cheatActivate(g_Cheats[i].cheat_id);
 			}
 		}
 
