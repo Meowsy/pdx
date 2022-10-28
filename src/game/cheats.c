@@ -39,6 +39,7 @@ struct cheat g_Cheats[NUM_CHEATS] = {
 	{ CHEATCAT_GAMEPLAY,        CHEAT_ENEMYSHIELDS,           L_MPWEAPONS_087,                0,                 SOLOSTAGEINDEX_DEFENSE,        DIFF_A,            CHEATFLAG_INVALIDATING | CHEATFLAG_COMPLETION,                                          { CHEAT_NONE }, }, // Enemy Shields
 	{ CHEATCAT_GAMEPLAY,        CHEAT_ENEMYROCKETS,           L_MPWEAPONS_093,                0,                 SOLOSTAGEINDEX_PELAGIC,        DIFF_A,            CHEATFLAG_INVALIDATING | CHEATFLAG_COMPLETION,                                          { CHEAT_MARQUIS }, }, // Enemy Rockets
 	{ CHEATCAT_GAMEPLAY,        CHEAT_PERFECTDARKNESS,        L_MPWEAPONS_096,                0,                 SOLOSTAGEINDEX_CRASHSITE,      DIFF_A,            CHEATFLAG_INVALIDATING | CHEATFLAG_COMPLETION,                                          { CHEAT_NONE }, }, // Perfect Darkness
+	{ CHEATCAT_GAMEPLAY,        CHEAT_HUD_ORDERS,             L_MPWEAPONS_HUDORDERS,          0,                 0,                             0,                 CHEATFLAG_ALWAYSAVAILABLE,                                                              { CHEAT_HUD_BOTDEBUG, CHEAT_NONE }, }, // Orders HUD
 	{ CHEATCAT_WEAPONSFORJO,    CHEAT_ROCKETLAUNCHER,         L_MPWEAPONS_027,                0,                 SOLOSTAGEINDEX_EXTRACTION,     DIFF_A,            CHEATFLAG_INVALIDATING | CHEATFLAG_COMPLETION,                                          { CHEAT_NONE }, }, // Rocket Launcher
 	{ CHEATCAT_WEAPONSFORJO,    CHEAT_SNIPERRIFLE,            L_MPWEAPONS_103,                0,                 SOLOSTAGEINDEX_VILLA,          DIFF_A,            CHEATFLAG_INVALIDATING | CHEATFLAG_COMPLETION,                                          { CHEAT_NONE }, }, // Sniper Rifle
 	{ CHEATCAT_WEAPONSFORJO,    CHEAT_SUPERDRAGON,            L_MPWEAPONS_105,                0,                 SOLOSTAGEINDEX_ESCAPE,         DIFF_A,            CHEATFLAG_INVALIDATING | CHEATFLAG_COMPLETION,                                          { CHEAT_NONE }, }, // SuperDragon
@@ -72,6 +73,7 @@ struct cheat g_Cheats[NUM_CHEATS] = {
 	{ CHEATCAT_DEBUG,           CHEAT_UNLOCKALLCONTENT,       L_MPWEAPONS_UNLOCKALLCONTENT,   0,                 0,                             0,                 CHEATFLAG_ALWAYSAVAILABLE,                                                              { CHEAT_NONE }, }, // Unlock All Content
 	{ CHEATCAT_DEBUG,           CHEAT_UNLOCKALLDOORS,         L_MPWEAPONS_UNLOCKALLDOORS,     0,                 0,                             0,                 CHEATFLAG_INVALIDATING | CHEATFLAG_ALWAYSAVAILABLE,                                     { CHEAT_NONE }, }, // Open Any Door
 	{ CHEATCAT_DEBUG,           CHEAT_JOPHASE,                L_MPWEAPONS_JOPHASE,            0,                 0,                             0,                 CHEATFLAG_INVALIDATING | CHEATFLAG_ALWAYSAVAILABLE,                                     { CHEAT_NONE }, }, // Jo Phase
+	{ CHEATCAT_DEBUG,           CHEAT_HUD_BOTDEBUG,           L_MPWEAPONS_HUDBOTDEBUG,        0,                 0,                             0,                 CHEATFLAG_INVALIDATING | CHEATFLAG_ALWAYSAVAILABLE,                                     { CHEAT_HUD_ORDERS, CHEAT_NONE }, }, // Bot Debug HUD
 };
 
 u16 cheatcategorynames[NUM_CHEATCATS] = {
@@ -841,7 +843,7 @@ struct menuitem g_CheatsMenuItems[] = {
 		MENUITEMTYPE_SELECTABLE,
 		0,
 		0,
-		L_MPWEAPONS_DEBUG, // "Fun"
+		L_MPWEAPONS_DEBUG, // "Debug"
 		CHEATCAT_DEBUG,
 		menuhandlerCheatCategory,
 	},

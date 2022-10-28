@@ -2,13 +2,13 @@
     {
         "id": "L_MPWEAPONS_000",
         "aka": [ "L_MPWEAPONS_PLAYERHASTHEITEM" ],
-        "en": "%shas the\n%s.\n",
-        "gb": "%shas the\n%s.\n",
+        "en": "%s has the\n%s.\n",
+        "gb": "%s has the\n%s.\n",
         "jp": "%s は\n%sを\n\\h82ddに\\h82f6れた\n",
-        "it": "%sha il\n%s\n",
+        "it": "%s ha il\n%s\n",
         "fr": "%s obtient:\n%s\n",
-        "de": "%shat den\n%s\n",
-        "es": "%stiene el\n%s\n"
+        "de": "%s hat den\n%s\n",
+        "es": "%s tiene el\n%s\n"
     },
     {
         "id": "L_MPWEAPONS_FIRINGRANGECHALLENGE",
@@ -119,5 +119,25 @@
         "fr": "Une autre mort étincelante!\n",
         "de": "Ein weiterer glitzernder Tod!\n",
         "es": "¡Otra muerte chispeante!\n"
+    },
+    {
+        "id": "L_MPWEAPONS_HUDORDERS",
+        "en": "Orders HUD\n",
+        "gb": "Orders HUD\n",
+        "jp": "\\h83e9\\h84a1 ＨＵＤ\n",
+        "it": "Ordini HUD\n",
+        "fr": "Ordres HUD\n",
+        "de": "Befehle HUD\n",
+        "es": "Órdenes HUD\n"
+    },
+    {
+        "id": "L_MPWEAPONS_HUDBOTDEBUG",
+        "en": "Simulant HUD\n",
+        "gb": "Simulant HUD\n",
+        "jp": "シミュラントのＨＵＤ\n",
+        "it": "Replicante HUD\n",
+        "fr": "Simulant HUD\n",
+        "de": "Simulant HUD\n",
+        "es": "Simulante HUD\n"
     }
 ]

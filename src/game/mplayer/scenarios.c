@@ -1162,7 +1162,7 @@ s32 scenarioPickUpBriefcase(struct chrdata *chr, struct prop *prop)
 		}
 
 		// "%s has the\n%s."
-		sprintf(text1, langGet(L_MPWEAPONS_PLAYERHASTHEITEM), scenarioRemoveLineBreaks(mpchr->name, 0), bgunGetShortName(WEAPON_BRIEFCASE2));
+		sprintf(text1, langGet(L_MPWEAPONS_PLAYERHASTHEITEM), scenarioRemoveLineBreaks(mpchr->name, 0), scenarioRemoveLineBreaks(bgunGetShortName(WEAPON_BRIEFCASE2), 1));
 
 		prevplayernum = g_Vars.currentplayernum;
 
@@ -1525,7 +1525,7 @@ void scenarioPickUpGoldenGun(struct chrdata *chr, struct prop *prop)
 	}
 
 	// "%s has the\n%s."
-	sprintf(message, langGet(L_MPWEAPONS_PLAYERHASTHEITEM), scenarioRemoveLineBreaks(mpchr->name, 0), bgunGetShortName(g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum));
+	sprintf(message, langGet(L_MPWEAPONS_PLAYERHASTHEITEM), scenarioRemoveLineBreaks(mpchr->name, 0), scenarioRemoveLineBreaks(bgunGetShortName(g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum), 1));
 	playernum = g_Vars.currentplayernum;
 
 	for (i = 0; i < PLAYERCOUNT(); i++) {

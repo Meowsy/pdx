@@ -54,6 +54,7 @@
 #include "game/propobj.h"
 #include "game/splat.h"
 #include "game/mpstats.h"
+#include "game/hud.h"
 #include "bss.h"
 #include "lib/ailist.h"
 #include "lib/collision.h"
@@ -4589,6 +4590,8 @@ Gfx *playerRenderShield(Gfx *gdl)
 
 Gfx *playerRenderHud(Gfx *gdl)
 {
+	gdl = hudRenderPlayerSelected(gdl);
+
 	if (g_Vars.currentplayer->cameramode == CAMERAMODE_THIRDPERSON) {
 		gdl = boltbeamsRender(gdl);
 		gdl = bgRenderArtifacts(gdl);

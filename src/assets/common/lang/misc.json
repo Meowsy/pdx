@@ -8,5 +8,75 @@
         "fr": "Prendre pistolet d'or\n",
         "de": "Erl. Goldenen Colt\n",
         "es": "Coger Pistola de Oro\n"
+    },
+    {
+        "id": "L_MISC_JUMPSHIP",
+        "en": "Jumpship\n",
+        "gb": "Jumpship\n",
+        "jp": "ジャンプシップ\n",
+        "it": "Navetta\n",
+        "fr": "Largueur\n",
+        "de": "Jumpship\n",
+        "es": "Lanzadera\n"
+    },
+    {
+        "id": "L_MISC_HOVERCRATE",
+        "en": "HoverCrate\n",
+        "gb": "HoverCrate\n",
+        "jp": "ホバ\\h8284コンテナ\n",
+        "it": "Antigravità\n",
+        "fr": "Caisse antigrav\n",
+        "de": "HoverCrate\n",
+        "es": "AntiGrav\n"
+    },
+    {
+        "id": "L_MISC_HOVERBIKE",
+        "en": "HoverBike\n",
+        "gb": "HoverBike\n",
+        "jp": "ホバ\\h8284バイク\n",
+        "it": "Aeromoto\n",
+        "fr": "Hoverbike\n",
+        "de": "HoverBike\n",
+        "es": "Aeromoto\n"
+    },
+    {
+        "id": "L_MISC_CLEANINGHOVBOT",
+        "en": "Cleaning Hovbot\n",
+        "gb": "Cleaning Hovbot\n",
+        "jp": "クリ\\h8284ニングロボット\n",
+        "it": "PuliRobot\n",
+        "fr": "Robot de nettoyage\n",
+        "de": "Reinigungs-Roboter\n",
+        "es": "Bot de Limpieza\n"
+    },
+    {
+        "id": "L_MISC_HOVERCOPTER",
+        "en": "Hovercopter\n",
+        "gb": "Hovercopter\n",
+        "jp": "ホバ\\h8284コプタ\\h8284\n",
+        "it": "Cannoniera\n",
+        "fr": "Hovercopter\n",
+        "de": "Hovercopter\n",
+        "es": "Hovercóptero\n"
+    },
+    {
+        "id": "L_MISC_G5ROBOT",
+        "en": "G5 Robot\n",
+        "gb": "G5 Robot\n",
+        "jp": "Ｇ５ロボット\n",
+        "it": "Robot G5\n",
+        "fr": "Robot G5\n",
+        "de": "G5-Roboter\n",
+        "es": "Robot G5\n"
+    },
+    {
+        "id": "L_MISC_A51INTERCEPTOR",
+        "en": "A51 Interceptor\n",
+        "gb": "A51 Interceptor\n",
+        "jp": "Ａ５１インタ\\h8284セプタ\\h8284\n",
+        "it": "Intercettatore A51\n",
+        "fr": "Intercepteur S51\n",
+        "de": "A51 Interceptor\n",
+        "es": "Interceptor A51\n"
     }
 ]

@@ -227,4 +227,5 @@
 	build/ROMID/game/trainingmenus.o (section); \
 	build/ROMID/game/modeldef.o (section); \
 	build/ROMID/game/game_1a78b0.o (section); \
-	build/ROMID/game/buddies.o (section);
+	build/ROMID/game/buddies.o (section); \
+	build/ROMID/game/hud.o (section);
