@@ -1,0 +1,15 @@
+{
+    "search.exclude": {
+        "src/assets/jpn-final": true,
+        "src/assets/ntsc-1.0": true,
+        "src/assets/ntsc-beta": true,
+        "src/assets/pal-beta": true,
+        "src/assets/pal-final": true,
+        "src/generated/ntsc-final": false
+    },
+    "[python]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4,
+        "editor.detectIndentation": false
+    }
+}
