@@ -2167,14 +2167,14 @@ void botScheduleReload(struct chrdata *chr, s32 handnum)
 struct prop *botFindPickup(struct chrdata *chr, s32 criteria)
 {
 	struct aibot *aibot = chr->aibot;
-	s32 weaponnums[6];
-	s32 scores1[6];
-	s32 scores2[6];
-	struct prop *weapproplist[6];
-	f32 weapdistlist[6];
+	s32 weaponnums[ARRAYCOUNT(g_MpSetup.weapons)];
+	s32 scores1[ARRAYCOUNT(g_MpSetup.weapons)];
+	s32 scores2[ARRAYCOUNT(g_MpSetup.weapons)];
+	struct prop *weapproplist[ARRAYCOUNT(g_MpSetup.weapons)];
+	f32 weapdistlist[ARRAYCOUNT(g_MpSetup.weapons)];
 	struct prop *ammoproplist[33];
 	f32 ammodistlist[33];
-	struct invitem *invitems[6];
+	struct invitem *invitems[ARRAYCOUNT(g_MpSetup.weapons)];
 	s32 i;
 	s32 j;
 	struct prop *prop;
