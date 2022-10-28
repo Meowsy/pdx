@@ -60,7 +60,7 @@ def make_object(rows, basename, key):
     assetmgr.write_object(zipped, filename)
 
 def make_binary(rows, key):
-    if len(rows) == 0 or (os.environ['ROMID'] == 'ntsc-final' and key != 'en'):
+    if len(rows) == 0 or (os.environ['ROMID'] == 'ntsc-final' and key != 'en') or (os.environ['ROMID'] != 'jpn-final' and key == 'jp'):
         return (0).to_bytes(16, 'big')
 
     output = bytes()
