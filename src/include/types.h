@@ -739,14 +739,8 @@ struct aibot {
 	/*0x058*/ u8 unk058; // related to fireslots
 	/*0x059*/ u8 unk059;
 	/*0x05c*/ s32 nextbullettimer60[2];
-
-	/**
-	 * 0x0001 = has unlimited ammo (darksim?)
-	 * 0x0004 = detected dangerous prop
-	 * 0x1000 = using remote mines
-	 */
-	/*0x064*/ u16 unk064;
-
+	          u8 hasinfiniteammo : 1;
+	          u8 detecteddangerousprop : 1;
 	/*0x068*/ struct attackanimconfig *unk068;
 	/*0x06c*/ f32 unk06c;
 	/*0x070*/ f32 unk070;

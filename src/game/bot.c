@@ -141,7 +141,8 @@ void botReset(struct chrdata *chr, u8 respawning)
 			aibot->unk04c_04 = false;
 			aibot->unk04c_03 = false;
 			aibot->hasuplink = false;
-			aibot->unk064 = 0;
+			aibot->hasinfiniteammo = false;
+			aibot->detecteddangerousprop = false;
 			aibot->unk04c_00 = false;
 			aibot->hillpadnum = -1;
 			aibot->hillcovernum = -1;
@@ -204,7 +205,7 @@ void botReset(struct chrdata *chr, u8 respawning)
 		}
 
 		if (aibot->config->difficulty == BOTDIFF_DARK) {
-			aibot->unk064 &= ~1;
+			aibot->hasinfiniteammo = false;
 
 			if (mpHasShield()) {
 				chr->cshield = 8;

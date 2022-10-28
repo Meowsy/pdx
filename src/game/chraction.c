@@ -11353,7 +11353,7 @@ bool chrDetectDangerousObject(struct chrdata *chr, u8 flags)
 				chr->runfrompos.z = g_DangerousProps[i]->pos.z;
 
 				if (chr->aibot) {
-					chr->aibot->unk064 |= 0x0004;
+					chr->aibot->detecteddangerousprop = 1;
 					chr->aibot->dangerouspropnum = i;
 				}
 
@@ -11363,7 +11363,7 @@ bool chrDetectDangerousObject(struct chrdata *chr, u8 flags)
 	}
 
 	if (chr->aibot) {
-		chr->aibot->unk064 &= ~0x0004;
+		chr->aibot->detecteddangerousprop = 0;
 		chr->aibot->dangerouspropnum = -1;
 	}
 

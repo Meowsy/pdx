@@ -134,7 +134,8 @@ void botmgrAllocateBot(s32 chrnum, s32 aibotnum)
 					}
 
 					aibot->aibotnum = aibotnum;
-					aibot->unk064 = 0;
+					aibot->hasinfiniteammo = false;
+					aibot->detecteddangerousprop = false;
 					aibot->gotoprop = NULL;
 					aibot->timeuntilreload60[0] = 0;
 					aibot->timeuntilreload60[1] = 0;
