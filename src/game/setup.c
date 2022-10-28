@@ -737,6 +737,9 @@ void setupPlaceWeapon(struct weaponobj *weapon, s32 cmdindex)
 				weapon->base.modelnum = mpweapon->model;
 				weapon->base.extrascale = mpweapon->extrascale;
 				giveweapon = mpweapon->giveweapon;
+				if (mpweapon->weaponnum == g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum && g_ScenarioData.mgg.goldengun != NULL) {
+					giveweapon = false;
+				}
 
 				if (mpweapon->weaponnum == WEAPON_MPSHIELD) {
 					struct shieldobj *shield = (struct shieldobj *)weapon;

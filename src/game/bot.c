@@ -368,6 +368,10 @@ u32 botPickupProp(struct prop *prop, struct chrdata *chr)
 			} else if (weapon->weaponnum == WEAPON_DATAUPLINK) {
 				result = scenarioPickUpUplink(chr, prop);
 			} else {
+				if (g_MpSetup.scenario == MPSCENARIO_GOLDENGUN && weapon->weaponnum == g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum) {
+					scenarioPickUpGoldenGun(chr, prop);
+				}
+
 				propPlayPickupSound(prop, weapon->weaponnum);
 				qty = weaponGetPickupAmmoQty(weapon);
 
@@ -1549,12 +1553,13 @@ u32 g_MpBotCommands[NUM_MPBOTCOMMANDS] = {
 	L_MISC_212, // "Get Case"
 	L_MISC_213, // "Pop Cap"
 	L_MISC_214, // "Protect"
+	L_MISC_GETGOLDENGUN, // "Get Golden Gun"
 };
 
 char *botGetCommandName(s32 command)
 {
 	if (command < 0 || command >= NUM_MPBOTCOMMANDS) {
-		return langGet(L_MISC_179); // "Normal"
+		return langGet(g_MpBotCommands[AIBOTCMD_NORMAL]); // "Normal"
 	}
 
 	return langGet(g_MpBotCommands[command]);
@@ -8993,6 +8998,16 @@ void botTickUnpaused(struct chrdata *chr)
 							botApplyScenarioCommand(chr, AIBOTCMD_NORMAL);
 						}
 					}
+				} else if (g_MpSetup.scenario == MPSCENARIO_GOLDENGUN) {
+					if (g_ScenarioData.mgg.goldengun != NULL) { // If the Golden Gun is spawned
+						s32 numchasing = botGetCountInTeamDoingCommand(chr, AIBOTCMD_GETGOLDENGUN, false);
+
+						if (numchasing <= 0 || numchasing < (teamsize + 1) / 2 || random() % 100 < 50) {
+							botApplyScenarioCommand(chr, AIBOTCMD_GETGOLDENGUN);
+						} else {
+							botApplyScenarioCommand(chr, AIBOTCMD_NORMAL);
+						}
+					}
 				}
 
 				// Consider changing command in 20 to 60 seconds
@@ -9299,6 +9314,35 @@ void botTickUnpaused(struct chrdata *chr)
 									aibot->abortattacktimer60 = -1;
 								}
 							}
+						}
+					}
+				} else if (aibot->command == AIBOTCMD_GETGOLDENGUN) {
+					// The Man With the Golden Gun - fetch the Golden Gun
+					if (g_MpSetup.scenario == MPSCENARIO_GOLDENGUN
+							&& g_ScenarioData.mgg.goldengun
+							&& g_ScenarioData.mgg.goldengun != chr->prop) {
+						// The Golden Gun is not held by current bot
+						if (g_ScenarioData.mgg.goldengun->type == PROPTYPE_CHR
+								|| g_ScenarioData.mgg.goldengun->type == PROPTYPE_PLAYER) {
+							struct chrdata *goldengunchr = g_ScenarioData.mgg.goldengun->chr;
+
+							if ((g_MpSetup.options & MPOPTION_TEAMSENABLED) && goldengunchr->team == chr->team) {
+								// The Golden Gun is held by teammate - protect them
+								if (botCanFollow(chr, goldengunchr)) {
+									newaction = MA_AIBOTFOLLOW;
+									aibot->canbreakfollow = random() % 4 == 0;
+									aibot->followingplayernum = mpPlayerGetIndex(goldengunchr);
+								}
+							} else if (!botIsTargetInvisible(chr, goldengunchr) && botPassesCowardCheck(chr, goldengunchr)) {
+								// The Golden Gun is held by opponent - attack them
+								newaction = MA_AIBOTATTACK;
+								aibot->attackingplayernum = mpPlayerGetIndex(goldengunchr);
+								aibot->abortattacktimer60 = -1;
+							}
+						} else {
+							// The Golden Gun is not held by anyone - fetch it
+							newaction = MA_AIBOTGOTOPROP;
+							aibot->gotoprop = g_ScenarioData.mgg.goldengun;
 						}
 					}
 				}

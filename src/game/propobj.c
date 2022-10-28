@@ -2123,6 +2123,11 @@ struct prop *objInit(struct defaultobj *obj, struct modelfiledata *filedata, str
 			prop->forcetick = true;
 			obj->flags |= OBJFLAG_INVINCIBLE | OBJFLAG_00400000;
 			obj->flags2 |= OBJFLAG2_IMMUNETOGUNFIRE | OBJFLAG2_00200000;
+		} else if (g_MpSetup.scenario == MPSCENARIO_GOLDENGUN && weapon->weaponnum == g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum) {
+			g_ScenarioData.mgg.goldengun = prop;
+			prop->forcetick = true;
+			obj->flags |= OBJFLAG_INVINCIBLE | OBJFLAG_00400000;
+			obj->flags2 |= OBJFLAG2_IMMUNETOGUNFIRE | OBJFLAG2_00200000;
 		}
 	}
 
@@ -11669,6 +11674,14 @@ void objInitMatrices(struct prop *prop)
 
 bool propCanRegen(struct prop *prop)
 {
+	if (g_MpSetup.scenario == MPSCENARIO_GOLDENGUN
+			&& prop->type == PROPTYPE_WEAPON
+			&& prop->weapon->weaponnum == g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum
+			&& g_ScenarioData.mgg.goldengun != NULL
+			&& g_ScenarioData.mgg.goldengun != prop) {
+		return false;
+	}
+
 	return true;
 }
 
@@ -18029,6 +18042,10 @@ s32 propPickupByPlayer(struct prop *prop, bool showhudmsg)
 			s32 sp64;
 
 			if (g_Vars.normmplayerisrunning) {
+				if (g_MpSetup.scenario == MPSCENARIO_GOLDENGUN && weapon->weaponnum == g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum) {
+					scenarioPickUpGoldenGun(g_Vars.currentplayer->prop->chr, prop);
+				}
+
 				if (weapon->weaponnum == WEAPON_BRIEFCASE2) {
 					sp64 = scenarioPickUpBriefcase(g_Vars.currentplayer->prop->chr, prop);
 

@@ -316,6 +316,10 @@ void mpReset(void)
 		g_AmBotCommands[6] = AIBOTCMD_GETCASE2;
 		g_AmBotCommands[8] = AIBOTCMD_GETCASE2;
 		break;
+	case MPSCENARIO_GOLDENGUN:
+		g_AmBotCommands[6] = AIBOTCMD_GETGOLDENGUN;
+		g_AmBotCommands[8] = AIBOTCMD_GETGOLDENGUN;
+		break;
 	default:
 		g_AmBotCommands[0] = AIBOTCMD_FOLLOW;
 		g_AmBotCommands[1] = AIBOTCMD_ATTACK;
@@ -861,13 +865,47 @@ s32 func0f188bcc(void)
 	return NUM_MPWEAPONS;
 }
 
-s32 mpGetNumWeaponOptions(void)
+bool mpIsUnlockedGun(s32 mpweaponnum)
+{
+	if (mpweaponnum >= 0 && mpweaponnum < NUM_MPWEAPONS) {
+		return challengeIsFeatureUnlocked(g_MpWeapons[mpweaponnum].unlockfeature);
+	}
+
+	return false;
+}
+
+bool mpIsValidGoldenGun(s32 mpweaponnum)
+{
+	switch (mpweaponnum) {
+		case MPWEAPON_NONE:
+		case MPWEAPON_LAPTOPGUN:
+		case MPWEAPON_DRAGON:
+#if VERSION != VERSION_JPN_FINAL
+		case MPWEAPON_COMBATKNIFE:
+#endif
+		case MPWEAPON_GRENADE:
+		case MPWEAPON_NBOMB:
+		case MPWEAPON_TIMEDMINE:
+		case MPWEAPON_PROXIMITYMINE:
+		case MPWEAPON_REMOTEMINE:
+		case MPWEAPON_XRAYSCANNER:
+		case MPWEAPON_CLOAKINGDEVICE:
+		case MPWEAPON_COMBATBOOST:
+		case MPWEAPON_SHIELD:
+		case MPWEAPON_DISABLED:
+			return false;
+		default:
+			return mpIsUnlockedGun(mpweaponnum);
+	}
+}
+
+s32 mpGetNumWeaponOptions(bool (*condition)(s32))
 {
 	s32 count = 0;
 	s32 i;
 
 	for (i = 0; i < ARRAYCOUNT(g_MpWeapons); i++) {
-		if (challengeIsFeatureUnlocked(g_MpWeapons[i].unlockfeature)) {
+		if (condition(i)) {
 			count++;
 		}
 	}
@@ -875,12 +913,12 @@ s32 mpGetNumWeaponOptions(void)
 	return count;
 }
 
-char *mpGetWeaponLabel(s32 weaponnum)
+char *mpGetWeaponLabel(s32 weaponnum, bool (*condition)(s32))
 {
 	s32 i;
 
 	for (i = 0; i < ARRAYCOUNT(g_MpWeapons); i++) {
-		if (challengeIsFeatureUnlocked(g_MpWeapons[i].unlockfeature)) {
+		if (condition(i)) {
 			if (weaponnum == 0) {
 				if (g_MpWeapons[i].weaponnum == WEAPON_NONE) {
 					return langGet(L_MPWEAPONS_058); // "Nothing"
@@ -909,29 +947,40 @@ const char var7f1b8a5c[] = "Gun index %d -> slot %d = gun %d\n\n";
 const char var7f1b8a80[] = "HOLDER: selecting weapon set %d\n";
 #endif
 
-void mpSetWeaponSlot(s32 slot, s32 mpweaponnum)
+void mpSetWeaponSlot(s32 slot, s32 mpweaponnum, bool (*condition)(s32))
 {
 	s32 optionindex = mpweaponnum;
 	s32 i;
 
 	for (i = 0; i <= mpweaponnum; i++) {
-		if (challengeIsFeatureUnlocked(g_MpWeapons[i].unlockfeature) == 0) {
+		if (!condition(i)) {
 			mpweaponnum++;
 		}
 
 		optionindex = mpweaponnum;
 	}
 
-	g_MpSetup.weapons[slot] = optionindex;
+	if (slot == ARRAYCOUNT(g_MpSetup.weapons)) {
+		g_ScenarioData.mgg.mpweaponnum = optionindex;
+	} else {
+		g_MpSetup.weapons[slot] = optionindex;
+	}
 }
 
-s32 mpGetWeaponSlot(s32 slot)
+s32 mpGetWeaponSlot(s32 slot, bool (*condition)(s32))
 {
 	s32 count = 0;
 	s32 i;
+	s32 weaponslot;
 
-	for (i = 0; i < g_MpSetup.weapons[slot]; i++) {
-		if (challengeIsFeatureUnlocked(g_MpWeapons[i].unlockfeature)) {
+	if (slot == ARRAYCOUNT(g_MpSetup.weapons)) {
+		weaponslot = g_ScenarioData.mgg.mpweaponnum;
+	} else {
+		weaponslot = g_MpSetup.weapons[slot];
+	}
+
+	for (i = 0; i < weaponslot; i++) {
+		if (condition(i)) {
 			count++;
 		}
 	}
@@ -945,9 +994,27 @@ struct mpweapon *func0f188e24(s32 arg0)
 	s32 slot = 0;
 	s32 a2 = v0;
 	u8 mpweaponnum;
+	int i;
+	u8 scenarioweapon;
+
+	switch (g_MpSetup.scenario) {
+	case MPSCENARIO_GOLDENGUN:
+		scenarioweapon = g_ScenarioData.mgg.mpweaponnum;
+		break;
+	default:
+		scenarioweapon = MPWEAPON_DISABLED;
+		break;
+	}
+
+	for (i = 0; i < ARRAYCOUNT(g_MpSetup.weapons); i++) {
+		if (g_MpSetup.weapons[i] == scenarioweapon) {
+			scenarioweapon = MPWEAPON_DISABLED;
+			break;
+		}
+	}
 
 	while (v0 > 0) {
-		mpweaponnum = g_MpSetup.weapons[slot];
+		mpweaponnum = (slot == ARRAYCOUNT(g_MpSetup.weapons)) ? scenarioweapon : g_MpSetup.weapons[slot];
 
 		if (g_MpWeapons[mpweaponnum].weaponnum != WEAPON_DISABLED) {
 			v0--;
@@ -956,7 +1023,7 @@ struct mpweapon *func0f188e24(s32 arg0)
 		if (v0 > 0) {
 			slot++;
 
-			if (slot >= 6) {
+			if (slot > ARRAYCOUNT(g_MpSetup.weapons)) {
 				slot = 0;
 
 				if (a2 == v0) {
@@ -1134,19 +1201,21 @@ void mpApplyWeaponSet(void)
 			}
 		}
 	} else if (g_MpWeaponSetNum == WEAPONSET_RANDOM) {
-		s32 numoptions = mpGetNumWeaponOptions();
+		s32 numoptions = mpGetNumWeaponOptions(&mpIsUnlockedGun);
 
 		for (i = 0; i < ARRAYCOUNT(g_MpSetup.weapons); i++) {
-			mpSetWeaponSlot(i, random() % numoptions);
+			mpSetWeaponSlot(i, random() % numoptions, &mpIsUnlockedGun);
 		}
 	} else if (g_MpWeaponSetNum == WEAPONSET_RANDOMFIVE) {
-		s32 numoptions = mpGetNumWeaponOptions() - 2;
+		s32 numoptions = mpGetNumWeaponOptions(&mpIsUnlockedGun) - 2;
 
 		for (i = 0; i < 5; i++) {
-			mpSetWeaponSlot(i, random() % numoptions + 1);
+			mpSetWeaponSlot(i, random() % numoptions + 1, &mpIsUnlockedGun);
 		}
 
-		mpSetWeaponSlot(i, mpGetNumWeaponOptions() - 1);
+		for (; i < ARRAYCOUNT(g_MpSetup.weapons); i++) {
+			mpSetWeaponSlot(i, mpGetNumWeaponOptions(&mpIsUnlockedGun) - 1, &mpIsUnlockedGun);
+		}
 	}
 }
 
@@ -5299,7 +5368,7 @@ void mpApplyConfig(struct mpconfigfull *config)
 	}
 
 	if (!challengeIsFeatureUnlocked(MPFEATURE_WEAPON_SHIELD)) {
-		for (i = 0; i < 6; i++) {
+		for (i = 0; i < ARRAYCOUNT(g_MpSetup.weapons); i++) {
 			if (g_MpSetup.weapons[i] == MPWEAPON_SHIELD) {
 				g_MpSetup.weapons[i] = MPWEAPON_NONE;
 			}
@@ -5380,7 +5449,7 @@ void mpsetupfileLoadWad(struct savebuffer *buffer)
 
 	mpGenerateBotNames();
 
-	for (i = 0; i < 6; i++) {
+	for (i = 0; i < ARRAYCOUNT(g_MpSetup.weapons); i++) {
 		g_MpSetup.weapons[i] = savebufferReadBits(buffer, 7);
 	}
 
@@ -5446,7 +5515,7 @@ void mpsetupfileSaveWad(struct savebuffer *buffer)
 		savebufferOr(buffer, g_BotConfigsArray[i].base.team, 3);
 	}
 
-	for (i = 0; i < 6; i++) {
+	for (i = 0; i < ARRAYCOUNT(g_MpSetup.weapons); i++) {
 		savebufferOr(buffer, g_MpSetup.weapons[i], 7);
 	}
 

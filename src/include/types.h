@@ -4382,6 +4382,16 @@ struct scenariodata_htb {
 	s16 padnums[60];
 };
 
+struct scenariodata_mgg {
+	s16 numpads;
+	s16 padnums[60];
+	s32 numpoints[MAX_MPCHRS];
+	struct prop *goldengun;
+	u8 mpweaponnum;
+	u8 highlightgoldengun : 1;
+	u8 showgoldengunonradar : 1;
+};
+
 struct htmterminal {
 	u32 unk00;
 	struct prop *prop;
@@ -4451,6 +4461,7 @@ struct scenariodata {
 		struct scenariodata_pac pac;
 		struct scenariodata_koh koh;
 		struct scenariodata_ctc ctc;
+		struct scenariodata_mgg mgg;
 	};
 };
 

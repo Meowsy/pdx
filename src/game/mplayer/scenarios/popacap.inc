@@ -209,17 +209,9 @@ void pacApplyNextVictim(void)
 		if (vplayernum == i) {
 			sprintf(text, langGet(L_MPWEAPONS_013)); // "You are the victim!"
 		} else if (scenarioChrsAreSameTeam(vplayernum, i)) {
-#if VERSION >= VERSION_JPN_FINAL
 			sprintf(text, langGet(L_MPWEAPONS_014), scenarioRemoveLineBreaks(g_MpAllChrConfigPtrs[vplayernum]->name, 0)); // "Protect %s!"
-#else
-			sprintf(text, langGet(L_MPWEAPONS_014), g_MpAllChrConfigPtrs[vplayernum]->name); // "Protect %s!"
-#endif
 		} else {
-#if VERSION >= VERSION_JPN_FINAL
 			sprintf(text, langGet(L_MPWEAPONS_015), scenarioRemoveLineBreaks(g_MpAllChrConfigPtrs[vplayernum]->name, 0)); // "Get %s!"
-#else
-			sprintf(text, langGet(L_MPWEAPONS_015), g_MpAllChrConfigPtrs[vplayernum]->name); // "Get %s!"
-#endif
 		}
 
 		scenarioCreateHudmsg(i, text);
@@ -229,19 +221,21 @@ void pacApplyNextVictim(void)
 void pacHandleDeath(s32 aplayernum, s32 vplayernum)
 {
 	struct scenariodata_pac *data = &g_ScenarioData.pac;
+	char text[64];
 
 	if (data->victimindex >= 0 && vplayernum == data->victims[data->victimindex]) {
 		if (aplayernum != vplayernum) {
 			if (aplayernum >= 0) {
 				if (scenarioChrsAreSameTeam(aplayernum, vplayernum)) {
-					scenarioCreateHudmsg(aplayernum, langGet(L_MPWEAPONS_008)); // "You're supposed to look"
-					scenarioCreateHudmsg(aplayernum, langGet(L_MPWEAPONS_009)); // "after your friends!"
+					sprintf(text, langGet(L_MPWEAPONS_008)); // "You're supposed to look"
+					sprintf(text, langGet(L_MPWEAPONS_009)); // "after your friends!"
 				} else {
 					data->killcounts[aplayernum]++;
-					scenarioCreateHudmsg(aplayernum, langGet(L_MPWEAPONS_010)); // "Well done!"
-					scenarioCreateHudmsg(aplayernum, langGet(L_MPWEAPONS_011)); // "You popped a cap!"
-					scenarioCreateHudmsg(aplayernum, langGet(L_MPWEAPONS_012)); // "Have 2 Points..."
+					sprintf(text, langGet(L_MPWEAPONS_010)); // "Well done!"
+					sprintf(text, langGet(L_MPWEAPONS_011)); // "You popped a cap!"
+					sprintf(text, langGet(L_MPWEAPONS_012)); // "Have 2 Points..."
 				}
+				scenarioCreateHudmsg(aplayernum, text);
 			}
 
 			pacApplyNextVictim();

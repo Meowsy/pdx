@@ -779,6 +779,10 @@ $(B_DIR)/%.o: src/%.c $(ASSETMGR_O_FILES) $(RECOMP_FILES)
 	@mkdir -p $(dir $@)
 	$(CC) -c $(CFLAGS) $(OPT_LVL) -o $@ $<
 
+$(B_DIR)/game/mplayer/scenarios.o: src/game/mplayer/scenarios.c src/game/mplayer/scenarios/capturethecase.inc src/game/mplayer/scenarios/combat.inc src/game/mplayer/scenarios/goldengun.inc src/game/mplayer/scenarios/hackthatmac.inc src/game/mplayer/scenarios/holdthebriefcase.inc src/game/mplayer/scenarios/kingofthehill.inc src/game/mplayer/scenarios/popacap.inc $(ASSETMGR_O_FILES) $(RECOMP_FILES)
+	@mkdir -p $(dir $@)
+	$(CC) -c $(CFLAGS) $(OPT_LVL) -o $@ $<
+
 $(B_DIR)/%.o: src/%.s
 	@mkdir -p $(dir $@)
 	cpp -P -Wno-trigraphs -I include -I include/PR -I src/include $(C_DEFINES) -D_LANGUAGE_ASSEMBLY -D_MIPSEB $< | $(AS) $(ASFLAGS) -o $@
