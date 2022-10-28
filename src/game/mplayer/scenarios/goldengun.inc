@@ -340,8 +340,7 @@ void mggHandleDeath(s32 aplayernum, s32 vplayernum)
 	if (aplayernum != vplayernum) {
 		if (aplayernum >= 0) {
 			if (scenarioChrsAreSameTeam(aplayernum, vplayernum)) {
-				sprintf(text, langGet(L_MPWEAPONS_008)); // "You're supposed to look"
-				sprintf(text, langGet(L_MPWEAPONS_009)); // "after your friends!"
+				sprintf(text, "%s%s", langGet(L_MPWEAPONS_008), langGet(L_MPWEAPONS_009)); // "You're supposed to look\nafter your friends!"
 				scenarioCreateHudmsg(aplayernum, text);
 			} else if (invGoldenGunEquipped(aplayernum)) {
 				g_ScenarioData.mgg.numpoints[aplayernum]++;
