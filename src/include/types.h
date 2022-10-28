@@ -745,7 +745,6 @@ struct aibot {
 	/*0x06c*/ f32 unk06c;
 	/*0x070*/ f32 unk070;
 	/*0x074*/ s8 distmode;
-	/*0x075*/ s8 unk075;
 	/*0x076*/ s16 lastkilledbyplayernum;
 	/*0x078*/ u8 unk078;
 	/*0x079*/ u8 command;
@@ -836,8 +835,6 @@ struct aibot {
 	/*0x2cc*/ s32 random2ttl60;
 	/*0x2d0*/ u32 random2;
 	/*0x2d4*/ f32 randomfrac;
-	/*0x2d8*/ u32 unk2d8;
-	/*0x2dc*/ u32 unk2dc;
 };
 
 struct geo {
