@@ -18,7 +18,29 @@ def main():
         fd = open(commonpath, 'r')
         data = fd.read()
         fd.close()
-        rows += json.loads(data)
+        rowscommon = json.loads(data)
+
+        for addition in rowscommon:
+            replaced = False
+            if (isinstance(addition["id"], str)):
+                idtable = [ addition["id"] ]
+            else:
+                idtable = addition["id"]
+            if ("aka" in addition):
+                if (isinstance(addition["aka"], str)):
+                    idtable += [ addition["aka"] ]
+                else:
+                    idtable += addition["aka"]
+            for aka in idtable:
+                index = listgetindexofid(rows, aka)
+                if (index >= 0):
+                    if (replaced):
+                        del rows[index]
+                    else:
+                        rows[index] = addition
+                        replaced = True
+            if (replaced == False):
+                rows += [ addition ]
 
     basename = os.path.basename(sys.argv[1]).replace('.json', '')
     shortname = get_shortname(basename)
@@ -37,7 +59,7 @@ def make_header(rows, shortname):
     filename = 'lang/%s.h' % shortname
     terminator = 'L_%s_END' % shortname.upper()
     start = banks.index(shortname) * 512
-    assetmgr.write_enums(typename, enums, filename, terminator, start=start)
+    assetmgr.write_enums(typename, enums, filename, terminator, start=start, rows=rows)
 
 def make_object(rows, basename, key):
     if len(rows) > 512:
@@ -462,5 +484,11 @@ jpnchars = {
 	'倒': 0x86b9,
 	'須': 0x86c9,
 }
+
+def listgetindexofid(list, id):
+    for i in range(len(list)):
+        if list[i]["id"] == id:
+            return i
+    return -1
 
 main()

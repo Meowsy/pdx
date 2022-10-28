@@ -21,7 +21,7 @@ def pad16(binary):
 
     return binary
 
-def write_enums(typename, names, filename, terminator, start=0):
+def write_enums(typename, names, filename, terminator, start=0, rows=None):
     filename = 'src/generated/%s/%s' % (os.environ['ROMID'], filename)
     mkpath(filename)
 
@@ -37,6 +37,12 @@ def write_enums(typename, names, filename, terminator, start=0):
             fd.write('\t%s = 0x%x,\n' % (name, start))
         else:
             fd.write('\t%s,\n' % name)
+
+    if rows != None:
+        for entry in rows:
+            if ("aka" in entry):
+                for aka in entry["aka"]:
+                    fd.write('\t%s = %s,\n' % (aka, entry["id"]))
 
     fd.write('\t%s\n' % terminator)
     fd.write('};\n')
