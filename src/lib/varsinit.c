@@ -44,6 +44,7 @@ void varsInit(void)
 	g_Vars.antiradaron = 1;
 	g_Vars.pendingantiplayernum = 1;
 	g_Vars.modifiedfiles = 0;
+	g_Vars.numaibuddies = 0;
 	g_Vars.bondvisible = true;
 	g_Vars.bondcollisions = true;
 	g_Vars.tickmode = TICKMODE_GE_FADEIN;

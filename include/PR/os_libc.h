@@ -89,8 +89,7 @@ extern void     bzero(void *, int);
 extern int		sprintf(char *s, const char *fmt, ...);
 extern void		osSyncPrintf(const char *fmt, ...);
 extern void		pdxOsSyncPrintf(const char* fmt, ...);
-#define pdxDebugPrintf(fmt)		pdxOsSyncPrintf(__FILE__ ":%i (%s): " fmt, __LINE__, __PRETTY_FUNCTION__)
-#define pdxDebugPrintfArgs(fmt, ...)	pdxOsSyncPrintf(__FILE__ ":%i (%s): " fmt, __LINE__, __PRETTY_FUNCTION__, __VA_ARGS__)
+#define pdxDebugPrintf(fmt, ...)	pdxOsSyncPrintf(__FILE__ ":%i (%s): " fmt, __LINE__, __PRETTY_FUNCTION__, ## __VA_ARGS__)
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */

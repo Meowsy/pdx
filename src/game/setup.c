@@ -1388,7 +1388,9 @@ void setupLoadFiles(s32 stagenum)
 		// Count the number of chrs and objects so enough model slots can be allocated
 		numchrs += setupCountCommandType(OBJTYPE_CHR);
 
-		if (!g_Vars.normmplayerisrunning && g_MissionConfig.iscoop && playerSimulantBuddiesCount() > 0) {
+		buddyCalculateSimulantBuddiesAmount();
+
+		if (!g_Vars.normmplayerisrunning && g_MissionConfig.iscoop && g_Vars.numaibuddies > 0) {
 			for (i = 0; i < ARRAYCOUNT(g_Vars.aibuddies); i++) {
 				if (g_Vars.aibuddytype[i] != BUDDY_NONE) {
 					numchrs++;
@@ -1501,8 +1503,11 @@ void setupCreateProps(s32 stagenum)
 
 			if (g_Vars.normmplayerisrunning == false
 					&& g_MissionConfig.iscoop
-					&& playerSimulantBuddiesCount() > 0) {
-				numchrs += playerSimulantBuddiesCount();
+					&& g_Vars.numaibuddies > 0) {
+				numchrs += g_Vars.numaibuddies;
+				pdxDebugPrintf("Adding %i chrs for %i g_Vars.numaibuddies\n", g_Vars.numaibuddies, g_Vars.numaibuddies);
+			} else {
+				pdxDebugPrintf("Adding %i chrs for %i g_Vars.numaibuddies\n", 0, g_Vars.numaibuddies);
 			}
 
 			chrmgrConfigure(numchrs);

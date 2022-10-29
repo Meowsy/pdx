@@ -195,6 +195,7 @@ struct g_vars {
 	/*0x468*/ bool speedpillon;
 	/*0x46c*/ s32 restartlevel;
 	/*0x470*/ s32 perfectbuddynum;
+	/*0x474*/ s32 numaibuddies;
 	/*0x478*/ bool aibuddiesspawned;
 	/*0x47c*/ s32 bossfileid;
 	/*0x480*/ u16 bossdeviceserial;

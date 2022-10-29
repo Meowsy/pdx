@@ -516,7 +516,7 @@ void bodyAllocateChr(s32 stagenum, struct packedchr *packed, s32 cmdindex)
 				chr->chrflags |= CHRCFLAG_CLONEABLE;
 			}
 
-			if (!g_Vars.normmplayerisrunning && g_MissionConfig.iscoop && playerSimulantBuddiesCount() > 0) {
+			if (!g_Vars.normmplayerisrunning && g_MissionConfig.iscoop && g_Vars.numaibuddies) {
 				chr->flags |= CHRFLAG0_AIVSAI;
 			}
 

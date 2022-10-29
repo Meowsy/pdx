@@ -6,6 +6,6 @@
 
 extern struct buddy g_Buddies[NUM_BUDDIES];
 
-s32 playerSimulantBuddiesCount();
+void buddyCalculateSimulantBuddiesAmount();
 
 #endif

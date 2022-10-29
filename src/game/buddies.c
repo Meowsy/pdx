@@ -114,12 +114,13 @@ struct buddy g_Buddies[NUM_BUDDIES] = {
     },
 };
 
-s32 playerSimulantBuddiesCount()
+void buddyCalculateSimulantBuddiesAmount()
 {
 	s32 i;
-	s32 count = 0;
+	g_Vars.numaibuddies = 0;
 	for (i = 0; i < ARRAYCOUNT(g_Vars.aibuddies); i++) {
-		count += g_Vars.aibuddytype[i] != BUDDY_NONE;
+		g_Vars.numaibuddies += g_Vars.aibuddytype[i] != BUDDY_NONE;
 	}
-	return count;
+
+    pdxDebugPrintf("g_Vars.numaibuddies: %i\n", g_Vars.numaibuddies);
 }

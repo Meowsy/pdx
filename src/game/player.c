@@ -3969,7 +3969,7 @@ void playerTick(bool arg0)
 
 		if (g_Vars.normmplayerisrunning == false
 				&& g_MissionConfig.iscoop
-				&& playerSimulantBuddiesCount() > 0
+				&& g_Vars.numaibuddies > 0
 				&& !g_Vars.aibuddiesspawned
 				&& g_Vars.stagenum != STAGE_CITRAINING
 				&& g_Vars.lvframenum > 20) {
