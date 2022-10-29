@@ -87,6 +87,8 @@
 #include "lib/lib_06440.h"
 #include "lib/lib_317f0.h"
 #include "lib/main.h"
+#include "lib/mema.h"
+#include "lib/memp.h"
 #include "lib/mtx.h"
 #include "lib/music.h"
 #include "lib/rng.h"
@@ -428,6 +430,7 @@ void lvReset(s32 stagenum)
 			playerReset();
 			playerSpawn();
 			bheadReset();
+			bgunPreload();
 
 			if (g_Vars.normmplayerisrunning && (g_MpSetup.options & MPOPTION_TEAMSENABLED)) {
 				playermgrCalculateAiBuddyNums();
@@ -438,6 +441,7 @@ void lvReset(s32 stagenum)
 		portalsReset();
 		lightsReset();
 		setCurrentPlayerNum(0);
+		bgPreload();
 	}
 
 	if (g_Vars.lvmpbotlevel) {
@@ -449,14 +453,6 @@ void lvReset(s32 stagenum)
 
 	if (stagenum == STAGE_BOOTPAKMENU) {
 		bootmenuReset();
-	}
-
-	if (stagenum == STAGE_4MBMENU) {
-		fmbReset();
-	}
-
-	if (IS8MB()) {
-		pheadReset();
 	}
 
 	modelmgrSetLvResetting(false);
@@ -915,9 +911,7 @@ void lvFindThreats(void)
 	struct prop **propptr = g_Vars.endonscreenprops - 1;
 	struct coord campos;
 
-	campos.x = g_Vars.currentplayer->cam_pos.x;
-	campos.y = g_Vars.currentplayer->cam_pos.y;
-	campos.z = g_Vars.currentplayer->cam_pos.z;
+	campos = g_Vars.currentplayer->cam_pos;
 
 	while (propptr >= g_Vars.onscreenprops) {
 		prop = *propptr;
@@ -948,6 +942,168 @@ void lvFindThreats(void)
 
 		propptr--;
 	}
+}
+
+u8 g_LvShowRates = 0;
+u8 g_LvAntialias = 1;
+u8 g_LvRateIndex = 59;
+u8 g_LvOom = 0;
+u32 g_LvOomSize = 0;
+u8 g_LvFrameRates[60];
+
+void lvRecordRate(void)
+{
+	g_LvFrameRates[g_LvRateIndex] = OS_CPU_COUNTER / g_Vars.diffframet;
+
+	g_LvRateIndex++;
+
+	if (g_LvRateIndex >= 60) {
+		g_LvRateIndex = 0;
+	}
+}
+
+Gfx *func0f153134(Gfx *gdl);
+
+Gfx *lvPrintRateGraph(Gfx *gdl)
+{
+	s32 i;
+	s32 top = 10;
+	s32 bottom = 70;
+	s32 x;
+	s32 y;
+
+	gdl = func0f153134(gdl);
+
+	// graph data
+	gdl = textSetPrimColour(gdl, 0x00ff00a0);
+
+	for (i = 0; i < 60; i++) {
+		s32 index = (g_LvRateIndex + i) % 60;
+
+		x = 10 + i * 2;
+		y = top + 60 - g_LvFrameRates[index];
+
+		gDPFillRectangleScaled(gdl++, x, y, x + 2, bottom);
+	}
+
+	gdl = text0f153838(gdl);
+
+	// grid lines
+	gdl = textSetPrimColour(gdl, 0x000000a0);
+
+	gDPFillRectangleScaled(gdl++, 10, 10, 130, 11);
+	gDPFillRectangleScaled(gdl++, 10, 20, 130, 21);
+	gDPFillRectangleScaled(gdl++, 10, 30, 130, 31);
+	gDPFillRectangleScaled(gdl++, 10, 40, 130, 41);
+	gDPFillRectangleScaled(gdl++, 10, 50, 130, 51);
+	gDPFillRectangleScaled(gdl++, 10, 60, 130, 61);
+	gDPFillRectangleScaled(gdl++, 10, 70, 130, 71);
+
+	// labels
+	gdl = func0f0d479c(gdl);
+
+	if (g_FontHandelGothicXs) {
+		x = 120 + 15;
+		y = 7;
+		gdl = textRender(gdl, &x, &y, "60", g_CharsHandelGothicXs, g_FontHandelGothicXs, 0x00ff00a0, 0x000000a0, viGetWidth(), viGetHeight(), 0, 0);
+
+		x = 120 + 15;
+		y = 37;
+		gdl = textRender(gdl, &x, &y, "30", g_CharsHandelGothicXs, g_FontHandelGothicXs, 0x00ff00a0, 0x000000a0, viGetWidth(), viGetHeight(), 0, 0);
+	}
+
+	return gdl;
+}
+
+Gfx *lvPrintRateText(Gfx *gdl)
+{
+	if (g_FontHandelGothicXs) {
+		char buffer[64];
+		s32 x = 10;
+		s32 y = 80;
+		s32 i;
+		s32 sum = 0;
+		s32 count = 0;
+		u32 min = 0xffffffff;
+		u32 max = 0;
+
+		for (i = 0; i < 60; i++) {
+			if (g_LvFrameRates[i]) {
+				sum += g_LvFrameRates[i];
+				count++;
+
+				if (g_LvFrameRates[i] < min) {
+					min = g_LvFrameRates[i];
+				}
+
+				if (g_LvFrameRates[i] > max) {
+					max = g_LvFrameRates[i];
+				}
+			}
+		}
+
+		if (count) {
+			x = 10;
+			sprintf(buffer, "min %d", min);
+			gdl = textRender(gdl, &x, &y, buffer, g_CharsHandelGothicXs, g_FontHandelGothicXs, 0x00ff00a0, 0x000000a0, viGetWidth(), viGetHeight(), 0, 0);
+
+			x = 50;
+			sprintf(buffer, "max %d", max);
+			gdl = textRender(gdl, &x, &y, buffer, g_CharsHandelGothicXs, g_FontHandelGothicXs, 0x00ff00a0, 0x000000a0, viGetWidth(), viGetHeight(), 0, 0);
+
+			x = 90;
+			sprintf(buffer, "avg %d", sum / count);
+			gdl = textRender(gdl, &x, &y, buffer, g_CharsHandelGothicXs, g_FontHandelGothicXs, 0x00ff00a0, 0x000000a0, viGetWidth(), viGetHeight(), 0, 0);
+
+			x = 130;
+			sprintf(buffer, "cur %d\n\n", (s32) (OS_CPU_COUNTER / g_Vars.diffframet));
+			gdl = textRender(gdl, &x, &y, buffer, g_CharsHandelGothicXs, g_FontHandelGothicXs, 0x00ff00a0, 0x000000a0, viGetWidth(), viGetHeight(), 0, 0);
+		}
+
+		x = 10;
+		sprintf(buffer, "Antialias %s\n", g_LvAntialias ? "on" : "off");
+		gdl = textRender(gdl, &x, &y, buffer, g_CharsHandelGothicXs, g_FontHandelGothicXs, 0x00ff00a0, 0x000000a0, viGetWidth(), viGetHeight(), 0, 0);
+
+		sprintf(buffer, "mema free %d KB\n", memaGetLongestFree() / 1024);
+		gdl = textRender(gdl, &x, &y, buffer, g_CharsHandelGothicXs, g_FontHandelGothicXs, 0x00ff00a0, 0x000000a0, viGetWidth(), viGetHeight(), 0, 0);
+
+		sprintf(buffer, "memp free %d KB\n", mempGetStageFree() / 1024);
+		gdl = textRender(gdl, &x, &y, buffer, g_CharsHandelGothicXs, g_FontHandelGothicXs, 0x00ff00a0, 0x000000a0, viGetWidth(), viGetHeight(), 0, 0);
+
+		if (g_LvOom) {
+			sprintf(buffer, "mem%c OOM %x\n", g_LvOom, g_LvOomSize);
+			gdl = textRender(gdl, &x, &y, buffer, g_CharsHandelGothicXs, g_FontHandelGothicXs, 0xff0000a0, 0x000000a0, viGetWidth(), viGetHeight(), 0, 0);
+		}
+	}
+
+	return gdl;
+}
+
+Gfx *lvPrint(Gfx *gdl)
+{
+	if (joyGetButtonsPressedThisFrame(0, L_TRIG)) {
+		g_LvShowRates = 1 - g_LvShowRates;
+	}
+
+	if (joyGetButtonsPressedThisFrame(0, U_JPAD)) {
+		g_LvAntialias = 1 - g_LvAntialias;
+		viUpdateMode();
+	}
+
+	lvRecordRate();
+
+	if (g_LvShowRates) {
+		g_ScaleX = g_ViRes == VIRES_HI ? 2 : 1;
+
+		gdl = text0f153628(gdl);
+		gdl = lvPrintRateGraph(gdl);
+		gdl = lvPrintRateText(gdl);
+		gdl = text0f153780(gdl);
+
+		g_ScaleX = 1;
+	}
+
+	return gdl;
 }
 
 /**
@@ -1264,9 +1420,7 @@ Gfx *lvRender(Gfx *gdl)
 							sndStart(var80095200, SFX_DRUGSPY_FIREDART, 0, -1, -1, -1, -1, -1);
 							g_Vars.currentplayer->eyespydarts--;
 
-							direction.x = g_Vars.currentplayer->eyespy->look.x;
-							direction.y = g_Vars.currentplayer->eyespy->look.y;
-							direction.z = g_Vars.currentplayer->eyespy->look.z;
+							direction = g_Vars.currentplayer->eyespy->look;
 
 							projectileCreate(g_Vars.currentplayer->eyespy->prop, 0,
 									&g_Vars.currentplayer->eyespy->prop->pos, &direction, WEAPON_TRANQUILIZER, NULL);
@@ -1723,6 +1877,8 @@ Gfx *lvRender(Gfx *gdl)
 		CRASH();
 	}
 #endif
+
+	gdl = lvPrint(gdl);
 
 	return gdl;
 }

@@ -58,7 +58,7 @@ bool botroomFindPos(s16 room, struct coord *pos, f32 *angleptr, s32 *padnumptr, 
 	s32 padnums[40]; // written to stack
 	s32 padcount;
 	s32 totalcount;
-	struct pad pad;
+	struct pad *pad;
 	bool sp54;
 	bool sp50;
 	s32 count;
@@ -105,14 +105,12 @@ bool botroomFindPos(s16 room, struct coord *pos, f32 *angleptr, s32 *padnumptr, 
 				waypointnum = g_Vars.waypointnums[g_Rooms[room].firstwaypoint + i];
 				waypoint = &g_StageSetup.waypoints[waypointnum];
 
-				padUnpack(waypoint->padnum, PADFIELD_FLAGS, &pad);
-
-				if (sp50 && (pad.flags & PADFLAG_20000)) {
+				if (sp50 && (g_Pads[waypoint->padnum].flags & PADFLAG_20000)) {
 					padUnsetFlag(waypoint->padnum, PADFLAG_20000);
 					padnums[padcount] = waypoint->padnum;
 					padcount++;
 					totalcount++;
-				} else if ((pad.flags & PADFLAG_20000) == 0) {
+				} else if ((g_Pads[waypoint->padnum].flags & PADFLAG_20000) == 0) {
 					padnums[padcount] = waypoint->padnum;
 					padcount++;
 					totalcount++;
@@ -140,22 +138,19 @@ bool botroomFindPos(s16 room, struct coord *pos, f32 *angleptr, s32 *padnumptr, 
 	if (i < covercount) {
 		coverUnpack(covernums[i], &cover);
 
-		pos->x = cover.pos->x;
-		pos->y = cover.pos->y;
-		pos->z = cover.pos->z;
+		*pos = *cover.pos;
 
 		*angleptr = atan2f(cover.look->z, cover.look->x);
 		*padnumptr = -1;
 		*covernumptr = covernums[i];
 	} else {
 		i -= covercount;
-		padUnpack(padnums[i], PADFIELD_POS | PADFIELD_LOOK, &pad);
 
-		pos->x = pad.pos.x;
-		pos->y = pad.pos.y;
-		pos->z = pad.pos.z;
+		pad = &g_Pads[padnums[i]];
 
-		*angleptr = atan2f(pad.look.z, pad.look.x);
+		*pos = pad->pos;
+
+		*angleptr = atan2f(pad->look.z, pad->look.x);
 		*padnumptr = padnums[i];
 		*covernumptr = -1;
 	}

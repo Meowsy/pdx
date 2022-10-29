@@ -368,8 +368,6 @@ char *cheatGetNameIfUnlocked(struct menuitem *item)
 s32 cheatMenuHandleDialog(s32 operation, struct menudialogdef *dialogdef, union handlerdata *data)
 {
 	if (operation == MENUOP_OPEN) {
-		func0f14a52c();
-
 		if (gbpakIsAnyPerfectDark()) {
 			gamefileSetFlag(GAMEFILEFLAG_USED_TRANSFERPAK);
 		}
@@ -403,8 +401,6 @@ s32 cheatMenuHandleDialog(s32 operation, struct menudialogdef *dialogdef, union 
 		if (gbpakIsAnyPerfectDark()) {
 			gamefileSetFlag(GAMEFILEFLAG_USED_TRANSFERPAK);
 		}
-
-		func0f14a560();
 	}
 
 	return 0;

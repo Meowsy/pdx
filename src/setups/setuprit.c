@@ -627,7 +627,6 @@ u8 func1004_reassign_ailists_during_conversation[] = {
 	endloop(0x04)
 
 	label(0x06)
-	dprint 'b','4',' ','s','h','i','e','l','d',' ','c','h','e','c','k','\n',0,
 	set_stage_flag(STAGEFLAG_00100000)
 	set_chr_target_chr(CHR_PRESIDENT, CHR_P1P2)
 	set_ailist(0x01, AILIST_BE_UNALERT)
@@ -872,9 +871,7 @@ u8 func0403_stripes[] = {
 		// Got target
 		label(0x06)
 		if_target_is_player(/*goto*/ 0x06)
-		if_chr_dead(CHR_TARGET, /*goto*/ 0x2d)
-		if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x2d)
-		if_chr_knockedout(CHR_TARGET, /*goto*/ 0x2d)
+		if_chr_deadish(CHR_TARGET, /*goto*/ 0x2d)
 		set_returnlist(CHR_SELF, AILIST_STRIPES)
 		set_shotlist(AILIST_STRIPES)
 		set_ailist(CHR_SELF, GAILIST_COMBAT_WITH_TARGET)
@@ -1103,15 +1100,11 @@ u8 func1009_check_end_level[] = {
 	label(0x08)
 	yield
 	label(0x06)
-	if_chr_death_animation_finished(CHR_BOND, /*goto*/ 0x2d)
-	if_chr_dead(CHR_BOND, /*goto*/ 0x2d)
-	if_chr_knockedout(CHR_BOND, /*goto*/ 0x2d)
+	if_chr_deadish(CHR_BOND, /*goto*/ 0x2d)
 	goto_next(0x06)
 
 	label(0x2d)
-	if_chr_death_animation_finished(CHR_COOP, /*goto*/ 0x2d)
-	if_chr_dead(CHR_COOP, /*goto*/ 0x2d)
-	if_chr_knockedout(CHR_COOP, /*goto*/ 0x2d)
+	if_chr_deadish(CHR_COOP, /*goto*/ 0x2d)
 	goto_next(0x06)
 
 	// Both players dead
@@ -1120,15 +1113,11 @@ u8 func1009_check_end_level[] = {
 
 	// Redundant check
 	label(0x06)
-	if_chr_death_animation_finished(CHR_BOND, /*goto*/ 0x2d)
-	if_chr_dead(CHR_BOND, /*goto*/ 0x2d)
-	if_chr_knockedout(CHR_BOND, /*goto*/ 0x2d)
+	if_chr_deadish(CHR_BOND, /*goto*/ 0x2d)
 	goto_next(0x06)
 
 	label(0x2d)
-	if_chr_death_animation_finished(CHR_COOP, /*goto*/ 0x2d)
-	if_chr_dead(CHR_COOP, /*goto*/ 0x2d)
-	if_chr_knockedout(CHR_COOP, /*goto*/ 0x2d)
+	if_chr_deadish(CHR_COOP, /*goto*/ 0x2d)
 	goto_next(0x06)
 
 	label(0x2d)
@@ -1193,9 +1182,7 @@ u8 func0406_init_president[] = {
 
 u8 func0405_president_in_room[] = {
 	set_shotlist(AILIST_PRESIDENT_IN_ROOM)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2d)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x2d)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x2d)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x2d)
 	goto_next(0x06)
 
 	// Dying
@@ -1210,9 +1197,7 @@ u8 func0405_president_in_room[] = {
 
 	beginloop(0x04)
 		if_stage_flag_eq(STAGEFLAG_00100000, TRUE, /*goto*/ 0x03)
-		if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2d)
-		if_chr_dead(CHR_SELF, /*goto*/ 0x2d)
-		if_chr_knockedout(CHR_SELF, /*goto*/ 0x2d)
+		if_chr_deadish(CHR_SELF, /*goto*/ 0x2d)
 	endloop(0x04)
 
 	// Dying
@@ -1452,9 +1437,7 @@ u8 func0404_president_running[] = {
 	set_self_chrflag(CHRCFLAG_PUSHABLE)
 	set_shotlist(AILIST_PRESIDENT_RUNNING)
 	set_target_chr(CHR_PRESET)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x06)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x06)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x06)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x06)
 	goto_next(0x2d)
 
 	// Dying
@@ -1474,7 +1457,6 @@ u8 func0404_president_running[] = {
 
 	// Alive
 	label(0x2d)
-	dprint 'b','4',' ','s','h','i','e','l','d',' ','c','h','e','c','k','\n',0,
 	if_just_injured(CHR_SELF, /*goto*/ 0x06)
 	goto_next(0x55)
 
@@ -1516,7 +1498,6 @@ u8 func0404_president_running[] = {
 		if_chr_in_room(CHR_TARGET, 0x00, 0x0030, /*goto*/ 0x11)
 		if_chr_in_room(CHR_TARGET, 0x00, 0x0031, /*goto*/ 0x11)
 		if_chr_in_room(CHR_TARGET, 0x00, 0x0032, /*goto*/ 0x11)
-		dprint 't','a','r','g','e','t','\n',0,
 		if_can_see_target(/*goto*/ 0x06)
 		goto_next(0x58)
 
@@ -1648,9 +1629,7 @@ u8 func0404_president_running[] = {
 
 u8 func100b_check_president_dead[] = {
 	beginloop(0x04)
-		if_chr_dead(CHR_PRESIDENT, /*goto*/ 0x06)
-		if_chr_death_animation_finished(CHR_PRESIDENT, /*goto*/ 0x06)
-		if_chr_knockedout(CHR_PRESIDENT, /*goto*/ 0x06)
+		if_chr_deadish(CHR_PRESIDENT, /*goto*/ 0x06)
 	endloop(0x04)
 
 	label(0x06)
@@ -1669,9 +1648,7 @@ u8 func0409_unused[] = {
 
 		label(0x06)
 		if_target_is_player(/*goto*/ 0x06)
-		if_chr_dead(CHR_TARGET, /*goto*/ 0x2d)
-		if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x2d)
-		if_chr_knockedout(CHR_TARGET, /*goto*/ 0x2d)
+		if_chr_deadish(CHR_TARGET, /*goto*/ 0x2d)
 		set_returnlist(CHR_SELF, 0x0409)
 		set_shotlist(0x0409)
 		set_ailist(CHR_SELF, GAILIST_COMBAT_WITH_TARGET)
@@ -1712,9 +1689,7 @@ u8 func100c_cockpit_stripes[] = {
 
 		label(0x06)
 		if_target_is_player(/*goto*/ 0x06)
-		if_chr_dead(CHR_TARGET, /*goto*/ 0x2d)
-		if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x2d)
-		if_chr_knockedout(CHR_TARGET, /*goto*/ 0x2d)
+		if_chr_deadish(CHR_TARGET, /*goto*/ 0x2d)
 		set_returnlist(CHR_SELF, AILIST_COCKPIT_STRIPES)
 		set_shotlist(GAILIST_COMBAT_WITH_TARGET)
 		set_ailist(CHR_SELF, GAILIST_COMBAT_WITH_TARGET)
@@ -1788,9 +1763,7 @@ u8 func0413_taker[] = {
 	endloop(0x0c)
 
 	label(0x06)
-	if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x11)
-	if_chr_dead(CHR_TARGET, /*goto*/ 0x11)
-	if_chr_knockedout(CHR_TARGET, /*goto*/ 0x11)
+	if_chr_deadish(CHR_TARGET, /*goto*/ 0x11)
 	try_attack_stand(ATTACKFLAG_AIMATTARGET | ATTACKFLAG_AIMONLY, 0, /*goto*/ 0x06)
 	label(0x06)
 	try_modify_attack(ATTACKFLAG_AIMATTARGET, 0, /*goto*/ 0x08)
@@ -1860,15 +1833,11 @@ u8 func100c_cockpit[] = {
 	endloop(0x04)
 
 	label(0x2d)
-	if_chr_dead(CHR_TAKER1, /*goto*/ 0x2d)
-	if_chr_death_animation_finished(CHR_TAKER1, /*goto*/ 0x2d)
-	if_chr_knockedout(CHR_TAKER1, /*goto*/ 0x2d)
+	if_chr_deadish(CHR_TAKER1, /*goto*/ 0x2d)
 	goto_next(0x06)
 
 	label(0x2d)
-	if_chr_dead(CHR_TAKER2, /*goto*/ 0x2d)
-	if_chr_death_animation_finished(CHR_TAKER2, /*goto*/ 0x2d)
-	if_chr_knockedout(CHR_TAKER2, /*goto*/ 0x2d)
+	if_chr_deadish(CHR_TAKER2, /*goto*/ 0x2d)
 	goto_next(0x06)
 
 	// Both takers dead
@@ -2167,7 +2136,6 @@ u8 func1002_intro[] = {
 	if_chr_death_animation_finished(CHR_COOP, /*goto*/ 0x2d)
 	set_chr_hiddenflag(CHR_COOP, CHRHFLAG_DISGUISED)
 	label(0x2d)
-	dprint 'D','I','S','G','U','I','S','E','D','\n',0,
 	camera_movement(ANIM_CUT_RIT_INTRO_CAM_03)
 	cmd0175(60)
 	if_chr_death_animation_finished(CHR_COOP, /*goto*/ 0x2d)
@@ -2337,9 +2305,7 @@ u8 func1011_dumbwaiter2[] = {
 u8 func040a_defend_pad[] = {
 	set_shotlist(AILIST_DEFEND_PAD)
 	set_returnlist(CHR_SELF, AILIST_DEFEND_PAD)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2d)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x2d)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x2d)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x2d)
 	goto_next(0x06)
 
 	// Dying
@@ -2368,7 +2334,6 @@ u8 func040a_defend_pad[] = {
 	jog_to_pad(PAD_PRESET)
 
 	beginloop(0x04)
-		dprint 'G','O',' ','T','O',' ','P','A','D','\n',0,
 		if_enemy_distance_lt_and_los(2540, /*goto*/ 0x08)
 		if_chr_distance_to_pad_lt(CHR_SELF, 200, PAD_PRESET, /*goto*/ 0x06)
 	endloop(0x04)
@@ -2377,7 +2342,6 @@ u8 func040a_defend_pad[] = {
 	stop_chr
 
 	beginloop(0x09)
-		dprint 'A','T',' ','P','A','D','\n',0,
 		if_enemy_distance_lt_and_los(2540, /*goto*/ 0x08)
 		if_chr_distance_to_pad_gt(CHR_SELF, 300, PAD_PRESET, /*goto*/ 0x06)
 	endloop(0x09)
@@ -2387,7 +2351,6 @@ u8 func040a_defend_pad[] = {
 
 	// Detected enemy
 	label(0x08)
-	dprint 'D','E','T','E','C','T','E','D','\n',0,
 	set_returnlist(CHR_SELF, AILIST_DEFEND_PAD)
 	set_shotlist(AILIST_DEFEND_PAD)
 	set_ailist(CHR_SELF, GAILIST_COMBAT_WITH_TARGET)
@@ -2406,7 +2369,6 @@ u8 func040b_defend_president[] = {
 	try_jog_to_chr(CHR_PRESIDENT, /*goto*/ 0x04)
 
 	beginloop(0x04)
-		dprint 'G','O',' ','T','O',' ','P','A','D','\n',0,
 		if_enemy_distance_lt_and_los(2540, /*goto*/ 0x08)
 		if_detected_chr(CHR_PRESIDENT, /*goto*/ 0x60)
 	endloop(0x04)
@@ -2420,7 +2382,6 @@ u8 func040b_defend_president[] = {
 	stop_chr
 
 	beginloop(0x09)
-		dprint 'A','T',' ','P','A','D','\n',0,
 		if_enemy_distance_lt_and_los(2540, /*goto*/ 0x08)
 		if_detected_chr(CHR_PRESIDENT, /*goto*/ 0x60)
 		goto_first(0x04)
@@ -2434,7 +2395,6 @@ u8 func040b_defend_president[] = {
 
 	// Detected enemy
 	label(0x08)
-	dprint 'D','E','T','E','C','T','E','D','\n',0,
 	set_returnlist(CHR_SELF, AILIST_DEFEND_PRESIDENT)
 	set_shotlist(AILIST_DEFEND_PRESIDENT)
 	set_ailist(CHR_SELF, GAILIST_COMBAT_WITH_TARGET)
@@ -2743,9 +2703,7 @@ u8 func041e_blonde[] = {
 	rebuild_squadrons
 	set_accuracy(30)
 	set_shotlist(AILIST_BLONDE)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x06)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x06)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x06)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x06)
 	goto_next(0x2d)
 
 	// Dying
@@ -2944,9 +2902,7 @@ u8 func0420_trent_attacking[] = {
 	endloop(0x08)
 
 	label(0x06)
-	if_chr_dead(CHR_TARGET, /*goto*/ 0x09)
-	if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x09)
-	if_chr_knockedout(CHR_TARGET, /*goto*/ 0x09)
+	if_chr_deadish(CHR_TARGET, /*goto*/ 0x09)
 	goto_first(0x03)
 
 	label(0x2d)
@@ -2991,13 +2947,8 @@ u8 func0422_trent_running[] = {
 
 u8 func1012_check_blondes_dead[] = {
 	beginloop(0x04)
-		if_chr_dead(CHR_BLONDE1, /*goto*/ 0x2d)
-		if_chr_death_animation_finished(CHR_BLONDE1, /*goto*/ 0x2d)
-		if_chr_knockedout(CHR_BLONDE1, /*goto*/ 0x2d)
-
-		if_chr_dead(CHR_BLONDE2, /*goto*/ 0x06)
-		if_chr_death_animation_finished(CHR_BLONDE2, /*goto*/ 0x06)
-		if_chr_knockedout(CHR_BLONDE2, /*goto*/ 0x06)
+		if_chr_deadish(CHR_BLONDE1, /*goto*/ 0x2d)
+		if_chr_deadish(CHR_BLONDE2, /*goto*/ 0x06)
 		reloop(0x04)
 
 		// Blonde 2 dead
@@ -3008,9 +2959,7 @@ u8 func1012_check_blondes_dead[] = {
 		// Blonde 1 dead
 		label(0x2d)
 		set_stage_flag(STAGEFLAG_ONE_BLONDE_DEAD)
-		if_chr_dead(CHR_BLONDE2, /*goto*/ 0x2d)
-		if_chr_death_animation_finished(CHR_BLONDE2, /*goto*/ 0x2d)
-		if_chr_knockedout(CHR_BLONDE2, /*goto*/ 0x2d)
+		if_chr_deadish(CHR_BLONDE2, /*goto*/ 0x2d)
 	endloop(0x04)
 
 	// Both blondes dead
@@ -3063,9 +3012,7 @@ u8 func0429_be_unalert[] = {
 
 	beginloop(0x04)
 		if_chr_stopped(/*goto*/ 0x06)
-		if_chr_dead(CHR_PRESIDENT, /*goto*/ 0x2d)
-		if_chr_death_animation_finished(CHR_PRESIDENT, /*goto*/ 0x2d)
-		if_chr_knockedout(CHR_PRESIDENT, /*goto*/ 0x2d)
+		if_chr_deadish(CHR_PRESIDENT, /*goto*/ 0x2d)
 	endloop(0x04)
 
 	label(0x06)
@@ -3290,9 +3237,7 @@ u8 func0425_steward_shot[] = {
 u8 func0408_stewardess[] = {
 	set_chr_maxdamage(CHR_SELF, 0)
 	set_shotlist(AILIST_STEWARDESS)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x06)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x06)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x06)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x06)
 	goto_next(0x03)
 
 	label(0x06)
@@ -3305,9 +3250,7 @@ u8 func0408_stewardess[] = {
 		label(0x2d)
 		if_alertness(99, OPERATOR_GREATER_THAN, /*goto*/ 0x2d)
 		if_saw_injury(0x00, /*goto*/ 0x2d)
-		if_chr_dead(CHR_STEWARD, /*goto*/ 0x2d)
-		if_chr_death_animation_finished(CHR_STEWARD, /*goto*/ 0x2d)
-		if_chr_knockedout(CHR_STEWARD, /*goto*/ 0x2d)
+		if_chr_deadish(CHR_STEWARD, /*goto*/ 0x2d)
 	endloop(0x03)
 
 	// Alerted
@@ -3587,7 +3530,6 @@ u8 func1019_midcutscene[] = {
 	set_chr_chrflag(CHR_ANTI, CHRCFLAG_HIDDEN)
 	if_stage_flag_eq(STAGEFLAG_MIDCUTSCENE_STARTED, TRUE, /*goto*/ 0x2d)
 	set_stage_flag(STAGEFLAG_MIDCUTSCENE_STARTED)
-	dprint 'm','i','d',' ','c','u','t','s','c','e','n','e','\n',0,
 	play_cutscene_track(MUSIC_AIRFORCEONE_MIDCUTSCENE)
 	label(0x2d)
 	camera_movement(ANIM_CUT_RIT_MID_CAM)
@@ -3933,9 +3875,7 @@ u8 func101d_handle_early_president_death[] = {
 	set_object_flag(OBJ_EXTERIOR_DOOR_DETACHED, OBJFLAG_00000100)
 
 	beginloop(0x08)
-		if_chr_death_animation_finished(CHR_PRESIDENT, /*goto*/ 0x2d)
-		if_chr_dead(CHR_PRESIDENT, /*goto*/ 0x2d)
-		if_chr_knockedout(CHR_PRESIDENT, /*goto*/ 0x2d)
+		if_chr_deadish(CHR_PRESIDENT, /*goto*/ 0x2d)
 	endloop(0x08)
 
 	label(0x2d)

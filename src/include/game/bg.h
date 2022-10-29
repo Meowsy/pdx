@@ -77,11 +77,7 @@ bool func0f161c08(struct coord *arg0, s16 roomnum);
 bool func0f161d30(struct coord *arg0, s16 roomnum);
 bool func0f162128(struct coord *arg0, s16 roomnum);
 void bgFindRoomsByPos(struct coord *pos, s16 *inrooms, s16 *aboverooms, s32 max, s16 *bestroom);
-bool bgPushValue(bool value);
-bool bgPopValue(void);
-bool bgGetNthValueFromEnd(s32 offset);
-struct bgcmd *bgExecuteCommandsBranch(struct bgcmd *cmd, bool s2);
-struct bgcmd *bgExecuteCommands(struct bgcmd *cmd);
+void bgExecuteCommands(void);
 void bgTickPortalsXray(void);
 void func0f1632d4(s16 roomnum1, s16 roomnum2, s16 draworder, struct screenbox *box);
 void func0f163528(struct var800a4d00 *arg0);
@@ -102,5 +98,6 @@ s32 bg0f164e8c(struct coord *arg0, struct coord *arg1);
 bool bgIsBboxOverlapping(struct coord *arg0, struct coord *arg1, struct coord *arg2, struct coord *arg3);
 void portalFindBbox(s32 portalnum, struct coord *bbmin, struct coord *bbmax);
 void bgFindEnteredRooms(struct coord *bbmin, struct coord *upper, s16 *rooms, s32 maxlen, bool arg4);
+void bgPreload(void);
 
 #endif

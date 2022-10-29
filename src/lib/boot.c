@@ -104,9 +104,9 @@ void bootPhase1(void)
 	inflatelen = (s32) &_inflateSegmentRomEnd - (s32) &_inflateSegmentRomStart;
 	copylen = datacomplen + inflatelen;
 	libram = (u32 *) ((u32) &_libSegmentStart + 0x2000);
-	libzipram = (u32 *) 0x70280000;
-	dataziprom = (u8 *) ((s32) &_datazipSegmentRomStart | 0x70000000);
-	datazipram = (u8 *) (0x70200000 - datacomplen);
+	libzipram = (u32 *) 0x80280000;
+	dataziprom = (u8 *) ((s32) &_datazipSegmentRomStart | 0x80000000);
+	datazipram = (u8 *) (0x80200000 - datacomplen);
 	dataram = (u32) &_dataSegmentStart;
 
 	for (i = copylen - 1; i >= 0; i--) {
@@ -246,12 +246,6 @@ void bootCreateIdleThread(void)
 	osStartThread(&g_IdleThread);
 }
 
-void bootCreateRmonThread(void)
-{
-	osCreateThread(&g_RmonThread, THREAD_RMON, rmonproc, NULL, bootAllocateStack(THREAD_RMON, STACKSIZE_RMON), THREADPRI_RMON);
-	osStartThread(&g_RmonThread);
-}
-
 void bootCreateSchedThread(void)
 {
 	osCreateMesgQueue(&g_SchedMesgQueue, var8008db48, ARRAYCOUNT(var8008db48));
@@ -271,7 +265,6 @@ void bootPhase2(void *arg)
 	bootCreateIdleThread();
 	videbugCreate();
 	pimgrCreate();
-	bootCreateRmonThread();
 
 	if (argsParseDebugArgs()) {
 		osStopThread(NULL);

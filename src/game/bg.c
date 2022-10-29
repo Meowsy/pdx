@@ -96,7 +96,6 @@ struct bgroom *g_BgRooms;
 struct bgportal *g_BgPortals;
 struct var800a4ccc *var800a4ccc;
 u8 *var800a4cd0;
-struct bgcmd *g_BgCommands;
 u8 *g_BgLightsFileData;
 f32 *g_BgTable5;
 s16 *g_RoomPortals;
@@ -106,6 +105,7 @@ struct var800a4ce8 *var800a4ce8;
 struct portalthing *g_PortalThings;
 struct var800a4cf0 var800a4cf0;
 
+bool g_BgPreload = false;
 s32 g_StageIndex = 1;
 u32 var8007fc04 = 0x00000000;
 u8 *var8007fc08 = NULL;
@@ -1221,9 +1221,7 @@ Gfx *bgRenderRoomXrayPass(Gfx *gdl, s32 roomnum, struct roomblock *block, bool r
 			struct coord sp28;
 			f32 sum;
 
-			sp34.x = coords[1].x;
-			sp34.y = coords[1].y;
-			sp34.z = coords[1].z;
+			sp34 = coords[1];
 
 			sp28.x = coords[0].x - player->cam_pos.x;
 			sp28.y = coords[0].y - player->cam_pos.y;
@@ -2439,9 +2437,7 @@ void func0f15b3e4(s32 portalnum, struct coord *a, struct coord *b, struct coord 
 	struct portalvertices *pvertices;
 	pvertices = (struct portalvertices *)((u32)g_BgPortals + g_BgPortals[portalnum].verticesoffset);
 
-	a->x = pvertices->vertices[0].x;
-	a->y = pvertices->vertices[0].y;
-	a->z = pvertices->vertices[0].z;
+	*a = pvertices->vertices[0];
 
 	b->x = pvertices->vertices[1].x - pvertices->vertices[0].x;
 	b->y = pvertices->vertices[1].y - pvertices->vertices[0].y;
@@ -2610,6 +2606,18 @@ void bgReset(s32 stagenum)
 		g_BgUnloadDelay240_2 = 120;
 	}
 
+	switch (g_Vars.stagenum) {
+	case STAGE_INFILTRATION:
+	case STAGE_RESCUE:
+	case STAGE_ESCAPE:
+	case STAGE_MAIANSOS:
+		g_BgPreload = false;
+		break;
+	default:
+		g_BgPreload = true;
+		break;
+	}
+
 	g_StageIndex = stageGetIndex2(stagenum);
 
 	if (g_StageIndex < 0) {
@@ -2720,12 +2728,6 @@ void bgReset(s32 stagenum)
 		}
 
 		g_BgPortals = (struct bgportal *)(g_BgPrimaryData2[2] + g_BgPrimaryData + 0xf1000000);
-
-		if (g_BgPrimaryData2[3] == 0) {
-			g_BgCommands = NULL;
-		} else {
-			g_BgCommands = (struct bgcmd *)(g_BgPrimaryData2[3] + g_BgPrimaryData + 0xf1000000);
-		}
 
 		if (g_BgPrimaryData2[4] == 0) {
 			g_BgLightsFileData = NULL;
@@ -3199,22 +3201,12 @@ void bgBuildTables(s32 stagenum)
 			}
 
 			tmp = &var800a4ccc[i];
-			tmp->coord.x = tmp2.coord.x;
-			tmp->coord.y = tmp2.coord.y;
-			tmp->coord.z = tmp2.coord.z;
+			tmp->coord = tmp2.coord;
 			tmp->min = tmp2.min;
 			tmp->max = tmp2.max;
 		}
 
 		portal0f0b65a8(numportals);
-
-		if (g_BgCommands != NULL) {
-			for (i = 0; g_BgCommands[i].type != BGCMD_END; i++) {
-				if (g_BgCommands[i].type == BGCMD_PORTALARG) {
-					g_BgCommands[i].param = portalFindNumByVertices((void *)(g_BgCommands[i].param + (u32)g_BgPrimaryData + 0xf1000000));
-				}
-			}
-		}
 
 		for (i = 0; i < g_Vars.roomcount; i++) {
 			g_Rooms[i].flags = 0;
@@ -3251,7 +3243,10 @@ void bgBuildTables(s32 stagenum)
 		inflatedsize = (inflatedsize | 0xf) + 1;
 
 		// Load and inflate section 3
-#if VERSION >= VERSION_NTSC_FINAL
+#ifdef AVOID_UB
+		section3 = mempAlloc(inflatedsize + section3compsize, MEMPOOL_STAGE);
+		scratch = section3 + inflatedsize;
+#elif VERSION >= VERSION_NTSC_FINAL
 		section3 = mempAlloc(inflatedsize + 0x8000, MEMPOOL_STAGE);
 		scratch = section3 + 0x8000;
 #else
@@ -3452,7 +3447,7 @@ void bgTick(void)
 
 	func0f15c920();
 
-	if (g_Vars.currentplayerindex == 0) {
+	if (!g_BgPreload && g_Vars.currentplayerindex == 0) {
 		bgTickRooms();
 	}
 
@@ -3651,9 +3646,7 @@ bool func0f15d08c(struct coord *a, struct coord *b)
 {
 	Mtxf *matrix = camGetWorldToScreenMtxf();
 
-	b->x = a->x;
-	b->y = a->y;
-	b->z = a->z;
+	*b = *a;
 
 	mtx4TransformVecInPlace(matrix, b);
 	cam0f0b4d68(b, b->f);
@@ -5237,21 +5230,17 @@ void bgLoadRoom(s32 roomnum)
 
 	// Determine how much memory to allocate.
 	// It must be big enough to fit both the inflated and compressed room data.
-	if (g_Rooms[roomnum].gfxdatalen > 0) {
-		size = g_Rooms[roomnum].gfxdatalen;
+	size = g_Rooms[roomnum].gfxdatalen;
 
-		if (debug0f11edb0()) {
-			size += 1024;
-		}
+	if (g_BgPreload) {
+		allocation = mempAlloc(size, MEMPOOL_STAGE);
 	} else {
-		size = memaGetLongestFree();
+		// Try to free enough bytes
+		bgGarbageCollectRooms(size, false);
+
+		// Make the allocation
+		allocation = memaAlloc(size);
 	}
-
-	// Try to free enough bytes
-	bgGarbageCollectRooms(size, false);
-
-	// Make the allocation
-	allocation = memaAlloc(size);
 
 	if (allocation != NULL) {
 		dyntexSetCurrentRoom(roomnum);
@@ -5401,7 +5390,11 @@ void bgLoadRoom(s32 roomnum)
 		g_Rooms[roomnum].loaded240 = 1;
 
 		if (g_Rooms[roomnum].gfxdatalen != size) {
-			memaRealloc((s32) allocation, size, g_Rooms[roomnum].gfxdatalen);
+			if (g_BgPreload) {
+				mempRealloc(allocation, g_Rooms[roomnum].gfxdatalen, MEMPOOL_STAGE);
+			} else {
+				memaRealloc((s32) allocation, size, g_Rooms[roomnum].gfxdatalen);
+			}
 		}
 
 		// Update gdl pointers in the gfxdata so they point to the ones
@@ -5487,6 +5480,10 @@ void bgUnloadRoom(s32 roomnum)
 {
 	u32 size;
 
+	if (g_BgPreload) {
+		return;
+	}
+
 	if (g_Rooms[roomnum].vtxbatches) {
 		size = ((g_Rooms[roomnum].numvtxbatches) * sizeof(struct vtxbatch) + 0xf) & ~0xf;
 		memaFree(g_Rooms[roomnum].vtxbatches, size);
@@ -5530,6 +5527,10 @@ void bgGarbageCollectRooms(s32 bytesneeded, bool desparate)
 	s32 oldesttimer;
 	s32 count = 0;
 	s32 i;
+
+	if (g_BgPreload) {
+		return;
+	}
 
 	while (bytesfree < bytesneeded) {
 		oldestroom = 0;
@@ -5857,7 +5858,11 @@ void bgFindRoomVtxBatches(s32 roomnum)
 
 			batchindex += xlucount;
 
-			batches = memaAlloc((batchindex * sizeof(struct vtxbatch) + 0xf) & ~0xf);
+			if (g_BgPreload) {
+				batches = mempAlloc((batchindex * sizeof(struct vtxbatch) + 0xf) & ~0xf, MEMPOOL_STAGE);
+			} else {
+				batches = memaAlloc((batchindex * sizeof(struct vtxbatch) + 0xf) & ~0xf);
+			}
 
 			if (batches != NULL) {
 				gdl = roomGetNextGdlInLayer(roomnum, NULL, VTXBATCHTYPE_OPA);
@@ -6278,12 +6283,8 @@ bool bgTestHitOnObj(struct coord *arg0, struct coord *arg1, struct coord *arg2, 
 
 									lowestsqdist = sqdist;
 
-									hitthing->unk00.x = sp8c.x;
-									hitthing->unk00.y = sp8c.y;
-									hitthing->unk00.z = sp8c.z;
-									hitthing->unk0c.x = sp80.x;
-									hitthing->unk0c.y = sp80.y;
-									hitthing->unk0c.z = sp80.z;
+									hitthing->unk00 = sp8c;
+									hitthing->unk0c = sp80;
 									hitthing->unk18 = &vtx[points[0]];
 									hitthing->unk1c = &vtx[points[1]];
 									hitthing->unk20 = &vtx[points[2]];
@@ -6556,12 +6557,8 @@ bool bgTestHitOnChr(struct model *model, struct coord *arg1, struct coord *arg2,
 
 									*sqdistptr = sqdist;
 
-									hitthing->unk00.x = sp84.x;
-									hitthing->unk00.y = sp84.y;
-									hitthing->unk00.z = sp84.z;
-									hitthing->unk0c.x = sp78.x;
-									hitthing->unk0c.y = sp78.y;
-									hitthing->unk0c.z = sp78.z;
+									hitthing->unk00 = sp84;
+									hitthing->unk0c = sp78;
 									hitthing->unk18 = &vtx[points[0]];
 									hitthing->unk1c = &vtx[points[1]];
 									hitthing->unk20 = &vtx[points[2]];
@@ -6780,12 +6777,8 @@ bool bgTestHitInVtxBatch(struct coord *arg0, struct coord *arg1, struct coord *a
 											if (hit) {
 												lowestsqdist = sqdist;
 
-												hitthing->unk00.x = spb0.x;
-												hitthing->unk00.y = spb0.y;
-												hitthing->unk00.z = spb0.z;
-												hitthing->unk0c.x = spa4.x;
-												hitthing->unk0c.y = spa4.y;
-												hitthing->unk0c.z = spa4.z;
+												hitthing->unk00 = spb0;
+												hitthing->unk0c = spa4;
 												hitthing->unk18 = &vtx[points[0]];
 												hitthing->unk1c = &vtx[points[1]];
 												hitthing->unk20 = &vtx[points[2]];
@@ -6928,13 +6921,9 @@ bool bgTestHitInRoom(struct coord *frompos, struct coord *topos, s32 roomnum, st
 
 	count = 0;
 
-	spb8.x = frompos->x;
-	spb8.y = frompos->y;
-	spb8.z = frompos->z;
+	spb8 = *frompos;
 
-	spac.x = topos->x;
-	spac.y = topos->y;
-	spac.z = topos->z;
+	spac = *topos;
 
 	spa0.x = spac.x - spb8.x;
 	spa0.y = spac.y - spb8.y;
@@ -7074,12 +7063,8 @@ bool bgTestHitInRoom(struct coord *frompos, struct coord *topos, s32 roomnum, st
 							f20 += f0 * f0;
 
 							if (f20 < spc8) {
-								hitthing->unk00.x = sp60.unk00.x;
-								hitthing->unk00.y = sp60.unk00.y;
-								hitthing->unk00.z = sp60.unk00.z;
-								hitthing->unk0c.x = sp60.unk0c.x;
-								hitthing->unk0c.y = sp60.unk0c.y;
-								hitthing->unk0c.z = sp60.unk0c.z;
+								hitthing->unk00 = sp60.unk00;
+								hitthing->unk0c = sp60.unk0c;
 								hitthing->unk18 = sp60.unk18;
 								hitthing->unk1c = sp60.unk1c;
 								hitthing->unk20 = sp60.unk20;
@@ -7110,9 +7095,7 @@ bool roomIsLoaded(s32 room)
 bool roomContainsCoord(struct coord *pos, s16 roomnum)
 {
 	struct coord copy;
-	copy.x = pos->x;
-	copy.y = pos->y;
-	copy.z = pos->z;
+	copy = *pos;
 
 	return copy.f[0] >= g_Rooms[roomnum].bbmin[0]
 		&& copy.f[0] <= g_Rooms[roomnum].bbmax[0]
@@ -7295,9 +7278,7 @@ void bgFindRoomsByPos(struct coord *posarg, s16 *inrooms, s16 *aboverooms, s32 m
 	s32 i;
 	s32 j;
 
-	pos.x = posarg->x;
-	pos.y = posarg->y;
-	pos.z = posarg->z;
+	pos = *posarg;
 
 	// Try rooms which have portals
 	for (i = 1; i < g_Vars.roomcount; i++) {
@@ -7385,294 +7366,561 @@ void bgFindRoomsByPos(struct coord *posarg, s16 *inrooms, s16 *aboverooms, s32 m
 	}
 }
 
-bool bgPushValue(bool value)
+void bgCmdDisableRoom(s32 roomnum)
 {
-	g_BgCmdStack[g_BgCmdStackIndex] = value;
-	g_BgCmdStackIndex = (g_BgCmdStackIndex + 1) % 20;
-
-	return value;
+	g_Rooms[roomnum].flags |= ROOMFLAG_DISABLEDBYSCRIPT;
 }
 
-bool bgPopValue(void)
+void bgCmdReset(void)
 {
-	bool val = g_BgCmdStack[g_BgCmdStackIndex = (g_BgCmdStackIndex + 19) % 20];
-	return val;
+	var800a65c0.xmin = g_Vars.currentplayer->screenxminf;
+	var800a65c0.ymin = g_Vars.currentplayer->screenyminf;
+	var800a65c0.xmax = g_Vars.currentplayer->screenxmaxf;
+	var800a65c0.ymax = g_Vars.currentplayer->screenymaxf;
+
+	g_BgCmdResult = BGRESULT_TRUE;
 }
 
-bool bgGetNthValueFromEnd(s32 n)
+void bgCmdRestrictToPortal(s32 portalnum)
 {
-	return g_BgCmdStack[((g_BgCmdStackIndex - n) + 19) % 20];
-}
-
-/**
- * BG files contain bytecode that is used to override the default portal
- * behaviour. They can be used to check if the camera is in particular rooms
- * and then force other rooms to show or hide.
- *
- * Only six BG files use of this feature. They are Villa, Chicago, Area 51,
- * Pelagic II, Deep Sea and Skedar Ruins. All other BG files contain a single
- * "end" instruction in their bytecode.
- *
- * The scripting language supports if-statements with an infinite nesting level.
- * The interpreter maintains a stack of boolean values which can be pushed to
- * or popped from the end. This can be used to build complex conditions that
- * combine "AND" and "OR" operations.
- *
- * All commands are interpreted in order. There is no support for loops.
- *
- * When processing conditional code the function calls itself recursively for
- * that branch. The execute argument denotes whether the condition passed and
- * these statements should be executed, or whether the condition failed and
- * it's just passing over them to get to the endif command.
- */
-struct bgcmd *bgExecuteCommandsBranch(struct bgcmd *cmd, bool execute)
-{
-	s32 i;
-
-	g_BgCmdThrowing = false;
-
-	if (!cmd) {
-		return cmd;
-	}
-
-	while (true) {
-		switch (cmd->type) {
-		case BGCMD_END:
-			return cmd;
-		case BGCMD_PUSH:
-			if (execute) {
-				bgPushValue(cmd->param);
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_POP:
-			if (execute) {
-				bgPopValue();
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_AND:
-			if (execute) {
-				bgPushValue(bgPopValue() & bgPopValue());
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_OR:
-			if (execute) {
-				bgPushValue(bgPopValue() | bgPopValue());
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_NOT:
-			if (execute) {
-				bgPushValue(bgPopValue() == 0);
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_XOR:
-			if (execute) {
-				bgPushValue(bgPopValue() ^ bgPopValue());
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_PUSH_CAMINROOMRANGE:
-			if (execute) {
-				bgPushValue(g_CamRoom >= cmd[1].param && g_CamRoom <= cmd[2].param);
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_SETRESULT_TRUE:
-			if (execute) {
-				var800a65c0.xmin = g_Vars.currentplayer->screenxminf;
-				var800a65c0.ymin = g_Vars.currentplayer->screenyminf;
-				var800a65c0.xmax = g_Vars.currentplayer->screenxmaxf;
-				var800a65c0.ymax = g_Vars.currentplayer->screenymaxf;
-				g_BgCmdResult = BGRESULT_TRUE;
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_SETRESULT_IFPORTALINFOV:
-			if (execute) {
-				if (!PORTAL_IS_CLOSED(cmd[1].param)) {
-					if (g_PortalGetScreenBbox(cmd[1].param, &g_PortalScreenBbox) == 0) {
-						g_BgCmdResult = BGRESULT_FALSE;
-					} else if (boxGetIntersection(&var800a65c0, &g_PortalScreenBbox) == 0) {
-						g_BgCmdResult = BGRESULT_FALSE;
-					} else {
-						g_BgCmdResult = BGRESULT_TRUE;
-					}
-				}
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_SETRESULT_TRUEIFTHROUGHPORTAL:
-			if (execute) {
-				struct screenbox portalbox;
-
-				if (!PORTAL_IS_CLOSED(cmd[1].param)) {
-					if (g_PortalGetScreenBbox(cmd[1].param, &portalbox) && boxGetIntersection(&var800a65c0, &portalbox)) {
-						if (g_BgCmdResult != BGRESULT_TRUE) {
-							boxCopy(&var800a65c0, &portalbox);
-							g_BgCmdResult = BGRESULT_TRUE;
-						} else {
-							boxExpand(&var800a65c0, &portalbox);
-						}
-					}
-				}
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_SETRESULT_FALSEIFNOTTHROUGHPORTAL:
-			if (execute) {
-				if (g_BgCmdResult == BGRESULT_TRUE) {
-					struct screenbox portalbox;
-
-					if (PORTAL_IS_CLOSED(cmd[1].param)) {
-						g_BgCmdResult = BGRESULT_FALSE;
-					} else if (g_PortalGetScreenBbox(cmd[1].param, &portalbox) == 0) {
-						g_BgCmdResult = BGRESULT_FALSE;
-					} else if (boxGetIntersection(&portalbox, (struct screenbox *)&g_Vars.currentplayer->screenxminf) == 0) {
-						g_BgCmdResult = BGRESULT_FALSE;
-					} else if (boxGetIntersection(&g_PortalScreenBbox, &portalbox) == 0) {
-						g_BgCmdResult = BGRESULT_FALSE;
-					}
-				}
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_IFRESULT_SHOWROOM:
-			if (execute) {
-				if (g_BgCmdResult == BGRESULT_TRUE && func0f15cd90(cmd[1].param, &var800a65c0)) {
-					roomSetOnscreen(cmd[1].param, 0, &var800a65c0);
-					g_ActiveRoomNums[g_NumActiveRooms++] = cmd[1].param;
-				}
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_DISABLEROOM:
-			if (execute) {
-				g_Rooms[cmd[1].param].flags |= ROOMFLAG_DISABLEDBYSCRIPT;
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_DISABLEROOMRANGE:
-			if (execute) {
-				for (i = cmd[1].param; i <= cmd[2].param; i++) {
-					g_Rooms[i].flags |= ROOMFLAG_DISABLEDBYSCRIPT;
-				}
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_LOADROOM:
-			cmd += cmd->len;
-			break;
-		case BGCMD_LOADROOMRANGE:
-			cmd += cmd->len;
-			break;
-		case BGCMD_SETROOMTESTSDISABLED:
-			if (execute) {
-				g_BgRoomTestsDisabled = true;
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_PUSH_PORTALISOPEN:
-			if (execute) {
-				bgPushValue(!PORTAL_IS_CLOSED(cmd[1].param));
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_2A:
-			if (execute) {
-				g_Rooms[cmd[1].param].unk07 = 0;
-			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_SETRESULT_FALSE:
-			if (execute) {
+	if (g_BgCmdResult == BGRESULT_TRUE) {
+		if (PORTAL_IS_OPEN(portalnum)) {
+			if (g_PortalGetScreenBbox(portalnum, &g_PortalScreenBbox) == 0) {
+				g_BgCmdResult = BGRESULT_FALSE;
+			} else if (boxGetIntersection(&var800a65c0, &g_PortalScreenBbox) == 0) {
 				g_BgCmdResult = BGRESULT_FALSE;
 			}
-			cmd += cmd->len;
-			break;
-		case BGCMD_BRANCH:
-			cmd = bgExecuteCommandsBranch(cmd + cmd->len, execute);
-			cmd += cmd->len;
-			break;
-		case BGCMD_CATCH:
-			cmd += cmd->len;
-			g_BgCmdThrowing = false;
-			return cmd;
-		case BGCMD_THROW:
-			cmd += cmd->len;
-			if (execute) {
-				g_BgCmdThrowing = true;
-			}
-			execute = false;
-			break;
-		case BGCMD_IF:
-			cmd = bgExecuteCommandsBranch(cmd + cmd->len, bgPopValue() & execute);
-			if (g_BgCmdThrowing) {
-				execute = false;
-			}
-			break;
-		case BGCMD_ELSE:
-			/**
-			 * Assuming this is indeed an else command, it's not safe to assume
-			 * that the execution state can be unconditionally toggled.
-			 * For example, given the following portal code:
-			 *
-			 * if (a false condition)
-			 *     if (any condition)
-			 *         branch 1
-			 *     else
-			 *         branch 2
-			 *     endif
-			 * endif
-			 *
-			 * ...when reaching the else, execution would be turned on.
-			 *
-			 * However, this command isn't even used.
-			 */
-			execute ^= 1;
-			cmd += cmd->len;
-			break;
-		case BGCMD_ENDIF:
-			/**
-			 * Note the return here rather than break.
-			 */
-			cmd += cmd->len;
-			return cmd;
-		default:
-			if (1);
-			if (1);
-			if (1);
-			if (1);
-			return cmd;
+		} else {
+			g_BgCmdResult = BGRESULT_FALSE;
 		}
 	}
-
-	g_BgCmdThrowing = false;
-
-	return cmd;
 }
 
-struct bgcmd *bgExecuteCommands(struct bgcmd *cmd)
+void bgCmdTryEnableRoom(s32 roomnum)
 {
-	struct player *player = g_Vars.currentplayer;
-	g_BgCmdResult = BGRESULT_TRUE;
-
-	if (!cmd) {
-		return cmd;
+	if (g_BgCmdResult == BGRESULT_TRUE && func0f15cd90(roomnum, &var800a65c0)) {
+		roomSetOnscreen(roomnum, 0, &var800a65c0);
+		g_ActiveRoomNums[g_NumActiveRooms++] = roomnum;
 	}
+}
 
-	// This may have been used in an osSyncPrintf call
-	bgGetNthValueFromEnd(0);
+void bgExecuteCommands(void)
+{
+	switch (g_Stages[g_StageIndex].bgfileid) {
+	case FILE_BG_ELD_SEG: // Villa
+		if (g_CamRoom == 0x2b) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x2b);
+			bgCmdRestrictToPortal(0x57);
+			bgCmdTryEnableRoom(0x2c);
+			bgCmdRestrictToPortal(0x58);
+			bgCmdTryEnableRoom(0x2d);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x56);
+			bgCmdTryEnableRoom(0x2a);
+			bgCmdRestrictToPortal(0x54);
+			bgCmdTryEnableRoom(0x29);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x56);
+			bgCmdRestrictToPortal(0x55);
+			bgCmdTryEnableRoom(0x49);
+			bgCmdRestrictToPortal(0x97);
+			bgCmdTryEnableRoom(0x4a);
+			bgCmdTryEnableRoom(0x4b);
+			bgCmdTryEnableRoom(0x54);
+			bgCmdTryEnableRoom(0x4c);
+			bgCmdTryEnableRoom(0x6e);
+			g_BgRoomTestsDisabled = true;
+		} else if (g_CamRoom == 0x33) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x33);
+			bgCmdRestrictToPortal(0x5f);
+			bgCmdTryEnableRoom(0x32);
+			bgCmdRestrictToPortal(0x5e);
+			bgCmdTryEnableRoom(0x31);
+			bgCmdRestrictToPortal(0x5d);
+			bgCmdTryEnableRoom(0x30);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x61);
+			bgCmdTryEnableRoom(0x34);
+			bgCmdRestrictToPortal(0x5b);
+			bgCmdTryEnableRoom(0x2f);
+			bgCmdRestrictToPortal(0x5a);
+			bgCmdTryEnableRoom(0x2e);
+			bgCmdRestrictToPortal(0x59);
+			bgCmdTryEnableRoom(0x2d);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x61);
+			bgCmdRestrictToPortal(0x60);
+			bgCmdTryEnableRoom(0x35);
+			g_BgRoomTestsDisabled = true;
+		} else if (g_CamRoom == 0x34) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x34);
+			bgCmdRestrictToPortal(0x60);
+			bgCmdTryEnableRoom(0x35);
+			bgCmdRestrictToPortal(0x62);
+			bgCmdTryEnableRoom(0x37);
+			bgCmdTryEnableRoom(0x38);
+			bgCmdTryEnableRoom(0x39);
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x36);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x61);
+			bgCmdTryEnableRoom(0x33);
+			bgCmdRestrictToPortal(0x5f);
+			bgCmdTryEnableRoom(0x32);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x5b);
+			bgCmdTryEnableRoom(0x2f);
+			bgCmdRestrictToPortal(0x5a);
+			bgCmdTryEnableRoom(0x2e);
+			bgCmdRestrictToPortal(0x59);
+			bgCmdTryEnableRoom(0x2d);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x5b);
+			bgCmdRestrictToPortal(0x5c);
+			bgCmdTryEnableRoom(0x30);
+			g_BgRoomTestsDisabled = true;
+		} else if (g_CamRoom == 0x35) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x35);
+			bgCmdRestrictToPortal(0x62);
+			bgCmdTryEnableRoom(0x37);
+			bgCmdTryEnableRoom(0x38);
+			bgCmdTryEnableRoom(0x39);
+			bgCmdRestrictToPortal(0x71);
+			bgCmdTryEnableRoom(0x3a);
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x36);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x60);
+			bgCmdTryEnableRoom(0x34);
+			bgCmdRestrictToPortal(0x61);
+			bgCmdTryEnableRoom(0x33);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x60);
+			bgCmdRestrictToPortal(0x5b);
+			bgCmdTryEnableRoom(0x2f);
+			g_BgRoomTestsDisabled = true;
+		} else if (g_CamRoom == 0x37) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x37);
+			bgCmdTryEnableRoom(0x36);
+			bgCmdRestrictToPortal(0x6f);
+			bgCmdTryEnableRoom(0x38);
+			bgCmdRestrictToPortal(0x72);
+			bgCmdTryEnableRoom(0x3a);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x6f);
+			bgCmdRestrictToPortal(0x70);
+			bgCmdTryEnableRoom(0x28);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x62);
+			bgCmdTryEnableRoom(0x35);
+			bgCmdRestrictToPortal(0x60);
+			bgCmdTryEnableRoom(0x34);
+			bgCmdRestrictToPortal(0x5b);
+			bgCmdTryEnableRoom(0x2f);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x6e);
+			bgCmdTryEnableRoom(0x39);
+			bgCmdRestrictToPortal(0x71);
+			bgCmdTryEnableRoom(0x3a);
+			bgCmdRestrictToPortal(0x73);
+			bgCmdTryEnableRoom(0x3d);
+			bgCmdTryEnableRoom(0x68);
+			bgCmdTryEnableRoom(0x3c);
+			bgCmdTryEnableRoom(0x62);
+			bgCmdTryEnableRoom(0x66);
+			g_BgRoomTestsDisabled = true;
+		} else if (g_CamRoom == 0x38 || g_CamRoom == 0x3a) {
+			bgCmdReset();
 
-	var800a65c0.xmin = player->screenxminf;
-	var800a65c0.ymin = player->screenyminf;
-	var800a65c0.xmax = player->screenxmaxf;
-	var800a65c0.ymax = player->screenymaxf;
+			if (g_CamRoom == 0x3a) {
+				bgCmdTryEnableRoom(0x3a);
+				bgCmdTryEnableRoom(0x36);
+				bgCmdRestrictToPortal(0x72);
+				bgCmdTryEnableRoom(0x38);
+				bgCmdTryEnableRoom(0x37);
+				bgCmdReset();
+				bgCmdRestrictToPortal(0x71);
+				bgCmdTryEnableRoom(0x39);
+				bgCmdRestrictToPortal(0x6e);
+				bgCmdTryEnableRoom(0x37);
+				bgCmdRestrictToPortal(0x62);
+				bgCmdTryEnableRoom(0x35);
+				g_BgRoomTestsDisabled = true;
+			} else {
+				bgCmdTryEnableRoom(0x38);
+				bgCmdTryEnableRoom(0x36);
+				bgCmdReset();
+				bgCmdRestrictToPortal(0x72);
+				bgCmdTryEnableRoom(0x3a);
+				bgCmdRestrictToPortal(0x71);
+				bgCmdTryEnableRoom(0x39);
+				bgCmdReset();
+				bgCmdRestrictToPortal(0x70);
+				bgCmdTryEnableRoom(0x28);
+				bgCmdReset();
+				bgCmdRestrictToPortal(0x6f);
+				bgCmdTryEnableRoom(0x37);
+				bgCmdRestrictToPortal(0x62);
+				bgCmdTryEnableRoom(0x35);
+				bgCmdReset();
+				bgCmdRestrictToPortal(0x6f);
+				bgCmdRestrictToPortal(0x6e);
+				bgCmdTryEnableRoom(0x39);
+				g_BgRoomTestsDisabled = true;
+			}
 
-	return bgExecuteCommandsBranch(cmd, true);
+			bgCmdReset();
+
+			if (g_CamRoom == 0x38) {
+				bgCmdRestrictToPortal(0x72);
+			}
+
+			bgCmdRestrictToPortal(0x73);
+			bgCmdTryEnableRoom(0x35);
+			bgCmdTryEnableRoom(0x3b);
+			bgCmdTryEnableRoom(0x3c);
+			bgCmdTryEnableRoom(0x3d);
+			bgCmdTryEnableRoom(0x3f);
+			bgCmdTryEnableRoom(0x4d);
+			bgCmdTryEnableRoom(0x4e);
+			bgCmdTryEnableRoom(0x4f);
+			bgCmdTryEnableRoom(0x50);
+			bgCmdTryEnableRoom(0x51);
+			bgCmdTryEnableRoom(0x52);
+			bgCmdTryEnableRoom(0x55);
+			bgCmdTryEnableRoom(0x56);
+			bgCmdTryEnableRoom(0x61);
+			bgCmdTryEnableRoom(0x62);
+			bgCmdTryEnableRoom(0x63);
+			bgCmdTryEnableRoom(0x64);
+			bgCmdTryEnableRoom(0x65);
+			bgCmdTryEnableRoom(0x66);
+			bgCmdTryEnableRoom(0x68);
+			bgCmdTryEnableRoom(0x6a);
+			bgCmdTryEnableRoom(0x6b);
+			bgCmdTryEnableRoom(0x6c);
+			bgCmdTryEnableRoom(0x6d);
+			bgCmdTryEnableRoom(0x71);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x73);
+			bgCmdRestrictToPortal(0x09);
+			bgCmdTryEnableRoom(0x05);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x73);
+			bgCmdRestrictToPortal(0x1e);
+			bgCmdTryEnableRoom(0x0f);
+
+			if (PORTAL_IS_OPEN(0x1e)) {
+				bgCmdRestrictToPortal(0x1d);
+				bgCmdTryEnableRoom(0x0e);
+			}
+
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x73);
+			bgCmdRestrictToPortal(0x46);
+			bgCmdTryEnableRoom(0x21);
+			bgCmdRestrictToPortal(0x47);
+			bgCmdTryEnableRoom(0x27);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x73);
+			bgCmdRestrictToPortal(0x17);
+			bgCmdTryEnableRoom(0x0c);
+
+			if (PORTAL_IS_OPEN(0x24)) {
+				bgCmdReset();
+				bgCmdRestrictToPortal(0x73);
+				bgCmdRestrictToPortal(0x24);
+				bgCmdTryEnableRoom(0x11);
+
+				if (PORTAL_IS_OPEN(0x20)) {
+					bgCmdRestrictToPortal(0x24);
+					bgCmdTryEnableRoom(0x10);
+				}
+			}
+
+			if (PORTAL_IS_OPEN(0x2c)) {
+				bgCmdReset();
+				bgCmdRestrictToPortal(0x73);
+				bgCmdRestrictToPortal(0x2c);
+				bgCmdTryEnableRoom(0x16);
+			}
+
+			if (PORTAL_IS_OPEN(0x43)) {
+				bgCmdReset();
+				bgCmdRestrictToPortal(0x73);
+				bgCmdRestrictToPortal(0x43);
+				bgCmdTryEnableRoom(0x20);
+			}
+		} else if (g_CamRoom == 0x39) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x39);
+			bgCmdTryEnableRoom(0x36);
+			bgCmdRestrictToPortal(0x71);
+			bgCmdTryEnableRoom(0x3a);
+			bgCmdRestrictToPortal(0x73);
+			bgCmdTryEnableRoom(0x3d);
+			bgCmdTryEnableRoom(0x68);
+			bgCmdTryEnableRoom(0x3c);
+			bgCmdTryEnableRoom(0x62);
+			bgCmdTryEnableRoom(0x66);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x71);
+			bgCmdRestrictToPortal(0x72);
+			bgCmdTryEnableRoom(0x38);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x6e);
+			bgCmdTryEnableRoom(0x37);
+			bgCmdRestrictToPortal(0x62);
+			bgCmdTryEnableRoom(0x35);
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x6e);
+			bgCmdRestrictToPortal(0x6f);
+			bgCmdTryEnableRoom(0x38);
+			g_BgRoomTestsDisabled = true;
+		} else if (g_CamRoom >= 0x44 && g_CamRoom <= 0x47) {
+			bgCmdDisableRoom(0x40);
+			bgCmdDisableRoom(0x3f);
+			bgCmdDisableRoom(0x41);
+			bgCmdDisableRoom(0x59);
+			bgCmdDisableRoom(0x3e);
+			bgCmdDisableRoom(0x50);
+			bgCmdDisableRoom(0x4a);
+			bgCmdDisableRoom(0x4b);
+			bgCmdDisableRoom(0x4c);
+			bgCmdDisableRoom(0x61);
+			bgCmdDisableRoom(0x4e);
+			bgCmdDisableRoom(0x63);
+			bgCmdDisableRoom(0x51);
+			bgCmdDisableRoom(0x4f);
+			bgCmdDisableRoom(0x52);
+
+			if (g_CamRoom == 0x46) {
+				bgCmdReset();
+				bgCmdTryEnableRoom(0x5f);
+			}
+		}
+
+		if ((g_CamRoom >= 0x4a && g_CamRoom <= 0x4c)
+				|| g_CamRoom == 0x3e
+				|| g_CamRoom == 0x59
+				|| g_CamRoom == 0x5b) {
+			bgCmdDisableRoom(0x44);
+			bgCmdDisableRoom(0x45);
+			bgCmdDisableRoom(0x46);
+			bgCmdDisableRoom(0x48);
+			bgCmdDisableRoom(0x47);
+		}
+
+		if ((g_CamRoom >= 0x4a && g_CamRoom <= 0x4c)
+				|| g_CamRoom == 0x3f
+				|| g_CamRoom == 0x40
+				|| g_CamRoom == 0x59
+				|| g_CamRoom == 0x5b) {
+			bgCmdDisableRoom(0x4f);
+			bgCmdDisableRoom(0x61);
+			bgCmdDisableRoom(0x0c);
+			bgCmdDisableRoom(0x4e);
+		}
+
+		if (g_CamRoom == 0x61 || g_CamRoom == 0x62 || g_CamRoom == 0x4e || g_CamRoom == 0x68) {
+			bgCmdDisableRoom(0x0c);
+			bgCmdDisableRoom(0x3f);
+			bgCmdDisableRoom(0x40);
+			bgCmdDisableRoom(0x41);
+			bgCmdDisableRoom(0x48);
+			bgCmdDisableRoom(0x47);
+			bgCmdDisableRoom(0x46);
+			bgCmdDisableRoom(0x45);
+			bgCmdDisableRoom(0x44);
+			bgCmdDisableRoom(0x43);
+			bgCmdDisableRoom(0x42);
+			bgCmdDisableRoom(0x57);
+			bgCmdDisableRoom(0x4c);
+
+			if (g_CamRoom != 0x61) {
+				g_Rooms[0x62].unk07 = 0;
+				g_Rooms[0x4e].unk07 = 0;
+				g_Rooms[0x68].unk07 = 0;
+			}
+		}
+		break;
+	case FILE_BG_PETE_SEG: // Chicago
+		if (g_CamRoom >= 0x02 && g_CamRoom <= 0x10) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x54);
+			bgCmdTryEnableRoom(0x58);
+
+			if (g_CamRoom == 0x02 || g_CamRoom == 0x10) {
+				bgCmdTryEnableRoom(0x29);
+			}
+
+			if (g_CamRoom == 0x0f) {
+				bgCmdTryEnableRoom(0x57);
+			}
+		} else if (g_CamRoom == 0x11 || g_CamRoom == 0x12 || g_CamRoom == 0x14) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x29);
+		} else if (g_CamRoom == 0x25) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x29);
+			bgCmdTryEnableRoom(0x2a);
+			bgCmdTryEnableRoom(0x58);
+		} else if (g_CamRoom == 0x26) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x29);
+			bgCmdTryEnableRoom(0x2a);
+			bgCmdTryEnableRoom(0x2b);
+			bgCmdTryEnableRoom(0x58);
+		} else if (g_CamRoom == 0x27) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x57);
+			bgCmdTryEnableRoom(0x2b);
+			bgCmdTryEnableRoom(0x58);
+		} else if (g_CamRoom == 0x28) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x29);
+			bgCmdTryEnableRoom(0x2a);
+			bgCmdTryEnableRoom(0x2b);
+			bgCmdTryEnableRoom(0x58);
+		} else if (g_CamRoom == 0x44 || g_CamRoom == 0x45) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x53);
+			bgCmdTryEnableRoom(0x54);
+			bgCmdTryEnableRoom(0x57);
+			bgCmdTryEnableRoom(0x58);
+		} else if (g_CamRoom >= 0x4a && g_CamRoom <= 0x52) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x57);
+			bgCmdTryEnableRoom(0x58);
+			bgCmdTryEnableRoom(0x53);
+			bgCmdTryEnableRoom(0x54);
+
+			if (g_CamRoom == 0x4e) {
+				bgCmdTryEnableRoom(0x2b);
+			}
+		} else if (g_CamRoom == 0x61) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x58);
+		}
+		break;
+	case FILE_BG_LUE_SEG: // Area 51
+		if (g_CamRoom == 0x2e) {
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x43);
+			bgCmdTryEnableRoom(0x38);
+			bgCmdRestrictToPortal(0x41);
+			bgCmdTryEnableRoom(0x37);
+
+			if (PORTAL_IS_OPEN(0x42)) {
+				bgCmdRestrictToPortal(0x42);
+				bgCmdTryEnableRoom(0x5c);
+				bgCmdRestrictToPortal(0x70);
+				bgCmdTryEnableRoom(0x5a);
+			}
+		} else if (g_CamRoom == 0x5a) {
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x6c);
+			bgCmdTryEnableRoom(0x59);
+		}
+		break;
+	case FILE_BG_DAM_SEG: // Pelagic II
+		if (g_CamRoom >= 0x29 && g_CamRoom <= 0x2b) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x29);
+			bgCmdTryEnableRoom(0x2a);
+			bgCmdTryEnableRoom(0x2b);
+		}
+		break;
+	case FILE_BG_PAM_SEG: // Deep Sea
+		if (g_CamRoom == 0x03 || (g_CamRoom >= 0x06 && g_CamRoom <= 0x08)) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x09);
+			bgCmdTryEnableRoom(0x0a);
+			bgCmdTryEnableRoom(0x0b);
+		} else if (g_CamRoom == 0x02) {
+			bgCmdReset();
+			bgCmdRestrictToPortal(0x02);
+			bgCmdTryEnableRoom(0x0a);
+			bgCmdTryEnableRoom(0x0b);
+		}
+		break;
+	case FILE_BG_SHO_SEG: // Skedar Ruins
+		if (g_CamRoom >= 0x04 && g_CamRoom <= 0x50) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x03);
+			bgCmdTryEnableRoom(0x1c);
+		} else if (g_CamRoom >= 0x56 && g_CamRoom <= 0x60) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x03);
+			bgCmdTryEnableRoom(0x1c);
+		}
+
+		if (g_CamRoom == 0x04 || g_CamRoom == 0x09 || g_CamRoom == 0x0a) {
+			bgCmdDisableRoom(0x0b);
+			bgCmdDisableRoom(0x0c);
+			bgCmdDisableRoom(0x0d);
+			bgCmdDisableRoom(0x0e);
+			bgCmdDisableRoom(0x0f);
+			bgCmdDisableRoom(0x10);
+			bgCmdDisableRoom(0x11);
+			bgCmdDisableRoom(0x12);
+		} else if (g_CamRoom == 0x1e || g_CamRoom == 0x1f) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x3a);
+		} else if (g_CamRoom >= 0x2a && g_CamRoom <= 0x2c) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x33);
+		} else if (g_CamRoom == 0x30) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x39);
+		} else if (g_CamRoom == 0x3c) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x29);
+		} else if (g_CamRoom == 0x47) {
+			bgCmdReset();
+			bgCmdDisableRoom(0x4b);
+			bgCmdTryEnableRoom(0x4c);
+			bgCmdTryEnableRoom(0x48);
+			bgCmdTryEnableRoom(0x4e);
+			bgCmdDisableRoom(0x4f);
+		} else if (g_CamRoom == 0x49 || g_CamRoom == 0x4a) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x4c);
+			bgCmdTryEnableRoom(0x48);
+			bgCmdTryEnableRoom(0x4e);
+			bgCmdTryEnableRoom(0x4d);
+			bgCmdDisableRoom(0x4f);
+		} else if (g_CamRoom == 0x4f) {
+			bgCmdReset();
+			bgCmdTryEnableRoom(0x4e);
+			bgCmdTryEnableRoom(0x4d);
+		} else if (g_CamRoom >= 0x51 && g_CamRoom <= 0x55) {
+			bgCmdDisableRoom(0x02);
+		} else if (g_CamRoom >= 0x7d && g_CamRoom <= 0x84) {
+			bgCmdDisableRoom(0x88);
+			bgCmdDisableRoom(0x86);
+		} else if (g_CamRoom == 0x88) {
+			bgCmdDisableRoom(0x7d);
+			bgCmdDisableRoom(0x7e);
+			bgCmdDisableRoom(0x7f);
+			bgCmdDisableRoom(0x80);
+			bgCmdDisableRoom(0x81);
+			bgCmdDisableRoom(0x82);
+			bgCmdDisableRoom(0x83);
+			bgCmdDisableRoom(0x84);
+		}
+
+		if (g_CamRoom >= 0x61 && g_CamRoom <= 0x7d) {
+			bgCmdDisableRoom(0x02);
+		}
+
+		break;
+	}
 }
 
 void bgTickPortalsXray(void)
@@ -8039,65 +8287,67 @@ void bgChooseRoomsToLoad(void)
 
 	g_BgNumRoomLoadCandidates = 0;
 
-	for (i = 0; g_BgPortals[i].verticesoffset != 0; i++) {
-		if ((g_BgPortals[i].flags & PORTALFLAG_SKIP) == 0) {
-			s32 roomnum1 = g_BgPortals[i].roomnum1;
-			s32 roomnum2 = g_BgPortals[i].roomnum2;
-			s32 portalnum;
+	if (!g_BgPreload) {
+		for (i = 0; g_BgPortals[i].verticesoffset != 0; i++) {
+			if ((g_BgPortals[i].flags & PORTALFLAG_SKIP) == 0) {
+				s32 roomnum1 = g_BgPortals[i].roomnum1;
+				s32 roomnum2 = g_BgPortals[i].roomnum2;
+				s32 portalnum;
 
-			if ((g_Rooms[roomnum1].flags & ROOMFLAG_ONSCREEN) && (g_Rooms[roomnum2].flags & ROOMFLAG_ONSCREEN) == 0) {
-				// From room1 to room2
-				g_Rooms[roomnum2].flags |= ROOMFLAG_STANDBY;
+				if ((g_Rooms[roomnum1].flags & ROOMFLAG_ONSCREEN) && (g_Rooms[roomnum2].flags & ROOMFLAG_ONSCREEN) == 0) {
+					// From room1 to room2
+					g_Rooms[roomnum2].flags |= ROOMFLAG_STANDBY;
 
-				if (g_Rooms[roomnum2].loaded240 == 0) {
-					g_Rooms[roomnum2].flags |= ROOMFLAG_LOADCANDIDATE;
-					g_BgNumRoomLoadCandidates++;
-				}
+					if (g_Rooms[roomnum2].loaded240 == 0) {
+						g_Rooms[roomnum2].flags |= ROOMFLAG_LOADCANDIDATE;
+						g_BgNumRoomLoadCandidates++;
+					}
 
-				roomUnpauseProps(roomnum2, true);
+					roomUnpauseProps(roomnum2, true);
 
-				if (PORTAL_IS_CLOSED(i)) {
-					for (j = 0; j < g_Rooms[roomnum2].numportals; j++) {
-						portalnum = g_RoomPortals[g_Rooms[roomnum2].roomportallistoffset + j];
+					if (PORTAL_IS_CLOSED(i)) {
+						for (j = 0; j < g_Rooms[roomnum2].numportals; j++) {
+							portalnum = g_RoomPortals[g_Rooms[roomnum2].roomportallistoffset + j];
 
-						if (roomnum2 == g_BgPortals[portalnum].roomnum1) {
-							if (g_Rooms[g_BgPortals[portalnum].roomnum2].loaded240 == 0) {
-								g_Rooms[g_BgPortals[portalnum].roomnum2].flags |= ROOMFLAG_LOADCANDIDATE;
-								g_BgNumRoomLoadCandidates++;
-							}
-						} else {
-							if (g_Rooms[g_BgPortals[portalnum].roomnum1].loaded240 == 0) {
-								g_Rooms[g_BgPortals[portalnum].roomnum1].flags |= ROOMFLAG_LOADCANDIDATE;
-								g_BgNumRoomLoadCandidates++;
+							if (roomnum2 == g_BgPortals[portalnum].roomnum1) {
+								if (g_Rooms[g_BgPortals[portalnum].roomnum2].loaded240 == 0) {
+									g_Rooms[g_BgPortals[portalnum].roomnum2].flags |= ROOMFLAG_LOADCANDIDATE;
+									g_BgNumRoomLoadCandidates++;
+								}
+							} else {
+								if (g_Rooms[g_BgPortals[portalnum].roomnum1].loaded240 == 0) {
+									g_Rooms[g_BgPortals[portalnum].roomnum1].flags |= ROOMFLAG_LOADCANDIDATE;
+									g_BgNumRoomLoadCandidates++;
+								}
 							}
 						}
 					}
-				}
-			} else if ((g_Rooms[roomnum2].flags & ROOMFLAG_ONSCREEN)
-					&& (g_Rooms[roomnum1].flags & ROOMFLAG_ONSCREEN) == 0) {
-				// From room2 to room1
-				g_Rooms[roomnum1].flags |= ROOMFLAG_STANDBY;
+				} else if ((g_Rooms[roomnum2].flags & ROOMFLAG_ONSCREEN)
+						&& (g_Rooms[roomnum1].flags & ROOMFLAG_ONSCREEN) == 0) {
+					// From room2 to room1
+					g_Rooms[roomnum1].flags |= ROOMFLAG_STANDBY;
 
-				if (g_Rooms[roomnum1].loaded240 == 0) {
-					g_Rooms[roomnum1].flags |= ROOMFLAG_LOADCANDIDATE;
-					g_BgNumRoomLoadCandidates++;
-				}
+					if (g_Rooms[roomnum1].loaded240 == 0) {
+						g_Rooms[roomnum1].flags |= ROOMFLAG_LOADCANDIDATE;
+						g_BgNumRoomLoadCandidates++;
+					}
 
-				roomUnpauseProps(roomnum1, true);
+					roomUnpauseProps(roomnum1, true);
 
-				if (PORTAL_IS_CLOSED(i)) {
-					for (j = 0; j < g_Rooms[roomnum1].numportals; j++) {
-						portalnum = g_RoomPortals[g_Rooms[roomnum1].roomportallistoffset + j];
+					if (PORTAL_IS_CLOSED(i)) {
+						for (j = 0; j < g_Rooms[roomnum1].numportals; j++) {
+							portalnum = g_RoomPortals[g_Rooms[roomnum1].roomportallistoffset + j];
 
-						if (roomnum1 == g_BgPortals[portalnum].roomnum1) {
-							if (g_Rooms[g_BgPortals[portalnum].roomnum1].loaded240 == 0) {
-								g_Rooms[g_BgPortals[portalnum].roomnum1].flags |= ROOMFLAG_LOADCANDIDATE;
-								g_BgNumRoomLoadCandidates++;
-							}
-						} else {
-							if (g_Rooms[g_BgPortals[portalnum].roomnum1].loaded240 == 0) {
-								g_Rooms[g_BgPortals[portalnum].roomnum2].flags |= ROOMFLAG_LOADCANDIDATE;
-								g_BgNumRoomLoadCandidates++;
+							if (roomnum1 == g_BgPortals[portalnum].roomnum1) {
+								if (g_Rooms[g_BgPortals[portalnum].roomnum1].loaded240 == 0) {
+									g_Rooms[g_BgPortals[portalnum].roomnum1].flags |= ROOMFLAG_LOADCANDIDATE;
+									g_BgNumRoomLoadCandidates++;
+								}
+							} else {
+								if (g_Rooms[g_BgPortals[portalnum].roomnum1].loaded240 == 0) {
+									g_Rooms[g_BgPortals[portalnum].roomnum2].flags |= ROOMFLAG_LOADCANDIDATE;
+									g_BgNumRoomLoadCandidates++;
+								}
 							}
 						}
 					}
@@ -8173,7 +8423,7 @@ void bgTickPortals(void)
 		var800a4640.unk2d0.box.xmax = box.xmax;
 		var800a4640.unk2d0.box.ymax = box.ymax;
 
-		bgExecuteCommands(g_BgCommands);
+		bgExecuteCommands();
 
 		if (!g_BgRoomTestsDisabled) {
 			if (g_BgPortals[0].verticesoffset == 0) {
@@ -8470,18 +8720,12 @@ void func0f164ab8(s32 portalnum)
 	roomnum1 = g_BgPortals[portalnum].roomnum1;
 	roomnum2 = g_BgPortals[portalnum].roomnum2;
 
-	room1centre.x = g_Rooms[roomnum1].centre.x;
-	room1centre.y = g_Rooms[roomnum1].centre.y;
-	room1centre.z = g_Rooms[roomnum1].centre.z;
+	room1centre = g_Rooms[roomnum1].centre;
 
-	room2centre.x = g_Rooms[roomnum2].centre.x;
-	room2centre.y = g_Rooms[roomnum2].centre.y;
-	room2centre.z = g_Rooms[roomnum2].centre.z;
+	room2centre = g_Rooms[roomnum2].centre;
 
 	ptr = &var800a4ccc[portalnum];
-	sp28.coord.x = ptr->coord.x;
-	sp28.coord.y = ptr->coord.y;
-	sp28.coord.z = ptr->coord.z;
+	sp28.coord = ptr->coord;
 	sp28.min = ptr->min;
 	sp28.max = ptr->max;
 
@@ -8672,13 +8916,9 @@ void bgFindEnteredRooms(struct coord *bbmin, struct coord *bbmax, s16 *rooms, s3
 	struct coord portalbbmin;
 	struct coord portalbbmax;
 
-	propbbmin.x = bbmin->x;
-	propbbmin.y = bbmin->y;
-	propbbmin.z = bbmin->z;
+	propbbmin = *bbmin;
 
-	propbbmax.x = bbmax->x;
-	propbbmax.y = bbmax->y;
-	propbbmax.z = bbmax->z;
+	propbbmax = *bbmax;
 
 	i = 0;
 
@@ -8733,4 +8973,15 @@ void bgFindEnteredRooms(struct coord *bbmin, struct coord *bbmax, s16 *rooms, s3
 
 end:
 	rooms[len] = -1;
+}
+
+void bgPreload(void)
+{
+	if (g_BgPreload) {
+		s32 i;
+
+		for (i = 1; i < g_Vars.roomcount; i++) {
+			bgLoadRoom(i);
+		}
+	}
 }

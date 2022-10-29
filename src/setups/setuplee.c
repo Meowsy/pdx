@@ -831,9 +831,7 @@ u8 func040d_elvis_wait_for_hangar_entry[] = {
 
 u8 func040e_elvis_give_ar34[] = {
 	set_shotlist(AILIST_ELVIS_GIVE_AR34)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x2c)
 	goto_next(0x06)
 
 	label(0x2c)
@@ -925,9 +923,7 @@ u8 func0409_elvis_follow[] = {
 #endif
 	set_shotlist(AILIST_ELVIS_FOLLOW)
 	set_returnlist(CHR_SELF, AILIST_ELVIS_FOLLOW)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x2c)
 	goto_next(0x06)
 
 	// Dying
@@ -944,7 +940,6 @@ u8 func0409_elvis_follow[] = {
 #if VERSION >= VERSION_NTSC_1_0
 	restart_timer
 	say_quip(CHR_BOND, 0x29, 0xff, 0x03, 0xff, BANK_1, 0x00, 0x00)
-	dprint 'I','N','J','U','R','E','D','\n',0,
 
 	beginloop(LABEL_C1)
 		if_timer_gt(180, /*goto*/ 0x06)
@@ -953,7 +948,6 @@ u8 func0409_elvis_follow[] = {
 
 	// Healthy
 	label(0x06)
-	dprint 'I','N','J','U','R','E','D','F','I','N','\n',0,
 #else
 	say_quip(CHR_BOND, 0x29, 0xff, 0x03, 0xff, BANK_1, 0x00, 0x00)
 
@@ -985,7 +979,6 @@ u8 func0409_elvis_follow[] = {
 		if_stage_flag_eq(STAGEFLAG_SAID_GO_ON_AHEAD, TRUE, /*goto*/ 0x2c)
 		if_chr_in_room(CHR_ELVIS, 0x00, 0x006c, /*goto*/ LABEL_C4)
 		label(0x2c)
-		dprint 'G','O',' ','T','O',' ','P','A','D','\n',0,
 		if_enemy_distance_lt_and_los(2540, /*goto*/ 0x08)
 		set_target_chr(CHR_PRESET)
 		if_distance_to_target_lt(200, /*goto*/ 0x06)
@@ -1007,7 +1000,6 @@ u8 func0409_elvis_follow[] = {
 		if_stage_flag_eq(STAGEFLAG_SAID_GO_ON_AHEAD, TRUE, /*goto*/ 0x2c)
 		if_chr_in_room(CHR_ELVIS, 0x00, 0x006c, /*goto*/ LABEL_C4)
 		label(0x2c)
-		dprint 'A','T',' ','P','A','D','\n',0,
 		if_enemy_distance_lt_and_los(2540, /*goto*/ 0x08)
 		set_target_chr(CHR_PRESET)
 		if_distance_to_target_gt(300, /*goto*/ 0x06)
@@ -1019,15 +1011,12 @@ u8 func0409_elvis_follow[] = {
 
 	// Enemy detected
 	label(0x08)
-	if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x2c)
-	if_chr_dead(CHR_TARGET, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_TARGET, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_TARGET, /*goto*/ 0x2c)
 	if_chrpresets_target_is_different(/*goto*/ 0x06)
 	label(0x2c)
 	goto_first(0x03)
 
 	label(0x06)
-	dprint 'D','E','T','E','C','T','E','D','\n',0,
 	call_rng
 	if_rand_lt(85, /*goto*/ LABEL_65)
 	if_rand_lt(170, /*goto*/ LABEL_66)
@@ -1089,9 +1078,7 @@ u8 func041d_init_elvis_outside_prebridgelift[] = {
 
 u8 func041c_elvis_outside_prebridgelift[] = {
 	set_shotlist(AILIST_ELVIS_OUTSIDE_PREBRIDGELIFT)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x2c)
 	goto_next(0x06)
 
 	// Dying
@@ -1120,7 +1107,6 @@ u8 func041c_elvis_outside_prebridgelift[] = {
 	endloop(0x0c)
 
 	label(0x08)
-	dprint 'D','E','T','E','C','T','E','D','\n',0,
 	set_shotlist(AILIST_ELVIS_OUTSIDE_PREBRIDGELIFT)
 	set_returnlist(CHR_SELF, AILIST_ELVIS_OUTSIDE_PREBRIDGELIFT)
 	set_ailist(CHR_SELF, GAILIST_COMBAT_WITH_TARGET)
@@ -1129,9 +1115,7 @@ u8 func041c_elvis_outside_prebridgelift[] = {
 
 u8 func040a_elvis_go_to_hangar_lift[] = {
 	set_shotlist(AILIST_ELVIS_GO_TO_HANGAR_LIFT)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x2c)
 	goto_next(0x06)
 
 	// Dying
@@ -1186,9 +1170,7 @@ u8 func040a_elvis_go_to_hangar_lift[] = {
 u8 func041b_elvis_at_bridge[] = {
 	stop_chr
 	set_shotlist(AILIST_ELVIS_AT_BRIDGE)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x2c)
 	goto_next(0x06)
 
 	// Dying
@@ -1235,7 +1217,6 @@ u8 func041b_elvis_at_bridge[] = {
 	endloop(0x0c)
 
 	label(0x08)
-	dprint 'D','E','T','E','C','T','E','D','\n',0,
 	set_shotlist(AILIST_ELVIS_AT_BRIDGE)
 	set_returnlist(CHR_SELF, AILIST_ELVIS_AT_BRIDGE)
 	set_ailist(CHR_SELF, GAILIST_COMBAT_WITH_TARGET)
@@ -1244,9 +1225,7 @@ u8 func041b_elvis_at_bridge[] = {
 
 u8 func1005_check_elvis_dead[] = {
 	beginloop(0x04)
-		if_chr_dead(CHR_ELVIS, /*goto*/ 0x2c)
-		if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0x2c)
-		if_chr_knockedout(CHR_ELVIS, /*goto*/ 0x2c)
+		if_chr_deadish(CHR_ELVIS, /*goto*/ 0x2c)
 	endloop(0x04)
 
 	label(0x2c)
@@ -1257,9 +1236,7 @@ u8 func1005_check_elvis_dead[] = {
 };
 
 u8 func040f_init_skedar[] = {
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x0d)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x0d)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x0d)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x0d)
 
 	// Alive
 	set_accuracy(VERSION >= VERSION_NTSC_1_0 ? 20 : 40)
@@ -1278,9 +1255,7 @@ u8 func040f_init_skedar[] = {
 };
 
 u8 func0410_wake_suspendedanim_skedar[] = {
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x2c)
 	goto_next(0x06)
 
 	label(0x2c)
@@ -1336,9 +1311,7 @@ u8 func1006_wake_slayer_skedar[] = {
 	unlock_door(0x14, 0x02)
 	open_door(0x13)
 
-	if_chr_death_animation_finished(CHR_SUSPENDEDANIM3, /*goto*/ 0x2c)
-	if_chr_dead(CHR_SUSPENDEDANIM3, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_SUSPENDEDANIM3, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_SUSPENDEDANIM3, /*goto*/ 0x2c)
 	set_ailist(CHR_SUSPENDEDANIM3, AILIST_WAKE_SUSPENDEDANIM_SKEDAR)
 
 	set_chr_team(CHR_SUSPENDEDANIM3, TEAM_ENEMY)
@@ -1412,7 +1385,6 @@ u8 func1008_hangar_lifts[] = {
 
 	// Activate Jo's lift so it starts going to bottom
 	label(0x2c)
-	dprint 'U','N','\n',0,
 	unset_object_flag(OBJ_HANGARLIFT_JO, OBJFLAG_DEACTIVATED)
 	yield
 	yield
@@ -1428,7 +1400,6 @@ u8 func1008_hangar_lifts[] = {
 
 	// Wait until lift stopped at bottom
 	beginloop(LABEL_65)
-		dprint 'D','A','\n',0,
 		if_lift_stationary(OBJ_HANGARLIFT_JO, /*goto*/ LABEL_66)
 	endloop(LABEL_65)
 
@@ -1443,7 +1414,6 @@ u8 func1008_hangar_lifts[] = {
 	set_object_flag(OBJ_HANGARLIFT_JO, OBJFLAG_DEACTIVATED)
 
 	beginloop(LABEL_67)
-		dprint 'T','R','\n',0,
 		chr_toggle_p1p2(CHR_SELF)
 		if_chr_death_animation_finished(CHR_BOND, /*goto*/ 0x2c)
 		if_chr_in_room(CHR_BOND, 0x00, 0x0018, /*goto*/ 0x2c)
@@ -1453,7 +1423,6 @@ u8 func1008_hangar_lifts[] = {
 
 	// Door closing automatically - reopen it
 	label(0x2d)
-	dprint 'P','E','\n',0,
 	goto_first(LABEL_66)
 
 	// Jo has entered the lift, or Jo dead in co-op
@@ -1473,7 +1442,6 @@ u8 func1008_hangar_lifts[] = {
 
 	// Wait until Y coordinate >= 400
 	beginloop(0x09)
-		dprint 'P','U','\n',0,
 		chr_toggle_p1p2(CHR_SELF)
 		if_chr_death_animation_finished(CHR_P1P2, /*goto*/ 0x2c)
 		if_chr_y(CHR_P1P2, 400, OPERATOR_LESS_THAN, /*goto*/ 0x2c)
@@ -1490,9 +1458,7 @@ u8 func1008_hangar_lifts[] = {
 	label(0x2c)
 	set_object_flag(OBJ_HANGARLIFT_JO, OBJFLAG_DEACTIVATED)
 	unset_object_flag(OBJ_HANGARLIFT_ELVIS, OBJFLAG_DEACTIVATED)
-	if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_ELVIS, /*goto*/ 0x2c)
-	if_chr_dead(CHR_ELVIS, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_ELVIS, /*goto*/ 0x2c)
 	set_ailist(CHR_ELVIS, GAILIST_STOP_AND_IDLE)
 	yield
 
@@ -1529,9 +1495,7 @@ u8 func1008_hangar_lifts[] = {
 	endloop(0x0c)
 
 	label(0x2c)
-	if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_ELVIS, /*goto*/ 0x2c)
-	if_chr_dead(CHR_ELVIS, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_ELVIS, /*goto*/ 0x2c)
 	set_ailist(CHR_ELVIS, AILIST_ELVIS_FOLLOW)
 	label(0x2c)
 
@@ -1698,7 +1662,6 @@ u8 func0408_knifeable_skedar[] = {
 		chr_toggle_p1p2(CHR_SELF)
 		set_target_chr(CHR_P1P2)
 		if_just_injured(CHR_SELF, /*goto*/ 0x0c)
-		dprint 'W','A','I','T','I','N','G',' ','T','W','O','\n',0,
 		if_chr_stopped(/*goto*/ 0x0d)
 		label(0x06)
 		if_target_in_sight(/*goto*/ 0x0c)
@@ -1885,9 +1848,7 @@ u8 func0414_hangarclone[] = {
 u8 func0419_hangar_maian[] = {
 	set_shotlist(AILIST_HANGAR_MAIAN)
 	set_self_chrflag(CHRCFLAG_NOAUTOAIM)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x2c)
 	goto_next(0x06)
 
 	label(0x2c)
@@ -1914,7 +1875,6 @@ u8 func0419_hangar_maian[] = {
 	go_to_target_pad(GOPOSFLAG_RUN)
 
 	beginloop(0x04)
-		dprint 'G','O',' ','T','O',' ','P','A','D','\n',0,
 		if_enemy_distance_lt_and_los(2540, /*goto*/ 0x08)
 		if_chr_distance_to_pad_lt(CHR_SELF, 200, PAD_PRESET, /*goto*/ 0x06)
 		if_timer_gt(60, /*goto*/ 0x2c)
@@ -1929,7 +1889,6 @@ u8 func0419_hangar_maian[] = {
 
 	// Wait at pad for enemy
 	beginloop(0x09)
-		dprint 'A','T',' ','P','A','D','\n',0,
 		if_enemy_distance_lt_and_los(2540, /*goto*/ 0x08)
 		if_chr_distance_to_pad_gt(CHR_SELF, 300, PAD_PRESET, /*goto*/ 0x06)
 	endloop(0x09)
@@ -1939,7 +1898,6 @@ u8 func0419_hangar_maian[] = {
 
 	// Enemy detected
 	label(0x08)
-	dprint 'D','E','T','E','C','T','E','D','\n',0,
 	set_returnlist(CHR_SELF, AILIST_HANGAR_MAIAN)
 	set_shotlist(AILIST_HANGAR_MAIAN)
 	set_ailist(CHR_SELF, GAILIST_COMBAT_WITH_TARGET)
@@ -2064,9 +2022,7 @@ u8 func100c_engineroom[] = {
 	endloop(0x04)
 
 	label(0x06)
-	if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0x2c)
-	if_chr_dead(CHR_ELVIS, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_ELVIS, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_ELVIS, /*goto*/ 0x2c)
 	set_ailist(CHR_ELVIS, AILIST_ELVIS_RUN_FROM_ENGINEROOM)
 	play_x_track(XREASON_DEFAULT, 10, 10)
 	speak(CHR_BOND, L_LEE_046, MP3_03D7, CHANNEL_6, COLOR_04_ORANGE) // "We have to get out of here!"
@@ -2317,9 +2273,7 @@ u8 func0415_bridgespawner[] = {
 		// morale is 0 or 1
 		label(0x2c)
 		if_never_been_onscreen(/*goto*/ 0x4d)
-		if_chr_death_animation_finished(CHR_CLONE, /*goto*/ 0x2c)
-		if_chr_dead(CHR_CLONE, /*goto*/ 0x2c)
-		if_chr_knockedout(CHR_CLONE, /*goto*/ 0x2c)
+		if_chr_deadish(CHR_CLONE, /*goto*/ 0x2c)
 		label(0x2c)
 		if_can_see_target(/*goto*/ 0x08)
 	endloop(0x04)
@@ -2346,9 +2300,7 @@ u8 func0415_bridgespawner[] = {
 
 	// Check clone is dead
 	label(0x2c)
-	if_chr_death_animation_finished(CHR_CLONE, /*goto*/ 0x4d)
-	if_chr_dead(CHR_CLONE, /*goto*/ 0x4d)
-	if_chr_knockedout(CHR_CLONE, /*goto*/ 0x4d)
+	if_chr_deadish(CHR_CLONE, /*goto*/ 0x4d)
 	goto_first(0x04)
 
 	// Spawn
@@ -2410,9 +2362,7 @@ u8 func0417_init_spawner_reveal[] = {
 
 u8 func041a_bridgeclone[] = {
 	set_shotlist(AILIST_BRIDGECLONE)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x2c)
 	goto_next(0x06)
 
 	// Dying
@@ -2439,9 +2389,7 @@ u8 func041a_bridgeclone[] = {
 	label(0x03)
 
 	beginloop(LABEL_C2)
-		if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x2c)
-		if_chr_dead(CHR_TARGET, /*goto*/ 0x2c)
-		if_chr_knockedout(CHR_TARGET, /*goto*/ 0x2c)
+		if_chr_deadish(CHR_TARGET, /*goto*/ 0x2c)
 		goto_next(0x06)
 
 		label(0x2c)
@@ -2457,9 +2405,7 @@ u8 func041a_bridgeclone[] = {
 
 	beginloop(0x08)
 		if_chr_dead(CHR_SELF, /*goto*/ LABEL_B8)
-		if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x10)
-		if_chr_dead(CHR_TARGET, /*goto*/ 0x10)
-		if_chr_knockedout(CHR_TARGET, /*goto*/ 0x10)
+		if_chr_deadish(CHR_TARGET, /*goto*/ 0x10)
 		if_timer_gt(120, /*goto*/ 0x09)
 	endloop(0x08)
 
@@ -2470,9 +2416,7 @@ u8 func041a_bridgeclone[] = {
 	// Start running
 	beginloop(0x0a)
 		if_chr_dead(CHR_SELF, /*goto*/ LABEL_B8)
-		if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x10)
-		if_chr_dead(CHR_TARGET, /*goto*/ 0x10)
-		if_chr_knockedout(CHR_TARGET, /*goto*/ 0x10)
+		if_chr_deadish(CHR_TARGET, /*goto*/ 0x10)
 		if_target_moving_away(/*goto*/ 0x2c)
 		if_distance_to_target_lt(150, /*goto*/ 0x2e)
 		label(0x2c)
@@ -2486,7 +2430,6 @@ u8 func041a_bridgeclone[] = {
 	// Close to target - face them
 	label(0x2e)
 	restart_timer
-	dprint 'F','A','C','E',' ','T','A','R','G','E','T','\n',0,
 	if_target_in_fov_left(10, /*goto*/ 0x06)
 	if_target_out_of_fov_left(246, /*goto*/ 0x06)
 	stop_chr
@@ -2494,9 +2437,7 @@ u8 func041a_bridgeclone[] = {
 
 	beginloop(0x0b)
 		if_chr_dead(CHR_SELF, /*goto*/ LABEL_B8)
-		if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x10)
-		if_chr_dead(CHR_TARGET, /*goto*/ 0x10)
-		if_chr_knockedout(CHR_TARGET, /*goto*/ 0x10)
+		if_chr_deadish(CHR_TARGET, /*goto*/ 0x10)
 		if_target_in_fov_left(10, /*goto*/ 0x06)
 		if_target_out_of_fov_left(246, /*goto*/ 0x06)
 		if_timer_gt(15, /*goto*/ 0x06)
@@ -2509,9 +2450,7 @@ u8 func041a_bridgeclone[] = {
 
 	beginloop(0x2f)
 		if_chr_dead(CHR_SELF, /*goto*/ LABEL_B8)
-		if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x10)
-		if_chr_dead(CHR_TARGET, /*goto*/ 0x10)
-		if_chr_knockedout(CHR_TARGET, /*goto*/ 0x10)
+		if_chr_deadish(CHR_TARGET, /*goto*/ 0x10)
 		if_chr_stopped(/*goto*/ 0x06)
 	endloop(0x2f)
 
@@ -2539,21 +2478,15 @@ u8 func041a_bridgeclone[] = {
 u8 func100f_bridge_entry[] = {
 	// Wait until 3 bridge Skedar dead
 	beginloop(0x09)
-		if_chr_dead(CHR_BRIDGE1, /*goto*/ 0x2c)
-		if_chr_death_animation_finished(CHR_BRIDGE1, /*goto*/ 0x2c)
-		if_chr_knockedout(CHR_BRIDGE1, /*goto*/ 0x2c)
+		if_chr_deadish(CHR_BRIDGE1, /*goto*/ 0x2c)
 		reloop(0x09)
 
 		label(0x2c)
-		if_chr_dead(CHR_BRIDGE2, /*goto*/ 0x2c)
-		if_chr_death_animation_finished(CHR_BRIDGE2, /*goto*/ 0x2c)
-		if_chr_knockedout(CHR_BRIDGE2, /*goto*/ 0x2c)
+		if_chr_deadish(CHR_BRIDGE2, /*goto*/ 0x2c)
 		reloop(0x09)
 
 		label(0x2c)
-		if_chr_dead(CHR_BRIDGE3, /*goto*/ 0x2c)
-		if_chr_death_animation_finished(CHR_BRIDGE3, /*goto*/ 0x2c)
-		if_chr_knockedout(CHR_BRIDGE3, /*goto*/ 0x2c)
+		if_chr_deadish(CHR_BRIDGE3, /*goto*/ 0x2c)
 	endloop(0x09)
 
 	label(0x2c)
@@ -2608,15 +2541,11 @@ u8 func1010_check_bridge_captured[] = {
 		if_stage_flag_eq(STAGEFLAG_BRIDGE_DOORS_UNLOCKED, TRUE, /*goto*/ 0x2c)
 		if_timer_gt(3600, /*goto*/ 0x0d)
 		label(0x2c)
-		if_chr_death_animation_finished(CHR_BRIDGESPAWNER1, /*goto*/ 0x2c)
-		if_chr_dead(CHR_BRIDGESPAWNER1, /*goto*/ 0x2c)
-		if_chr_knockedout(CHR_BRIDGESPAWNER1, /*goto*/ 0x2c)
+		if_chr_deadish(CHR_BRIDGESPAWNER1, /*goto*/ 0x2c)
 		reloop(0x09)
 
 		label(0x2c)
-		if_chr_death_animation_finished(CHR_BRIDGESPAWNER2, /*goto*/ 0x2c)
-		if_chr_dead(CHR_BRIDGESPAWNER2, /*goto*/ 0x2c)
-		if_chr_knockedout(CHR_BRIDGESPAWNER2, /*goto*/ 0x2c)
+		if_chr_deadish(CHR_BRIDGESPAWNER2, /*goto*/ 0x2c)
 	endloop(0x09)
 
 	// 60 seconds elapsed
@@ -2648,15 +2577,11 @@ u8 func1011_check_end_level[] = {
 	endloop(0x08)
 
 	label(0x06)
-	if_chr_death_animation_finished(CHR_BOND, /*goto*/ 0x2c)
-	if_chr_dead(CHR_BOND, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_BOND, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_BOND, /*goto*/ 0x2c)
 	goto_next(0x06)
 
 	label(0x2c)
-	if_chr_death_animation_finished(CHR_COOP, /*goto*/ 0x2c)
-	if_chr_dead(CHR_COOP, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_COOP, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_COOP, /*goto*/ 0x2c)
 	goto_next(0x06)
 
 	// Both players dead
@@ -2666,9 +2591,7 @@ u8 func1011_check_end_level[] = {
 
 	// Either buddy is alive
 	label(0x06)
-	if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0x2c)
-	if_chr_dead(CHR_ELVIS, /*goto*/ 0x2c)
-	if_chr_knockedout(CHR_ELVIS, /*goto*/ 0x2c)
+	if_chr_deadish(CHR_ELVIS, /*goto*/ 0x2c)
 
 	// Mission complete
 	set_invincible(CHR_BOND)
@@ -3103,9 +3026,7 @@ u8 func0420_init_bridge3[] = {
  */
 u8 func0421_bridge_skedar[] = {
 	set_shotlist(AILIST_BRIDGE_SKEDAR)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x06)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x06)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x06)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x06)
 	goto_next(0x2c)
 
 	// Dying
@@ -3240,7 +3161,6 @@ u8 func0421_bridge_skedar[] = {
 
 	label(LABEL_60)
 	try_attack_amount(40, 60)
-	dprint 'F','I','R','E',' ','F','U','L','L','\n',0,
 	label(0x06)
 	goto_first(LABEL_CB)
 
@@ -3347,9 +3267,7 @@ u8 func0422_cass[] = {
 
 	beginloop(LABEL_C2)
 		damage_chr(CHR_SELF, WEAPON_SUPERDRAGON)
-		if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2c)
-		if_chr_dead(CHR_SELF, /*goto*/ 0x2c)
-		if_chr_knockedout(CHR_SELF, /*goto*/ 0x2c)
+		if_chr_deadish(CHR_SELF, /*goto*/ 0x2c)
 	endloop(LABEL_C2)
 
 	label(0x2c)
@@ -3579,7 +3497,6 @@ u8 func101c_lift_door_sounds[] = {
 	endloop(LABEL_C2)
 
 	label(0x2c)
-	dprint 'S','O','U','N','D','\n',0,
 	play_sound(SFX_81A6, -1)
 	restart_timer
 

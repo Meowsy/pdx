@@ -39,6 +39,7 @@
 #include "game/options.h"
 #include "game/propobj.h"
 #include "game/objectives.h"
+#include "game/setuputils.h"
 #include "bss.h"
 #include "lib/collision.h"
 #include "lib/vi.h"
@@ -181,6 +182,160 @@ char var800700bc[][10] = {
 	{ 'i','d','l','e','s','t','u','c','k' }, // "idlestuck"
 	{ 'x','x','x'                         }, // "xxx"
 };
+
+struct modelfiledata *g_GunModeldefs[0x5e]; // All weapon IDs
+struct modelfiledata *g_HandModeldefs[4]; // 4 players, or P1/P2/disguised/unused
+struct modelfiledata *g_CartModeldefs[4]; // 4 types of casings
+
+void bgunPreloadGun(s32 weaponnum)
+{
+	s32 gunfilenum;
+
+	if (weaponnum >= WEAPON_UNARMED && weaponnum < ARRAYCOUNT(g_GunModeldefs) && g_GunModeldefs[weaponnum] == NULL) {
+		// Classic weapons exist in CI training but cannot be used,
+		// so don't waste time and memory with preloading them.
+		if (g_Vars.stagenum == STAGE_CITRAINING && weaponnum >= WEAPON_PP9I && weaponnum <= WEAPON_RCP45) {
+			return;
+		}
+
+		gunfilenum = weaponGetModelNum(weaponnum);
+
+		if (gunfilenum) {
+			g_GunModeldefs[weaponnum] = modeldefLoadToNew(gunfilenum);
+			modelCalculateRwDataLen(g_GunModeldefs[weaponnum]);
+		}
+	}
+}
+
+void bgunPreload(void)
+{
+	s32 i;
+	s32 gunfilenum;
+	s32 handfilenum;
+	s32 cartfilenum;
+	s32 headnum;
+	s32 bodynum;
+	s32 prevplayernum;
+
+	for (i = 0; i < ARRAYCOUNT(g_GunModeldefs); i++) {
+		g_GunModeldefs[i] = NULL;
+	}
+
+	for (i = 0; i < ARRAYCOUNT(g_HandModeldefs); i++) {
+		g_HandModeldefs[i] = NULL;
+	}
+
+	for (i = 0; i < ARRAYCOUNT(g_CartModeldefs); i++) {
+		g_CartModeldefs[i] = NULL;
+	}
+
+	// Guns
+	bgunPreloadGun(WEAPON_UNARMED);
+
+	if (g_Vars.normmplayerisrunning) {
+		// Load the 6 selected MP weapons
+		for (i = 0; i < ARRAYCOUNT(g_MpSetup.weapons); i++) {
+			s32 weaponnum = g_MpWeapons[g_MpSetup.weapons[i]].weaponnum;
+			bgunPreloadGun(weaponnum);
+		}
+	} else {
+		s32 *ptr;
+		struct defaultobj *obj;
+
+		// Scan the stage's setup file for intro weapons and preload them
+		ptr = g_StageSetup.intro;
+
+		if (ptr) {
+			while (ptr[0] != INTROCMD_END) {
+				switch (ptr[0]) {
+				case INTROCMD_SPAWN:
+				case INTROCMD_CASE:
+				case INTROCMD_CASERESPAWN:
+				case INTROCMD_WATCHTIME:
+					ptr += 3;
+					break;
+				case INTROCMD_HILL:
+				case INTROCMD_4:
+				case INTROCMD_OUTFIT:
+				case INTROCMD_CREDITOFFSET:
+					ptr += 2;
+					break;
+				case INTROCMD_WEAPON:
+					bgunPreloadGun(ptr[1]);
+					ptr += 4;
+					break;
+				case INTROCMD_AMMO:
+					ptr += 4;
+					break;
+				case INTROCMD_3:
+					ptr += 8;
+					break;
+				case INTROCMD_6:
+					ptr += 10;
+					break;
+				default:
+					ptr++;
+					break;
+				}
+			}
+		}
+
+		// Weapons held by chrs or on the ground
+		obj = (struct defaultobj *)g_StageSetup.props;
+
+		if (obj) {
+			while (obj->type != OBJTYPE_END) {
+				if (obj->type == OBJTYPE_WEAPON) {
+					struct weaponobj *weapon = (struct weaponobj *)obj;
+					bgunPreloadGun(weapon->weaponnum);
+				}
+
+				obj = (struct defaultobj *)((u32 *)obj + setupGetCmdLength((u32 *)obj));
+			}
+		}
+
+		// Unarmed chrs can draw a Falcon
+		if (g_Vars.stagenum != STAGE_AIRFORCEONE) {
+			bgunPreloadGun(WEAPON_FALCON2);
+		}
+	}
+
+	// Hands
+	prevplayernum = g_Vars.currentplayernum;
+
+	for (i = 0; i < PLAYERCOUNT(); i++) {
+		setCurrentPlayerNum(i);
+		playerChooseBodyAndHead(&bodynum, &headnum, NULL);
+
+		handfilenum = g_HeadsAndBodies[bodynum].handfilenum;
+		g_HandModeldefs[i] = modeldefLoadToNew(handfilenum);
+		modelCalculateRwDataLen(g_HandModeldefs[i]);
+	}
+
+	setCurrentPlayerNum(prevplayernum);
+
+	if (!g_Vars.normmplayerisrunning) {
+		// Load disguised hand model into index 2
+		if (g_Vars.stagenum == STAGE_RESCUE) {
+			handfilenum = g_HeadsAndBodies[BODY_DARKLAB].handfilenum;
+			g_HandModeldefs[2] = modeldefLoadToNew(handfilenum);
+			modelCalculateRwDataLen(g_HandModeldefs[2]);
+		} else if (g_Vars.stagenum == STAGE_AIRBASE) {
+			handfilenum = g_HeadsAndBodies[BODY_DARK_AF1].handfilenum;
+			g_HandModeldefs[2] = modeldefLoadToNew(handfilenum);
+			modelCalculateRwDataLen(g_HandModeldefs[2]);
+		}
+	}
+
+	// Carts
+	if (PLAYERCOUNT() == 1) {
+		for (i = 0; i < ARRAYCOUNT(g_CartModeldefs); i++) {
+			cartfilenum = g_CartFileNums[i];
+			g_CartModeldefs[i] = modeldefLoadToNew(cartfilenum);
+			modelCalculateRwDataLen(g_CartModeldefs[i]);
+		}
+	}
+}
 
 #if VERSION >= VERSION_NTSC_1_0
 void bgunRumble(s32 handnum, s32 weaponnum)
@@ -2049,9 +2204,7 @@ bool bgun0f09aba4(struct hand *hand, struct handweaponinfo *info, s32 handnum, s
 			hand->posend.y = 0;
 			hand->posend.z = 0;
 
-			hand->posstart.x = hand->posoffset.x;
-			hand->posstart.y = hand->posoffset.y;
-			hand->posstart.z = hand->posoffset.z;
+			hand->posstart = hand->posoffset;
 		}
 
 		if (hand->stateflags & HANDSTATEFLAG_00000040) {
@@ -2081,9 +2234,7 @@ bool bgun0f09aba4(struct hand *hand, struct handweaponinfo *info, s32 handnum, s
 			if ((hand->stateflags & HANDSTATEFLAG_00000080) == 0) {
 				hand->stateflags |= HANDSTATEFLAG_00000080;
 				hand->rotxstart = hand->rotxoffset;
-				hand->posstart.x = hand->posoffset.x;
-				hand->posstart.y = hand->posoffset.y;
-				hand->posstart.z = hand->posoffset.z;
+				hand->posstart = hand->posoffset;
 			}
 
 			hand->rotxend = M_BADTAU - (recoilangle * M_BADTAU) / 360.0f;
@@ -3934,12 +4085,12 @@ const char var7f1ac144[] = "GunLockTimer: %d\n";
 
 void bgunTickMasterLoad(void)
 {
-	s32 newweaponnum;
+	s32 weaponnum;
 	struct player *player = g_Vars.currentplayer;
 	bool hashands;
 	u16 handfilenum;
 	s32 sum;
-	u16 filenum;
+	u16 gunfilenum;
 	s32 i;
 	struct casing *casing;
 	struct hand *hand;
@@ -3954,112 +4105,94 @@ void bgunTickMasterLoad(void)
 
 	if ((player->gunctrl.gunmemowner == GUNMEMOWNER_BONDGUN || bgun0f09e004(GUNMEMOWNER_BONDGUN)) && player->gunctrl.gunmemnew >= 0) {
 		if (player->gunctrl.gunlocktimer == 0) {
-			newweaponnum = player->gunctrl.gunmemnew;
+			weaponnum = player->gunctrl.gunmemnew;
 
-			playerChooseBodyAndHead(&bodynum, &headnum, NULL);
+			gunfilenum = weaponGetModelNum(weaponnum);
 
-			handfilenum = g_HeadsAndBodies[bodynum].handfilenum;
-
-			if (IS4MB()) {
-				handfilenum = FILE_GCOMBATHANDSLOD;
-			}
-
-			filenum = weaponGetModelNum(newweaponnum);
-
-			if (player->gunctrl.masterloadstate != MASTERLOADSTATE_LOADED || newweaponnum != player->gunctrl.gunmemtype) {
-				if (filenum) {
+			if (player->gunctrl.masterloadstate != MASTERLOADSTATE_LOADED || weaponnum != player->gunctrl.gunmemtype) {
+				if (gunfilenum) {
 					hashands = false;
 
-					if (weaponHasFlag(newweaponnum, WEAPONFLAG_HASHANDS)) {
+					if (weaponHasFlag(weaponnum, WEAPONFLAG_HASHANDS)) {
 						hashands = true;
 					}
 
-					if (newweaponnum == WEAPON_UNARMED) {
+					if (weaponnum == WEAPON_UNARMED) {
 						// For unarmed, the fists are implemented
 						// as weapon models rather than hand models
-						filenum = handfilenum;
-						handfilenum = 0 * (player->gunctrl.gunloadstate == 4);
+						playerChooseBodyAndHead(&bodynum, &headnum, NULL);
+						handfilenum = g_HeadsAndBodies[bodynum].handfilenum;
+						gunfilenum = handfilenum;
 						hashands = false;
 					}
 
 					if (player->gunctrl.masterloadstate == MASTERLOADSTATE_FLUX) {
-						casing = g_Casings;
-
-						while (casing < &g_Casings[ARRAYCOUNT(g_Casings)]) {
-							if (casing->modeldef == player->gunctrl.cartmodeldef) {
-								casing->modeldef = NULL;
-							}
-
-							casing++;
-						}
-
-						g_CasingsActive = false;
-
-						casing = g_Casings;
-
-						while (casing < &g_Casings[ARRAYCOUNT(g_Casings)]) {
-							if (casing->modeldef != NULL) {
-								g_CasingsActive = true;
-							}
-
-							casing++;
-						}
-
 						player->gunctrl.cartmodeldef = NULL;
 						player->gunctrl.masterloadstate = MASTERLOADSTATE_HANDS;
-					} else if (player->gunctrl.masterloadstate == MASTERLOADSTATE_HANDS) {
+					}
+
+					if (player->gunctrl.masterloadstate == MASTERLOADSTATE_HANDS) {
+						// Hands are always preloaded
 						if (hashands) {
-							if (handfilenum != player->gunctrl.handfilenum) {
-								if (player->gunctrl.gunloadstate == GUNLOADSTATE_FLUX) {
-									player->gunctrl.unk15a0 = bgunGetGunMem();
-									player->gunctrl.unk15a4 = bgunCalculateGunMemCapacity();
-									player->gunctrl.gunloadstate = GUNLOADSTATE_MODEL;
-									player->gunctrl.loadfilenum = handfilenum;
-									player->gunctrl.loadtomodeldef = &player->gunctrl.handmodeldef;
-									player->gunctrl.loadmemptr = (u32 *) &player->gunctrl.unk15a0;
-									player->gunctrl.loadmemremaining = (u32 *) &player->gunctrl.unk15a4;
-								}
-
-								bgunTickGunLoad();
-
-								if (player->gunctrl.gunloadstate == GUNLOADSTATE_LOADED) {
-									player->gunctrl.handfilenum = handfilenum;
-								} else {
-									return;
-								}
+							if (player->disguised) {
+								player->gunctrl.handmodeldef = g_HandModeldefs[2];
+							} else {
+								player->gunctrl.handmodeldef = g_HandModeldefs[g_Vars.currentplayernum];
 							}
 						} else {
-							player->gunctrl.handfilenum = 0;
 							player->gunctrl.handmodeldef = NULL;
-							player->gunctrl.unk15a0 = bgunGetGunMem();
-							player->gunctrl.unk15a4 = bgunCalculateGunMemCapacity();
 						}
+
+						player->gunctrl.unk15a0 = bgunGetGunMem();
+						player->gunctrl.unk15a4 = bgunCalculateGunMemCapacity();
 
 						player->gunctrl.masterloadstate = MASTERLOADSTATE_GUN;
 						player->gunctrl.gunloadstate = GUNLOADSTATE_FLUX;
-					} else if (player->gunctrl.masterloadstate == MASTERLOADSTATE_GUN) {
-						if (player->gunctrl.gunloadstate == GUNLOADSTATE_FLUX) {
-							player->gunctrl.unk15a8 = (u8 *) player->gunctrl.unk15a0;
-							player->gunctrl.unk15ac = player->gunctrl.unk15a4;
-							player->gunctrl.gunloadstate = GUNLOADSTATE_MODEL;
-							player->gunctrl.loadfilenum = filenum;
-							player->gunctrl.loadtomodeldef = &player->gunctrl.gunmodeldef;
-							player->gunctrl.loadmemptr = (u32 *) &player->gunctrl.unk15a8;
-							player->gunctrl.loadmemremaining = (u32 *) &player->gunctrl.unk15ac;
-						}
+					}
 
-						bgunTickGunLoad();
+					if (player->gunctrl.masterloadstate == MASTERLOADSTATE_GUN) {
+						if (weaponnum < ARRAYCOUNT(g_GunModeldefs) && g_GunModeldefs[weaponnum]) {
+							// Preloaded
+							if (weaponnum == WEAPON_UNARMED) {
+								if (player->disguised) {
+									player->gunctrl.gunmodeldef = g_HandModeldefs[2];
+								} else {
+									player->gunctrl.gunmodeldef = g_HandModeldefs[g_Vars.currentplayernum];
+								}
+							} else {
+								player->gunctrl.gunmodeldef = g_GunModeldefs[weaponnum];
+							}
 
-						if (player->gunctrl.gunloadstate == GUNLOADSTATE_LOADED) {
 							player->gunctrl.masterloadstate = MASTERLOADSTATE_CARTS;
 							player->gunctrl.gunloadstate = GUNLOADSTATE_FLUX;
-						}
-					} else if (player->gunctrl.masterloadstate == MASTERLOADSTATE_CARTS) {
-						if (player->gunctrl.gunloadstate == GUNLOADSTATE_LOADED) {
-							player->gunctrl.gunloadstate = GUNLOADSTATE_FLUX;
-						}
+							player->gunctrl.unk15a8 = bgunGetGunMem();
+							player->gunctrl.unk15ac = bgunCalculateGunMemCapacity();
+						} else {
+							// Not preloaded
+							if (player->gunctrl.gunloadstate == GUNLOADSTATE_FLUX) {
+								player->gunctrl.unk15a8 = (u8 *) player->gunctrl.unk15a0;
+								player->gunctrl.unk15ac = player->gunctrl.unk15a4;
+								player->gunctrl.gunloadstate = GUNLOADSTATE_MODEL;
+								player->gunctrl.loadfilenum = gunfilenum;
+								player->gunctrl.loadtomodeldef = &player->gunctrl.gunmodeldef;
+								player->gunctrl.loadmemptr = (u32 *) &player->gunctrl.unk15a8;
+								player->gunctrl.loadmemremaining = (u32 *) &player->gunctrl.unk15ac;
+							}
 
-						if (player->gunctrl.gunloadstate == GUNLOADSTATE_FLUX && player->gunctrl.cartmodeldef == NULL && PLAYERCOUNT() == 1) {
+							bgunTickGunLoad();
+
+							if (player->gunctrl.gunloadstate == GUNLOADSTATE_LOADED) {
+								player->gunctrl.masterloadstate = MASTERLOADSTATE_CARTS;
+								player->gunctrl.gunloadstate = GUNLOADSTATE_FLUX;
+							} else {
+								return;
+							}
+						}
+					}
+
+					if (player->gunctrl.masterloadstate == MASTERLOADSTATE_CARTS) {
+						// Carts are always preloaded
+						if (PLAYERCOUNT() == 1) {
 							for (i = 0; i < 2; i++) {
 								hand = player->hands + i;
 								func = gsetGetWeaponFunction2(&hand->gset);
@@ -4081,25 +4214,11 @@ void bgunTickMasterLoad(void)
 									}
 
 									if (casingindex >= 0) {
-										if (player->gunctrl.cartmodeldef == NULL) {
-											filenum = g_CartFileNums[casingindex];
-											player->gunctrl.loadfilenum = filenum;
-											player->gunctrl.gunloadstate = GUNLOADSTATE_MODEL;
-											player->gunctrl.loadtomodeldef = &player->gunctrl.cartmodeldef;
-											player->gunctrl.loadmemptr = (u32 *) &player->gunctrl.unk15a8;
-											player->gunctrl.loadmemremaining = (u32 *) &player->gunctrl.unk15ac;
-											break;
-										}
-
+										player->gunctrl.cartmodeldef = g_CartModeldefs[casingindex];
 										break;
 									}
 								}
 							}
-						}
-
-						if (player->gunctrl.gunloadstate != GUNLOADSTATE_FLUX) {
-							bgunTickGunLoad();
-							return;
 						}
 
 						sum = 0;
@@ -4146,17 +4265,14 @@ void bgunTickMasterLoad(void)
 						bgunCalculateGunMemCapacity();
 
 						player->gunctrl.masterloadstate = MASTERLOADSTATE_LOADED;
-						player->gunctrl.gunmemtype = newweaponnum;
+						player->gunctrl.gunmemtype = weaponnum;
 						player->gunctrl.gunmemnew = -1;
 					}
-				}
-#if VERSION >= VERSION_NTSC_1_0
-				else {
+				} else {
 					player->gunctrl.masterloadstate = MASTERLOADSTATE_LOADED;
-					player->gunctrl.gunmemtype = newweaponnum;
+					player->gunctrl.gunmemtype = weaponnum;
 					player->gunctrl.gunmemnew = -1;
 				}
-#endif
 			}
 		} else {
 			player->gunctrl.gunlocktimer--;
@@ -4256,9 +4372,7 @@ void bgun0f09ebcc(struct defaultobj *obj, struct coord *coord, s16 *rooms, Mtxf 
 			projectileSetSticky(objprop);
 			mtx4Copy(matrix2, (Mtxf *)&obj->projectile->mtx);
 
-			obj->projectile->speed.x = velocity->x;
-			obj->projectile->speed.y = velocity->y;
-			obj->projectile->speed.z = velocity->z;
+			obj->projectile->speed = *velocity;
 			obj->projectile->obj = obj;
 			obj->projectile->unk0d8 = g_Vars.lvframenum;
 		}
@@ -4274,9 +4388,7 @@ void bgun0f09ed2c(struct defaultobj *obj, struct coord *newpos, Mtxf *arg2, stru
 	if (objprop) {
 		struct prop *playerprop = g_Vars.currentplayer->prop;
 
-		pos.x = playerprop->pos.x;
-		pos.y = playerprop->pos.y;
-		pos.z = playerprop->pos.z;
+		pos = playerprop->pos;
 
 		roomsCopy(playerprop->rooms, rooms);
 
@@ -4285,9 +4397,7 @@ void bgun0f09ed2c(struct defaultobj *obj, struct coord *newpos, Mtxf *arg2, stru
 		if (obj->hidden & OBJHFLAG_PROJECTILE) {
 			obj->projectile->flags |= PROJECTILEFLAG_LAUNCHING;
 
-			obj->projectile->nextsteppos.x = newpos->x;
-			obj->projectile->nextsteppos.y = newpos->y;
-			obj->projectile->nextsteppos.z = newpos->z;
+			obj->projectile->nextsteppos = *newpos;
 		}
 	}
 }
@@ -4424,9 +4534,7 @@ void bgunCreateThrownProjectile(s32 handnum, struct gset *gset)
 
 	hand = g_Vars.currentplayer->hands + handnum;
 
-	muzzlepos.x = g_Vars.currentplayer->hands[handnum].muzzlepos.x;
-	muzzlepos.y = g_Vars.currentplayer->hands[handnum].muzzlepos.y;
-	muzzlepos.z = g_Vars.currentplayer->hands[handnum].muzzlepos.z;
+	muzzlepos = g_Vars.currentplayer->hands[handnum].muzzlepos;
 
 	mtx4LoadIdentity(&sp1f4);
 
@@ -4451,13 +4559,9 @@ void bgunCreateThrownProjectile(s32 handnum, struct gset *gset)
 	playerSetPerimEnabled(playerprop, false);
 
 	if (cdTestLos11(&playerprop->pos, playerprop->rooms, &muzzlepos, spawnrooms, CDTYPE_ALL) != CDRESULT_COLLISION) {
-		spawnpos.x = muzzlepos.x;
-		spawnpos.y = muzzlepos.y;
-		spawnpos.z = muzzlepos.z;
+		spawnpos = muzzlepos;
 	} else {
-		spawnpos.x = playerprop->pos.x;
-		spawnpos.y = playerprop->pos.y;
-		spawnpos.z = playerprop->pos.z;
+		spawnpos = playerprop->pos;
 
 		roomsCopy(playerprop->rooms, spawnrooms);
 	}
@@ -4477,9 +4581,7 @@ void bgunCreateThrownProjectile(s32 handnum, struct gset *gset)
 		func0f061d54(0, 0, 0);
 
 		if (hand->hasdotinfo) {
-			aimpos.x = hand->dotpos.x;
-			aimpos.y = hand->dotpos.y;
-			aimpos.z = hand->dotpos.z;
+			aimpos = hand->dotpos;
 
 			chrCalculateTrajectory(&spawnpos, 21.666666f, &aimpos, &sp140);
 
@@ -4507,9 +4609,7 @@ void bgunCreateThrownProjectile(s32 handnum, struct gset *gset)
 				sp1dc.y = -sp78.m[2][1];
 				sp1dc.z = -sp78.m[2][2];
 			} else {
-				sp1dc.x = sp140.x;
-				sp1dc.y = sp140.y;
-				sp1dc.z = sp140.z;
+				sp1dc = sp140;
 			}
 		}
 
@@ -4565,9 +4665,7 @@ void bgunCreateThrownProjectile(s32 handnum, struct gset *gset)
 
 		if (obj->hidden & OBJHFLAG_PROJECTILE) {
 			obj->projectile->flags |= PROJECTILEFLAG_LAUNCHING;
-			obj->projectile->nextsteppos.x = muzzlepos.x;
-			obj->projectile->nextsteppos.y = muzzlepos.y;
-			obj->projectile->nextsteppos.z = muzzlepos.z;
+			obj->projectile->nextsteppos = muzzlepos;
 
 			if (gset->weaponnum == WEAPON_GRENADE && gset->weaponfunc == FUNC_SECONDARY) {
 				obj->projectile->unk08c = 1.0f;
@@ -4704,9 +4802,7 @@ void bgunCreateFiredProjectile(s32 handnum)
 			bgunCalculatePlayerShotSpread(&sp204, &sp1f8, handnum, true);
 			mtx4RotateVecInPlace(camGetProjectionMtxF(), &sp1f8);
 
-			spawnpos.x = hand->muzzlepos.x;
-			spawnpos.y = hand->muzzlepos.y;
-			spawnpos.z = hand->muzzlepos.z;
+			spawnpos = hand->muzzlepos;
 
 			if (hand->gset.weaponnum == WEAPON_SLAYER && hand->gset.weaponfunc == FUNC_SECONDARY) {
 				spawnpos.x += 50.0f * sp1f8.x;
@@ -4721,9 +4817,7 @@ void bgunCreateFiredProjectile(s32 handnum)
 				func0f061d54(0, 0, 0);
 
 				if (hand->hasdotinfo) {
-					aimpos.x = hand->dotpos.x;
-					aimpos.y = hand->dotpos.y;
-					aimpos.z = hand->dotpos.z;
+					aimpos = hand->dotpos;
 
 					chrCalculateTrajectory(&spawnpos, sp25c, &aimpos, &sp1bc);
 
@@ -4750,9 +4844,7 @@ void bgunCreateFiredProjectile(s32 handnum)
 						sp1f8.y = -spf4.m[2][1];
 						sp1f8.z = -spf4.m[2][2];
 					} else {
-						sp1f8.x = sp1bc.x;
-						sp1f8.y = sp1bc.y;
-						sp1f8.z = sp1bc.z;
+						sp1f8 = sp1bc;
 					}
 				}
 			}
@@ -5022,9 +5114,7 @@ void bgunSwivel(f32 screenx, f32 screeny, f32 crossdamp, f32 aimdamp)
 			hand = &player->hands[h];
 
 			if (hand->hasdotinfo && !g_Vars.mplayerisrunning) {
-				sp94.x = hand->dotpos.x;
-				sp94.y = hand->dotpos.y;
-				sp94.z = hand->dotpos.z;
+				sp94 = hand->dotpos;
 
 				mtx4TransformVecInPlace(camGetWorldToScreenMtxf(), &sp94);
 
@@ -5290,13 +5380,9 @@ bool bgunGetLastShootInfo(struct coord *pos, struct coord *dir, s32 handnum)
 		return false;
 	}
 
-	pos->x = hand->lastshootpos.x;
-	pos->y = hand->lastshootpos.y;
-	pos->z = hand->lastshootpos.z;
+	*pos = hand->lastshootpos;
 
-	dir->x = hand->lastshootdir.x;
-	dir->y = hand->lastshootdir.y;
-	dir->z = hand->lastshootdir.z;
+	*dir = hand->lastshootdir;
 
 	return true;
 }
@@ -5307,13 +5393,9 @@ void bgunSetLastShootInfo(struct coord *pos, struct coord *dir, s32 handnum)
 
 	hand->lastdirvalid = true;
 
-	hand->lastshootpos.x = pos->x;
-	hand->lastshootpos.y = pos->y;
-	hand->lastshootpos.z = pos->z;
+	hand->lastshootpos = *pos;
 
-	hand->lastshootdir.x = dir->x;
-	hand->lastshootdir.y = dir->y;
-	hand->lastshootdir.z = dir->z;
+	hand->lastshootdir = *dir;
 }
 
 s32 bgunGetShotsToTake(s32 handnum)
@@ -6027,9 +6109,7 @@ void bgun0f0a24f0(struct coord *arg0, s32 handnum)
 	b.y *= 1000;
 	b.z *= 1000;
 
-	arg0->x = b.x;
-	arg0->y = b.y;
-	arg0->z = b.z;
+	*arg0 = b;
 }
 
 /**
@@ -6715,9 +6795,7 @@ void bgunUpdateSmoke(struct hand *hand, s32 handnum, s32 weaponnum, struct weapo
 		smokerooms[0] = g_Vars.currentplayer->cam_room;
 		smokerooms[1] = -1;
 
-		smokepos.x = hand->muzzlepos.x;
-		smokepos.y = hand->muzzlepos.y;
-		smokepos.z = hand->muzzlepos.z;
+		smokepos = hand->muzzlepos;
 
 		hand->gunsmokepoint = 0.0f;
 
@@ -6763,13 +6841,9 @@ void bgunUpdateLasersight(struct hand *hand, struct modelfiledata *modeldef, s32
 
 			mtx4RotateVecInPlace(&hand->cammtx, &beamfar);
 
-			sp48.x = beamfar.x;
-			sp48.y = beamfar.y;
-			sp48.z = beamfar.z;
+			sp48 = beamfar;
 
-			sp3c.x = beamnear.x;
-			sp3c.y = beamnear.y;
-			sp3c.z = beamnear.z;
+			sp3c = beamnear;
 
 			mtx4TransformVec(camGetWorldToScreenMtxf(), &sp3c, &sp54);
 			mtx4RotateVec(camGetProjectionMtxF(), &sp48, &sp30);
@@ -6814,13 +6888,9 @@ void bgunUpdateLasersight(struct hand *hand, struct modelfiledata *modeldef, s32
 		lasersightSetBeam(handnum, 1, &beamnear, &beamfar);
 
 		if (handnum == HAND_RIGHT && hand->hasdotinfo && !busy) {
-			dotpos.x = hand->dotpos.x;
-			dotpos.y = hand->dotpos.y;
-			dotpos.z = hand->dotpos.z;
+			dotpos = hand->dotpos;
 
-			dotrot.x = hand->dotrot.x;
-			dotrot.y = hand->dotrot.y;
-			dotrot.z = hand->dotrot.z;
+			dotrot = hand->dotrot;
 
 			lasersightSetDot(handnum, &dotpos, &dotrot);
 		}

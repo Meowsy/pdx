@@ -509,9 +509,7 @@ u8 func0401_init_unarmed_skedar[] = {
 u8 func0402_unarmed_skedar[] = {
 	set_shotlist(AILIST_UNARMED_SKEDAR)
 	set_action(MA_NORMAL, TRUE)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x2d)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2d)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x2d)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x2d)
 	goto_next(0x06)
 
 	// Dying
@@ -602,9 +600,7 @@ u8 func0402_unarmed_skedar[] = {
 		if_chr_has_hiddenflag(CHR_TARGET, CHRHFLAG_CLOAKED, /*goto*/ 0x10)
 		if_chr_in_room(CHR_SELF, 0x00, 0x003b, /*goto*/ LABEL_HANDLE_PHOENIX_AREA)
 		if_chr_in_room(CHR_SELF, 0x00, 0x0041, /*goto*/ LABEL_HANDLE_WALL_AREA)
-		if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x10)
-		if_chr_dead(CHR_TARGET, /*goto*/ 0x10)
-		if_chr_knockedout(CHR_TARGET, /*goto*/ 0x10)
+		if_chr_deadish(CHR_TARGET, /*goto*/ 0x10)
 		if_target_moving_away(/*goto*/ 0x2d)
 		if_distance_to_target_lt(150, /*goto*/ 0x2f)
 		label(0x2d)
@@ -617,7 +613,6 @@ u8 func0402_unarmed_skedar[] = {
 
 	label(0x2f)
 	restart_timer
-	dprint 'F','A','C','E',' ','T','A','R','G','E','T','\n',0,
 	if_target_in_fov_left(10, /*goto*/ 0x06)
 	if_target_out_of_fov_left(246, /*goto*/ 0x06)
 	stop_chr
@@ -628,9 +623,7 @@ u8 func0402_unarmed_skedar[] = {
 		if_chr_has_hiddenflag(CHR_TARGET, CHRHFLAG_CLOAKED, /*goto*/ 0x10)
 		if_chr_in_room(CHR_SELF, 0x00, 0x003b, /*goto*/ LABEL_HANDLE_PHOENIX_AREA)
 		if_chr_in_room(CHR_SELF, 0x00, 0x0041, /*goto*/ LABEL_HANDLE_WALL_AREA)
-		if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x10)
-		if_chr_dead(CHR_TARGET, /*goto*/ 0x10)
-		if_chr_knockedout(CHR_TARGET, /*goto*/ 0x10)
+		if_chr_deadish(CHR_TARGET, /*goto*/ 0x10)
 		if_target_in_fov_left(10, /*goto*/ 0x06)
 		if_target_out_of_fov_left(246, /*goto*/ 0x06)
 		if_timer_gt(60, /*goto*/ 0x06)
@@ -648,17 +641,13 @@ u8 func0402_unarmed_skedar[] = {
 		if_chr_has_hiddenflag(CHR_TARGET, CHRHFLAG_CLOAKED, /*goto*/ 0x10)
 		if_chr_in_room(CHR_SELF, 0x00, 0x003b, /*goto*/ LABEL_HANDLE_PHOENIX_AREA)
 		if_chr_in_room(CHR_SELF, 0x00, 0x0041, /*goto*/ LABEL_HANDLE_WALL_AREA)
-		if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x10)
-		if_chr_dead(CHR_TARGET, /*goto*/ 0x10)
-		if_chr_knockedout(CHR_TARGET, /*goto*/ 0x10)
+		if_chr_deadish(CHR_TARGET, /*goto*/ 0x10)
 		if_chr_stopped(/*goto*/ 0x06)
 	endloop(0x30)
 
 	// Finished attack
 	label(0x06)
-	if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x10)
-	if_chr_dead(CHR_TARGET, /*goto*/ 0x10)
-	if_chr_knockedout(CHR_TARGET, /*goto*/ 0x10)
+	if_chr_deadish(CHR_TARGET, /*goto*/ 0x10)
 	goto_first(0xd9)
 
 	// Killed target
@@ -739,9 +728,7 @@ u8 func0403_init_miniskedar[] = {
 
 u8 func0404_miniskedar[] = {
 	set_shotlist(AILIST_MINISKEDAR)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x2d)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2d)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x2d)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x2d)
 	goto_next(0x06)
 
 	// Dying
@@ -808,7 +795,6 @@ u8 func0404_miniskedar[] = {
 
 	label(0x2f)
 	restart_timer
-	dprint 'F','A','C','E',' ','T','A','R','G','E','T','\n',0,
 	stop_chr
 	try_face_entity(ATTACKFLAG_AIMATTARGET, 0, /*goto*/ 0x0c)
 
@@ -1212,19 +1198,16 @@ u8 func1007_bug_throws_bond[] = {
 		if_stage_flag_eq(STAGEFLAG_BOND_THREW_THIRD_BUG, FALSE, /*goto*/ 0x57)
 
 		label(0x55)
-		dprint 'C','H','E','C','K',' ','1','\n',0,
 		if_ammo_quantity_lt(CHR_BOND, AMMOTYPE_BUG, 3, /*goto*/ 0x2d)
 	endloop(0x03)
 
 	// Threw first
 	label(0x2d)
-	dprint 'F','I','R','E',' ','1','\n',0,
 	set_stage_flag(STAGEFLAG_BOND_THREW_FIRST_BUG)
 	goto_next(0x0e)
 
 	// Check for second
 	label(0x56)
-	dprint 'C','H','E','C','K',' ','2','\n',0,
 	label(0x2d)
 	if_ammo_quantity_lt(CHR_BOND, AMMOTYPE_BUG, 2, /*goto*/ 0x2d)
 	goto_first(0x03)
@@ -1235,7 +1218,6 @@ u8 func1007_bug_throws_bond[] = {
 
 	// Check for third
 	label(0x57)
-	dprint 'C','H','E','C','K',' ','3','\n',0,
 	if_ammo_quantity_lt(CHR_BOND, AMMOTYPE_BUG, 1, /*goto*/ 0x2d)
 	goto_first(0x03)
 
@@ -1251,7 +1233,6 @@ u8 func1007_bug_throws_bond[] = {
 	restart_timer
 
 	beginloop(0x08)
-		dprint 'A','T',' ','R','E','S','T','\n',0,
 		if_stage_flag_eq(STAGEFLAG_PILLAR1_MARKED, TRUE, /*goto*/ 0x2d)
 		if_weapon_thrown_on_object(WEAPON_TARGETAMPLIFIER, OBJ_PILLAR1, /*goto*/ 0x09)
 		label(0x2d)
@@ -1265,7 +1246,6 @@ u8 func1007_bug_throws_bond[] = {
 	endloop(0x08)
 
 	label(0x09)
-	dprint '1',' ','P','L','A','C','E','D','\n',0,
 	if_stage_flag_eq(STAGEFLAG_PILLAR1_MARKED, TRUE, /*goto*/ 0x0d)
 	set_stage_flag(STAGEFLAG_PILLAR1_MARKED)
 	show_hudmsg(CHR_BOND, L_SHO_025) // "Target Amplifier placed correctly."
@@ -1273,7 +1253,6 @@ u8 func1007_bug_throws_bond[] = {
 	goto_first(0x03)
 
 	label(0x0b)
-	dprint '2',' ','P','L','A','C','E','D','\n',0,
 	if_stage_flag_eq(STAGEFLAG_PILLAR2_MARKED, TRUE, /*goto*/ 0x0d)
 	set_stage_flag(STAGEFLAG_PILLAR2_MARKED)
 	show_hudmsg(CHR_BOND, L_SHO_025) // "Target Amplifier placed correctly."
@@ -1281,7 +1260,6 @@ u8 func1007_bug_throws_bond[] = {
 	goto_first(0x03)
 
 	label(0x0c)
-	dprint '3',' ','P','L','A','C','E','D','\n',0,
 	if_stage_flag_eq(STAGEFLAG_PILLAR3_MARKED, TRUE, /*goto*/ 0x0d)
 	set_stage_flag(STAGEFLAG_PILLAR3_MARKED)
 	show_hudmsg(CHR_BOND, L_SHO_025) // "Target Amplifier placed correctly."
@@ -1289,7 +1267,6 @@ u8 func1007_bug_throws_bond[] = {
 	goto_first(0x03)
 
 	label(0x0d)
-	dprint 'P','L','L','A','C','E','D',' ','W','R','O','N','G','\n',0,
 	if_chr_death_animation_finished(CHR_COOP, /*goto*/ 0x2e)
 	if_stage_flag_eq(STAGEFLAG_COOP_BUGS_WASTED, TRUE, /*goto*/ 0x2d)
 	goto_next(0x0f)
@@ -1332,17 +1309,14 @@ u8 func101b_bug_throws_coop[] = {
 		if_stage_flag_eq(STAGEFLAG_COOP_THREW_THIRD_BUG, FALSE, /*goto*/ 0x57)
 
 		label(0x55)
-		dprint 'C','O','O','P',' ','C','H','E','C','K',' ','1','\n',0,
 		if_ammo_quantity_lt(CHR_COOP, AMMOTYPE_BUG, 3, /*goto*/ 0x2d)
 	endloop(0x03)
 
 	label(0x2d)
-	dprint 'C','O','O','P',' ','F','I','R','E',' ','1','\n',0,
 	set_stage_flag(STAGEFLAG_COOP_THREW_FIRST_BUG)
 	goto_next(0x0e)
 
 	label(0x56)
-	dprint 'C','O','O','P',' ','C','H','E','C','K',' ','2','\n',0,
 	label(0x2d)
 	if_ammo_quantity_lt(CHR_COOP, AMMOTYPE_BUG, 2, /*goto*/ 0x2d)
 	goto_first(0x03)
@@ -1352,7 +1326,6 @@ u8 func101b_bug_throws_coop[] = {
 	goto_next(0x0e)
 
 	label(0x57)
-	dprint 'C','O','O','P',' ','C','H','E','C','K',' ','3','\n',0,
 	if_ammo_quantity_lt(CHR_COOP, AMMOTYPE_BUG, 1, /*goto*/ 0x2d)
 	goto_first(0x03)
 
@@ -1368,7 +1341,6 @@ u8 func101b_bug_throws_coop[] = {
 	restart_timer
 
 	beginloop(0x08)
-		dprint 'C','O','O','P',' ','A','T',' ','R','E','S','T','\n',0,
 		if_stage_flag_eq(STAGEFLAG_PILLAR1_MARKED, TRUE, /*goto*/ 0x2d)
 		if_weapon_thrown_on_object(WEAPON_TARGETAMPLIFIER, 0x01, /*goto*/ 0x09)
 		label(0x2d)
@@ -1382,7 +1354,6 @@ u8 func101b_bug_throws_coop[] = {
 	endloop(0x08)
 
 	label(0x09)
-	dprint 'C','O','O','P',' ','1',' ','P','L','A','C','E','D','\n',0,
 	unset_object_flag3(OBJ_PILLAR1, OBJFLAG3_RTRACKED_YELLOW)
 	if_stage_flag_eq(STAGEFLAG_PILLAR1_MARKED, TRUE, /*goto*/ 0x0d)
 	set_stage_flag(STAGEFLAG_PILLAR1_MARKED)
@@ -1391,7 +1362,6 @@ u8 func101b_bug_throws_coop[] = {
 	goto_first(0x03)
 
 	label(0x0b)
-	dprint 'C','O','O','P',' ','2',' ','P','L','A','C','E','D','\n',0,
 	unset_object_flag3(OBJ_PILLAR2, OBJFLAG3_RTRACKED_YELLOW)
 	if_stage_flag_eq(STAGEFLAG_PILLAR2_MARKED, TRUE, /*goto*/ 0x0d)
 	set_stage_flag(STAGEFLAG_PILLAR2_MARKED)
@@ -1400,7 +1370,6 @@ u8 func101b_bug_throws_coop[] = {
 	goto_first(0x03)
 
 	label(0x0c)
-	dprint 'C','O','O','P',' ','3',' ','P','L','A','C','E','D','\n',0,
 	unset_object_flag3(OBJ_PILLAR3, OBJFLAG3_RTRACKED_YELLOW)
 	if_stage_flag_eq(STAGEFLAG_PILLAR3_MARKED, TRUE, /*goto*/ 0x0d)
 	set_stage_flag(STAGEFLAG_PILLAR3_MARKED)
@@ -1409,7 +1378,6 @@ u8 func101b_bug_throws_coop[] = {
 	goto_first(0x03)
 
 	label(0x0d)
-	dprint 'C','O','O','P',' ','P','L','L','A','C','E','D',' ','W','R','O','N','G','\n',0,
 	if_ammo_quantity_lt(CHR_BOND, AMMOTYPE_BUG, 1, /*goto*/ 0x2d)
 	goto_next(0x0f)
 
@@ -1670,9 +1638,7 @@ u8 func0409_reaper_slayer_skedar[] = {
 	unset_self_chrflag(CHRCFLAG_HIDDEN)
 #endif
 	set_shotlist(AILIST_REAPER_SLAYER_SKEDAR)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x06)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x06)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x06)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x06)
 	goto_next(0x2d)
 
 	// Dying
@@ -1819,7 +1785,6 @@ u8 func0409_reaper_slayer_skedar[] = {
 
 	label(0x72)
 	try_attack_amount(40, 60)
-	dprint 'F','I','R','E',' ','F','U','L','L','\n',0,
 	label(0x06)
 	goto_first(0x64)
 
@@ -2170,7 +2135,6 @@ u8 func040d_king_combat[] = {
 	say_quip(CHR_BOND, QUIP_ATTACK2, 0xff, 0x03, 0xff, BANK_0, 0x00, 0x00)
 	set_chr_cloaked(CHR_SELF, FALSE, TRUE)
 	restart_timer
-	dprint 'F','A','C','E',' ','T','A','R','G','E','T','\n',0,
 	if_target_in_fov_left(10, /*goto*/ 0x06)
 	if_target_out_of_fov_left(246, /*goto*/ 0x06)
 	stop_chr
@@ -2187,7 +2151,6 @@ u8 func040d_king_combat[] = {
 	goto_next(0x87)
 
 	label(0x06)
-	dprint 'P','U','N','C','H','\n',0,
 	try_punch_or_kick(/*goto*/ 0x0b)
 	goto_next(0x87)
 
@@ -2302,11 +2265,7 @@ u8 func040e_king_skedar_spawner[] = {
 	set_chr_hiddenflag(CHR_SELF, CHRHFLAG_00100000)
 
 	beginloop(0x04)
-		if_chr_death_animation_finished(CHR_CLONE, /*goto*/ 0x2d)
-#if VERSION >= VERSION_NTSC_1_0
-		if_chr_dead(CHR_CLONE, /*goto*/ 0x2d)
-		if_chr_knockedout(CHR_CLONE, /*goto*/ 0x2d)
-#endif
+		if_chr_deadish(CHR_CLONE, /*goto*/ 0x2d)
 		goto_next(0x06)
 
 		// Clone dead
@@ -2318,11 +2277,7 @@ u8 func040e_king_skedar_spawner[] = {
 		reloop(0x04)
 
 		label(0x4f)
-		if_chr_death_animation_finished(CHR_CLONE, /*goto*/ 0x4f)
-#if VERSION >= VERSION_NTSC_1_0
-		if_chr_dead(CHR_CLONE, /*goto*/ 0x4f)
-		if_chr_knockedout(CHR_CLONE, /*goto*/ 0x4f)
-#endif
+		if_chr_deadish(CHR_CLONE, /*goto*/ 0x4f)
 		reloop(0x04)
 
 		label(0x4f)
@@ -2365,11 +2320,7 @@ u8 func0411_king_miniskedar_spawner[] = {
 	set_chr_hiddenflag(CHR_SELF, CHRHFLAG_00100000)
 
 	beginloop(0x04)
-		if_chr_death_animation_finished(CHR_CLONE, /*goto*/ 0x2d)
-#if VERSION >= VERSION_NTSC_1_0
-		if_chr_dead(CHR_CLONE, /*goto*/ 0x2d)
-		if_chr_knockedout(CHR_CLONE, /*goto*/ 0x2d)
-#endif
+		if_chr_deadish(CHR_CLONE, /*goto*/ 0x2d)
 		goto_next(0x06)
 
 		// Clone dead
@@ -2382,11 +2333,7 @@ u8 func0411_king_miniskedar_spawner[] = {
 		// Clone dead and flag set
 		// Redundant check
 		label(0x4f)
-		if_chr_death_animation_finished(CHR_CLONE, /*goto*/ 0x4f)
-#if VERSION >= VERSION_NTSC_1_0
-		if_chr_dead(CHR_CLONE, /*goto*/ 0x4f)
-		if_chr_knockedout(CHR_CLONE, /*goto*/ 0x4f)
-#endif
+		if_chr_deadish(CHR_CLONE, /*goto*/ 0x4f)
 		reloop(0x04)
 
 		// Spawn clone
@@ -2516,15 +2463,11 @@ u8 func1014_spike_top[] = {
 
 	set_stage_flag(STAGEFLAG_SPIKE5_DESTROYED)
 	yield
-	if_chr_death_animation_finished(CHR_BOND, /*goto*/ 0x2d)
-	if_chr_dead(CHR_BOND, /*goto*/ 0x2d)
-	if_chr_knockedout(CHR_BOND, /*goto*/ 0x2d)
+	if_chr_deadish(CHR_BOND, /*goto*/ 0x2d)
 	goto_next(0x06)
 
 	label(0x2d)
-	if_chr_death_animation_finished(CHR_COOP, /*goto*/ 0x2d)
-	if_chr_dead(CHR_COOP, /*goto*/ 0x2d)
-	if_chr_knockedout(CHR_COOP, /*goto*/ 0x2d)
+	if_chr_deadish(CHR_COOP, /*goto*/ 0x2d)
 	goto_next(0x06)
 
 	label(0x2d)
@@ -3678,11 +3621,9 @@ u8 unregistered_function1[] = {
 u8 unregistered_function2[] = {
 	beginloop(0x04)
 		if_object_flag3(OBJ_PUZZLEROCK, OBJFLAG3_PUSHABLE, /*goto*/ 0x2d)
-		dprint 'C','A','N','T',' ','P','U','S','H','\n',0,
 		reloop(0x04)
 
 		label(0x2d)
-		dprint 'C','A','N',' ','P','U','S','H','\n',0,
 	endloop(0x04)
 
 	endlist

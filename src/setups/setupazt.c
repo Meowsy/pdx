@@ -1002,10 +1002,8 @@ u8 unregistered_function1[] = {
 	restart_timer
 
 	beginloop(0x67)
-		dprint 'T','I','M','E','\n',0,
 		if_timer_lt(1800, /*goto*/ 0x98)
 		label(0x31)
-		dprint 'S','Q','U','A','D','\n',0,
 		if_num_chrs_in_squadron_gt(1, 0x0f, /*goto*/ 0x98)
 		call_rng
 		if_rand_gt(64, /*goto*/ 0x69)
@@ -1057,10 +1055,8 @@ u8 func100c_spawn_dd_guards[] = {
 	endloop(0x67)
 
 	label(0x31)
-	dprint 'T','I','M','E','\n',0,
 	if_timer_lt(3600, /*goto*/ 0x98)
 	label(0x31)
-	dprint 'S','Q','U','A','D','\n',0,
 	if_num_chrs_in_squadron_gt(1, 0x0e, /*goto*/ 0x98)
 	call_rng
 	if_rand_gt(64, /*goto*/ 0x69)
@@ -1179,9 +1175,7 @@ u8 func1009_check_shuttle_destroyed[] = {
 
 u8 func100a_check_president_dead[] = {
 	beginloop(0x06)
-		if_chr_death_animation_finished(CHR_PRESIDENT, /*goto*/ 0x31)
-		if_chr_dead(CHR_PRESIDENT, /*goto*/ 0x31)
-		if_chr_knockedout(CHR_PRESIDENT, /*goto*/ 0x31)
+		if_chr_deadish(CHR_PRESIDENT, /*goto*/ 0x31)
 	endloop(0x06)
 
 	label(0x31)
@@ -1193,9 +1187,7 @@ u8 func100a_check_president_dead[] = {
 
 u8 func100b_check_clone_dead[] = {
 	beginloop(0x06)
-		if_chr_death_animation_finished(CHR_PRES_CLONE, /*goto*/ 0x31)
-		if_chr_dead(CHR_PRES_CLONE, /*goto*/ 0x31)
-		if_chr_knockedout(CHR_PRES_CLONE, /*goto*/ 0x31)
+		if_chr_deadish(CHR_PRES_CLONE, /*goto*/ 0x31)
 	endloop(0x06)
 
 	label(0x31)
@@ -1231,7 +1223,6 @@ u8 func0404_elvis[] = {
 		restart_timer
 		start_patrol
 		label(0x31)
-		dprint 'G','O',' ','T','O',' ','P','A','D','\n',0,
 		set_target_chr(CHR_BOND)
 		set_chrpreset(CHR_BOND)
 		if_stage_flag_eq(STAGEFLAG_ELVIS_GAVE_PROXYMINE, TRUE, /*goto*/ 0x31)
@@ -1280,7 +1271,6 @@ u8 func0404_elvis[] = {
 
 	// Detected enemy
 	label(0x0a)
-	dprint 'D','E','T','E','C','T','E','D','\n',0,
 	set_returnlist(CHR_SELF, AILIST_INIT_ELVIS)
 	set_shotlist(AILIST_INIT_ELVIS)
 	set_ailist(CHR_SELF, GAILIST_COMBAT_WITH_TARGET)
@@ -1291,7 +1281,6 @@ u8 func0404_elvis[] = {
 	try_run_to_target(/*goto*/ 0x12)
 
 	beginloop(0x12)
-		dprint 'G','O',' ','T','O','W','A','R','D','S','\n',0,
 		if_distance_to_target_lt(300, /*goto*/ 0x13)
 		if_timer_gt(180, /*goto*/ 0x08)
 	endloop(0x12)
@@ -1352,7 +1341,6 @@ u8 func0418_robot[] = {
 	goto_first(0x66)
 
 	beginloop(0x04)
-		dprint 'P','A','R','T',' ','1','\n',0,
 		chr_toggle_p1p2(CHR_SELF)
 		set_target_chr(CHR_P1P2)
 		if_alertness(99, OPERATOR_GREATER_THAN, /*goto*/ 0x0d)
@@ -1402,10 +1390,8 @@ u8 func0418_robot[] = {
 	set_self_flag_bankx(CHRFLAG0_SKIPSAFETYCHECKS, BANK_0)
 
 	beginloop(0x0a)
-		dprint 'P','A','R','T',' ','2','\n',0,
 		if_timer_gt(180, /*goto*/ 0x08)
 		if_distance_to_target_gt(1000, /*goto*/ 0x15)
-		dprint 'P','A','R','T',' ','2','\n',0,
 		if_target_in_sight(/*goto*/ 0x13)
 		chr_toggle_p1p2(CHR_SELF)
 		set_target_chr(CHR_P1P2)
@@ -1419,7 +1405,6 @@ u8 func0418_robot[] = {
 	label(0x13)
 	set_target_chr(CHR_P1P2)
 	restart_timer
-	dprint 'P','A','R','T',' ','3','a','\n',0,
 	try_attack_stand(ATTACKFLAG_AIMATTARGET, 0, /*goto*/ 0x0e)
 	goto_first(0x04)
 
@@ -1452,10 +1437,8 @@ u8 func0414_spawner[] = {
 		reloop(0x06)
 
 		label(0x0a)
-		dprint 'H','E','A','R','S','P','A','W','N','\n',0,
 		label(0x31)
 		if_never_been_onscreen(/*goto*/ 0x52)
-		dprint 'N','E','V','E','R',' ','V','I','S','F','A','I','L','\n',0,
 		if_can_see_target(/*goto*/ 0x0a)
 	endloop(0x06)
 
@@ -1463,14 +1446,11 @@ u8 func0414_spawner[] = {
 	set_ailist(CHR_SELF, GAILIST_ALERTED)
 
 	label(0x52)
-	dprint 'C','H','E','C','K',' ','D','U','P','E','\n',0,
 	if_chr_death_animation_finished(CHR_CLONE, /*goto*/ 0x52)
 	set_ailist(CHR_SELF, AILIST_SPAWNER)
 
 	label(0x52)
-	dprint 'C','R','E','A','T','E',' ','S','P','A','W','N','\n',0,
 	try_spawn_clone2(CHR_SELF, GAILIST_ALERTED, 0, /*goto*/ 0x31)
-	dprint 'C','R','E','A','T','E',' ','F','A','I','L','\n',0,
 	set_ailist(CHR_SELF, AILIST_SPAWNER)
 
 	label(0x31)
@@ -1542,9 +1522,7 @@ u8 func041b_init_president[] = {
 
 u8 func041c_president_waiting[] = {
 	set_shotlist(AILIST_PRESIDENT_WAITING)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x08)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x08)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x08)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x08)
 	goto_next(0x31)
 
 	// Dying
@@ -1577,11 +1555,8 @@ u8 func041d_president_running[] = {
 	set_self_chrflag(CHRCFLAG_PUSHABLE)
 	set_alertness(100)
 	set_shotlist(AILIST_PRESIDENT_RUNNING)
-	dprint 'R','E','S','T','A','R','T','\n',0,
 	yield
-	if_chr_dead(CHR_SELF, /*goto*/ 0x08)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x08)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x08)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x08)
 	goto_next(0x31)
 
 	// Dying
@@ -1590,7 +1565,6 @@ u8 func041d_president_running[] = {
 	restart_timer
 
 	beginloop(0x9c)
-		dprint 'K','I','L','L','E','D','\n',0,
 		if_timer_gt(15, /*goto*/ 0x08)
 	endloop(0x9c)
 
@@ -1602,7 +1576,6 @@ u8 func041d_president_running[] = {
 
 	// Alive
 	label(0x31)
-	dprint 'b','4',' ','s','h','i','e','l','d',' ','c','h','e','c','k','\n',0,
 	if_just_injured(CHR_SELF, /*goto*/ 0x08)
 	goto_next(0x9d)
 
@@ -1613,7 +1586,6 @@ u8 func041d_president_running[] = {
 	play_sound_from_entity(CHANNEL_6, CHR_SELF, 0x0bb8, 0x1770, 0x01)
 
 	beginloop(0x9e)
-		dprint 'I','N','J','U','R','E','D','\n',0,
 		if_num_times_shot_lt(1, /*goto*/ 0x08)
 		if_timer_lt(20, /*goto*/ 0x08)
 		label(0x08)
@@ -1626,7 +1598,6 @@ u8 func041d_president_running[] = {
 	restart_timer
 
 	beginloop(0x9f)
-		dprint 'W','A','I','T','\n',0,
 		// Room 0x0014 = UFO area
 		// Yes, checking this 5 times is unnecessary
 		if_chr_in_room(CHR_SELF, 0x00, 0x0014, /*goto*/ 0xa5)
@@ -1634,7 +1605,6 @@ u8 func041d_president_running[] = {
 		if_chr_in_room(CHR_SELF, 0x00, 0x0014, /*goto*/ 0xa5)
 		if_chr_in_room(CHR_SELF, 0x00, 0x0014, /*goto*/ 0xa5)
 		if_chr_in_room(CHR_SELF, 0x00, 0x0014, /*goto*/ 0xa5)
-		dprint 't','a','r','g','e','t','\n',0,
 		if_can_see_target(/*goto*/ 0x08)
 		goto_next(0xa0)
 
@@ -1666,7 +1636,6 @@ u8 func041d_president_running[] = {
 	try_run_to_target(/*goto*/ 0xa1)
 
 	beginloop(0xa1)
-		dprint 'F','O','L','L','O','W','\n',0,
 		if_chr_in_room(CHR_SELF, 0x00, 0x0014, /*goto*/ 0xa5)
 		if_chr_in_room(CHR_SELF, 0x00, 0x0014, /*goto*/ 0xa5)
 		if_chr_in_room(CHR_SELF, 0x00, 0x0014, /*goto*/ 0xa5)
@@ -1695,7 +1664,6 @@ u8 func041d_president_running[] = {
 
 	// Unreachable
 	beginloop(0xa4)
-		dprint 'R','U','N','N','F','O','\n',0,
 		if_chr_in_room(CHR_SELF, 0x00, 0x0014, /*goto*/ 0xa5)
 		if_chr_in_room(CHR_SELF, 0x00, 0x0014, /*goto*/ 0xa5)
 		if_chr_in_room(CHR_SELF, 0x00, 0x0014, /*goto*/ 0xa5)
@@ -1732,9 +1700,7 @@ u8 func041d_president_running[] = {
 
 u8 func100e_check_robots_left[] = {
 	beginloop(0x06)
-		if_chr_death_animation_finished(CHR_ROBOT1, /*goto*/ 0x31)
-		if_chr_dead(CHR_ROBOT1, /*goto*/ 0x31)
-		if_chr_knockedout(CHR_ROBOT1, /*goto*/ 0x31)
+		if_chr_deadish(CHR_ROBOT1, /*goto*/ 0x31)
 		if_chr_in_room(CHR_ROBOT1, 0x00, ROOM_AZT_004A, /*goto*/ 0x08)
 		if_chr_in_room(CHR_ROBOT1, 0x00, ROOM_AZT_004B, /*goto*/ 0x08)
 		if_chr_in_room(CHR_ROBOT1, 0x00, ROOM_AZT_004C, /*goto*/ 0x08)
@@ -1744,9 +1710,7 @@ u8 func100e_check_robots_left[] = {
 		reloop(0x06)
 
 		label(0x31)
-		if_chr_death_animation_finished(CHR_ROBOT2, /*goto*/ 0x31)
-		if_chr_dead(CHR_ROBOT2, /*goto*/ 0x31)
-		if_chr_knockedout(CHR_ROBOT2, /*goto*/ 0x31)
+		if_chr_deadish(CHR_ROBOT2, /*goto*/ 0x31)
 		if_chr_in_room(CHR_ROBOT2, 0x00, ROOM_AZT_004A, /*goto*/ 0x08)
 		if_chr_in_room(CHR_ROBOT2, 0x00, ROOM_AZT_004B, /*goto*/ 0x08)
 		if_chr_in_room(CHR_ROBOT2, 0x00, ROOM_AZT_004C, /*goto*/ 0x08)
@@ -1756,9 +1720,7 @@ u8 func100e_check_robots_left[] = {
 		reloop(0x06)
 
 		label(0x31)
-		if_chr_death_animation_finished(CHR_ROBOT3, /*goto*/ 0x31)
-		if_chr_dead(CHR_ROBOT3, /*goto*/ 0x31)
-		if_chr_knockedout(CHR_ROBOT3, /*goto*/ 0x31)
+		if_chr_deadish(CHR_ROBOT3, /*goto*/ 0x31)
 		if_chr_in_room(CHR_ROBOT3, 0x00, ROOM_AZT_004A, /*goto*/ 0x08)
 		if_chr_in_room(CHR_ROBOT3, 0x00, ROOM_AZT_004B, /*goto*/ 0x08)
 		if_chr_in_room(CHR_ROBOT3, 0x00, ROOM_AZT_004C, /*goto*/ 0x08)
@@ -1768,9 +1730,7 @@ u8 func100e_check_robots_left[] = {
 		reloop(0x06)
 
 		label(0x31)
-		if_chr_death_animation_finished(CHR_ROBOT4, /*goto*/ 0x31)
-		if_chr_dead(CHR_ROBOT4, /*goto*/ 0x31)
-		if_chr_knockedout(CHR_ROBOT4, /*goto*/ 0x31)
+		if_chr_deadish(CHR_ROBOT4, /*goto*/ 0x31)
 		if_chr_in_room(CHR_ROBOT4, 0x00, ROOM_AZT_004A, /*goto*/ 0x08)
 		if_chr_in_room(CHR_ROBOT4, 0x00, ROOM_AZT_004B, /*goto*/ 0x08)
 		if_chr_in_room(CHR_ROBOT4, 0x00, ROOM_AZT_004C, /*goto*/ 0x08)
@@ -1915,33 +1875,23 @@ u8 func100f_check_end_level[] = {
 	endloop(0x0b)
 
 	label(0x31)
-	if_chr_death_animation_finished(CHR_BOND, /*goto*/ 0x31)
-	if_chr_dead(CHR_BOND, /*goto*/ 0x31)
-	if_chr_knockedout(CHR_BOND, /*goto*/ 0x31)
+	if_chr_deadish(CHR_BOND, /*goto*/ 0x31)
 	goto_next(0x08)
 
 	label(0x31)
-	if_chr_death_animation_finished(CHR_COOP, /*goto*/ 0x31)
-	if_chr_dead(CHR_COOP, /*goto*/ 0x31)
-	if_chr_knockedout(CHR_COOP, /*goto*/ 0x31)
+	if_chr_deadish(CHR_COOP, /*goto*/ 0x31)
 
 	// Jo or Velvet alive
 	label(0x08)
-	if_chr_death_animation_finished(CHR_PRESIDENT, /*goto*/ 0x32)
-	if_chr_dead(CHR_PRESIDENT, /*goto*/ 0x32)
-	if_chr_knockedout(CHR_PRESIDENT, /*goto*/ 0x32)
+	if_chr_deadish(CHR_PRESIDENT, /*goto*/ 0x32)
 	set_ailist(CHR_PRESIDENT, GAILIST_STOP_AND_IDLE)
 
-	if_chr_death_animation_finished(CHR_BOND, /*goto*/ 0x31)
-	if_chr_dead(CHR_BOND, /*goto*/ 0x31)
-	if_chr_knockedout(CHR_BOND, /*goto*/ 0x31)
+	if_chr_deadish(CHR_BOND, /*goto*/ 0x31)
 	goto_next(0x08)
 
 	// Both players dead
 	label(0x31)
-	if_chr_death_animation_finished(CHR_COOP, /*goto*/ 0x31)
-	if_chr_dead(CHR_COOP, /*goto*/ 0x31)
-	if_chr_knockedout(CHR_COOP, /*goto*/ 0x31)
+	if_chr_deadish(CHR_COOP, /*goto*/ 0x31)
 	goto_next(0x08)
 
 	label(0x31)

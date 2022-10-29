@@ -827,9 +827,7 @@ u8 func0403_init_jonathan[] = {
 
 u8 func0402_jonathan_waiting_for_meetup[] = {
 	set_shotlist(AILIST_JONATHAN_WAITING_FOR_MEETUP)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x32)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x32)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x32)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x32)
 	goto_next(0x67)
 
 	label(0x32)
@@ -898,9 +896,7 @@ u8 func0404_jonathan_following_and_mine[] = {
 	rebuild_squadrons
 	set_returnlist(CHR_SELF, AILIST_JONATHAN_FOLLOWING_AND_MINE)
 	set_shotlist(AILIST_JONATHAN_FOLLOWING_AND_MINE)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x32)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x32)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x32)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x32)
 	goto_next(0x06)
 
 	label(0x32)
@@ -923,7 +919,6 @@ u8 func0404_jonathan_following_and_mine[] = {
 	label(0x63)
 	if_stage_flag_eq(STAGEFLAG_JON_SHOT_WHILE_PLANTING, TRUE, /*goto*/ 0x0e)
 	set_target_chr(CHR_P1P2)
-	dprint 'J','O','N','A',' ','F','O','L','L','O','W','\n',0,
 
 	label(LABEL_FOLLOW)
 	if_distance_to_target_gt(200, /*goto*/ 0x5c)
@@ -1081,9 +1076,7 @@ u8 func0404_jonathan_following_and_mine[] = {
 u8 func0413_jonathan_hangar[] = {
 	set_returnlist(CHR_SELF, AILIST_JONATHAN_HANGAR)
 	set_shotlist(AILIST_JONATHAN_HANGAR)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x32)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x32)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x32)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x32)
 	goto_next(0x06)
 
 	label(0x32)
@@ -1141,17 +1134,13 @@ u8 func0413_jonathan_hangar[] = {
 
 	// Start conversation
 	label(0x06)
-	if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0xc3)
-	if_chr_dead(CHR_ELVIS, /*goto*/ 0xc3)
-	if_chr_knockedout(CHR_ELVIS, /*goto*/ 0xc3)
+	if_chr_deadish(CHR_ELVIS, /*goto*/ 0xc3)
 	restart_timer
 	chr_do_animation(ANIM_TALKING_0232, -1, 200, CHRANIMFLAG_MOVEWHENINVIS, 0, CHR_ELVIS, 2)
 	speak(CHR_P1P2, L_TRA_059, MP3_029A, CHANNEL_5, COLOR_06_WHITE) // "Oh, no! We have a problem. It's a single seater!"
 
 	beginloop(0x7d)
-		if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_dead(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_knockedout(CHR_ELVIS, /*goto*/ 0xc3)
+		if_chr_deadish(CHR_ELVIS, /*goto*/ 0xc3)
 		if_sound_finished(CHANNEL_5, /*goto*/ 0x32)
 		reloop(0x7d)
 
@@ -1165,9 +1154,7 @@ u8 func0413_jonathan_hangar[] = {
 	speak(CHR_P1P2, L_TRA_060, MP3_029B, CHANNEL_5, COLOR_06_WHITE) // "Two can get in but no more."
 
 	beginloop(0x7e)
-		if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_dead(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_knockedout(CHR_ELVIS, /*goto*/ 0xc3)
+		if_chr_deadish(CHR_ELVIS, /*goto*/ 0xc3)
 		if_sound_finished(CHANNEL_5, /*goto*/ 0x32)
 		reloop(0x7e)
 
@@ -1180,9 +1167,7 @@ u8 func0413_jonathan_hangar[] = {
 	speak(CHR_BOND, L_TRA_041, MP3_02A7, CHANNEL_5, COLOR_09_BLUE) // "It's the only way out of here."
 
 	beginloop(0x15)
-		if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_dead(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_knockedout(CHR_ELVIS, /*goto*/ 0xc3)
+		if_chr_deadish(CHR_ELVIS, /*goto*/ 0xc3)
 		if_sound_finished(CHANNEL_5, /*goto*/ 0x32)
 		reloop(0x15)
 
@@ -1196,9 +1181,7 @@ u8 func0413_jonathan_hangar[] = {
 	speak(CHR_P1P2, L_TRA_061, MP3_029C, CHANNEL_5, COLOR_06_WHITE) // "Plus, it's got no style, you know what I'm saying?"
 
 	beginloop(0x7f)
-		if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_dead(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_knockedout(CHR_ELVIS, /*goto*/ 0xc3)
+		if_chr_deadish(CHR_ELVIS, /*goto*/ 0xc3)
 		if_sound_finished(CHANNEL_5, /*goto*/ 0x32)
 		reloop(0x7f)
 
@@ -1211,9 +1194,7 @@ u8 func0413_jonathan_hangar[] = {
 	speak(CHR_BOND, L_TRA_042, MP3_02A8, CHANNEL_5, COLOR_09_BLUE) // "You're the only one who can fly it, Elvis, so get ..."
 
 	beginloop(0x17)
-		if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_dead(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_knockedout(CHR_ELVIS, /*goto*/ 0xc3)
+		if_chr_deadish(CHR_ELVIS, /*goto*/ 0xc3)
 		if_sound_finished(CHANNEL_5, /*goto*/ 0x32)
 		endloop(0x17)
 
@@ -1227,9 +1208,7 @@ u8 func0413_jonathan_hangar[] = {
 	speak(CHR_P1P2, L_TRA_045, MP3_02B9, CHANNEL_5, COLOR_03_RED) // "One of us will have to stay behind and open the ha..."
 
 	beginloop(0x1a)
-		if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_dead(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_knockedout(CHR_ELVIS, /*goto*/ 0xc3)
+		if_chr_deadish(CHR_ELVIS, /*goto*/ 0xc3)
 		if_sound_finished(CHANNEL_5, /*goto*/ 0x32)
 		reloop(0x1a)
 
@@ -1242,9 +1221,7 @@ u8 func0413_jonathan_hangar[] = {
 	speak(CHR_BOND, L_TRA_043, MP3_02A9, CHANNEL_5, COLOR_09_BLUE) // "But we can't leave you behind."
 
 	beginloop(0x18)
-		if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_dead(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_knockedout(CHR_ELVIS, /*goto*/ 0xc3)
+		if_chr_deadish(CHR_ELVIS, /*goto*/ 0xc3)
 		if_sound_finished(CHANNEL_5, /*goto*/ 0x32)
 		reloop(0x18)
 
@@ -1257,9 +1234,7 @@ u8 func0413_jonathan_hangar[] = {
 	speak(CHR_BOND, L_TRA_044, MP3_02AA, CHANNEL_5, COLOR_09_BLUE) // "There must be a way out of here."
 
 	beginloop(0x19)
-		if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_dead(CHR_ELVIS, /*goto*/ 0xc3)
-		if_chr_knockedout(CHR_ELVIS, /*goto*/ 0xc3)
+		if_chr_deadish(CHR_ELVIS, /*goto*/ 0xc3)
 		if_sound_finished(CHANNEL_5, /*goto*/ 0x32)
 		reloop(0x19)
 
@@ -1277,9 +1252,7 @@ u8 func0413_jonathan_hangar[] = {
 	reloop(0x1b)
 
 	label(0x66)
-	if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0x06)
-	if_chr_dead(CHR_ELVIS, /*goto*/ 0x06)
-	if_chr_knockedout(CHR_ELVIS, /*goto*/ 0x06)
+	if_chr_deadish(CHR_ELVIS, /*goto*/ 0x06)
 	set_ailist(CHR_ELVIS, AILIST_ELVIS_GO_TO_UFO)
 
 	label(0x06)
@@ -1392,9 +1365,7 @@ u8 func0413_jonathan_hangar[] = {
 u8 func041c_elvis_go_to_ufo[] = {
 	set_returnlist(CHR_SELF, AILIST_ELVIS_GO_TO_UFO)
 	set_shotlist(AILIST_ELVIS_GO_TO_UFO)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x32)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x32)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x32)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x32)
 	goto_next(0x06)
 
 	label(0x32)
@@ -1419,9 +1390,7 @@ u8 func041c_elvis_go_to_ufo[] = {
 u8 func041b_jonathan_after_terminals[] = {
 	set_returnlist(CHR_SELF, AILIST_JONATHAN_AFTER_TERMINALS)
 	set_shotlist(AILIST_JONATHAN_AFTER_TERMINALS)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x32)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x32)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x32)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x32)
 	goto_next(0x06)
 
 	label(0x32)
@@ -1927,9 +1896,7 @@ u8 func100b_check_jonathan_dead[] = {
 
 	// All difficulties
 	beginloop(0x04)
-		if_chr_dead(CHR_JONATHAN, /*goto*/ 0x06)
-		if_chr_death_animation_finished(CHR_JONATHAN, /*goto*/ 0x06)
-		if_chr_knockedout(CHR_JONATHAN, /*goto*/ 0x06)
+		if_chr_deadish(CHR_JONATHAN, /*goto*/ 0x06)
 	endloop(0x04)
 
 	label(0x06)
@@ -2005,19 +1972,13 @@ u8 func100c_medpack_activation[] = {
 	endloop(0x0c)
 
 	label(0x32)
-	if_chr_death_animation_finished(CHR_JONATHAN, /*goto*/ 0x32)
-	if_chr_dead(CHR_JONATHAN, /*goto*/ 0x32)
-	if_chr_knockedout(CHR_JONATHAN, /*goto*/ 0x32)
-	if_chr_death_animation_finished(CHR_BOND, /*goto*/ 0x33)
-	if_chr_dead(CHR_BOND, /*goto*/ 0x33)
-	if_chr_knockedout(CHR_BOND, /*goto*/ 0x33)
+	if_chr_deadish(CHR_JONATHAN, /*goto*/ 0x32)
+	if_chr_deadish(CHR_BOND, /*goto*/ 0x33)
 	goto_next(0x06)
 
 	// Joanna is dead
 	label(0x33)
-	if_chr_death_animation_finished(CHR_COOP, /*goto*/ 0x32)
-	if_chr_dead(CHR_COOP, /*goto*/ 0x32)
-	if_chr_knockedout(CHR_COOP, /*goto*/ 0x32)
+	if_chr_deadish(CHR_COOP, /*goto*/ 0x32)
 	goto_next(0x06)
 
 	// Everyone is alive
@@ -2033,7 +1994,6 @@ u8 func100c_medpack_activation[] = {
 };
 
 u8 func0412_init_elvis[] = {
-	dprint 'E','L','V','I','S',' ','W','O','K','E','\n',0,
 	stop_chr
 #if VERSION >= VERSION_NTSC_1_0
 	set_self_chrflag(CHRCFLAG_PUSHABLE)
@@ -2049,7 +2009,6 @@ u8 func0412_init_elvis[] = {
 };
 
 u8 func040b_elvis_follow[] = {
-	dprint 'E','L','V','I','S',' ','F','O','L','L','O','W','\n',0,
 	set_target_chr(CHR_JONATHAN)
 
 	label(0x5a)
@@ -2191,9 +2150,7 @@ u8 func100d_check_terminals_destroyed[] = {
 
 u8 func100e_check_elvis_dead[] = {
 	beginloop(0x04)
-		if_chr_dead(CHR_ELVIS, /*goto*/ 0x06)
-		if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0x06)
-		if_chr_knockedout(CHR_ELVIS, /*goto*/ 0x06)
+		if_chr_deadish(CHR_ELVIS, /*goto*/ 0x06)
 	endloop(0x04)
 
 	label(0x06)
@@ -2213,14 +2170,12 @@ u8 func1010_check_end_level[] = {
 
 		label(0x32)
 #if VERSION < VERSION_NTSC_1_0
-		dprint '1','\n',0,
 #endif
 		if_objective_complete(1, /*goto*/ 0x32)
 		reloop(0x04)
 
 		label(0x32)
 #if VERSION < VERSION_NTSC_1_0
-		dprint '2','\n',0,
 #endif
 		if_difficulty_lt(DIFF_SA, /*goto*/ 0x32)
 		if_objective_complete(3, /*goto*/ 0x32)
@@ -2228,7 +2183,6 @@ u8 func1010_check_end_level[] = {
 
 		label(0x32)
 #if VERSION < VERSION_NTSC_1_0
-		dprint '3','\n',0,
 #endif
 		if_objective_complete(2, /*goto*/ 0x32)
 		reloop(0x04)
@@ -2239,36 +2193,25 @@ u8 func1010_check_end_level[] = {
 
 		label(0x32)
 #if VERSION < VERSION_NTSC_1_0
-		dprint '4','\n',0,
 #endif
 		if_stage_flag_eq(STAGEFLAG_INNER_DOOR_OPENING, TRUE, /*goto*/ 0x32)
 		reloop(0x04)
 
 		label(0x32)
-		dprint '5','\n',0,
 		if_stage_flag_eq(STAGEFLAG_OUTER_DOOR_OPENING, TRUE, /*goto*/ 0x32)
 	reloop(0x04)
 
 	label(0x32)
-	dprint '6','\n',0,
-	if_chr_death_animation_finished(CHR_ELVIS, /*goto*/ 0x0f)
-	if_chr_dead(CHR_ELVIS, /*goto*/ 0x0f)
-	if_chr_knockedout(CHR_ELVIS, /*goto*/ 0x0f)
+	if_chr_deadish(CHR_ELVIS, /*goto*/ 0x0f)
 
-	if_chr_death_animation_finished(CHR_JONATHAN, /*goto*/ 0x0f)
-	if_chr_dead(CHR_JONATHAN, /*goto*/ 0x0f)
-	if_chr_knockedout(CHR_JONATHAN, /*goto*/ 0x0f)
+	if_chr_deadish(CHR_JONATHAN, /*goto*/ 0x0f)
 
-	if_chr_death_animation_finished(CHR_BOND, /*goto*/ 0x32)
-	if_chr_dead(CHR_BOND, /*goto*/ 0x32)
-	if_chr_knockedout(CHR_BOND, /*goto*/ 0x32)
+	if_chr_deadish(CHR_BOND, /*goto*/ 0x32)
 	goto_next(0x06)
 
 	// Joanna is dead
 	label(0x32)
-	if_chr_death_animation_finished(CHR_COOP, /*goto*/ 0x33)
-	if_chr_dead(CHR_COOP, /*goto*/ 0x33)
-	if_chr_knockedout(CHR_COOP, /*goto*/ 0x33)
+	if_chr_deadish(CHR_COOP, /*goto*/ 0x33)
 	goto_next(0x06)
 
 	// Both Joanna and Velvet are dead
@@ -2877,15 +2820,11 @@ u8 func0c01_midcutscene[] = {
 	disable_object(OBJ_HOVERBED)
 #if VERSION >= VERSION_NTSC_1_0
 	set_target_chr(CHR_BOND)
-	if_chr_death_animation_finished(CHR_BOND, /*goto*/ 0x33)
-	if_chr_dead(CHR_BOND, /*goto*/ 0x33)
-	if_chr_knockedout(CHR_BOND, /*goto*/ 0x33)
+	if_chr_deadish(CHR_BOND, /*goto*/ 0x33)
 	goto_next(0x06)
 
 	label(0x33)
-	if_chr_death_animation_finished(CHR_COOP, /*goto*/ 0x06)
-	if_chr_dead(CHR_COOP, /*goto*/ 0x06)
-	if_chr_knockedout(CHR_COOP, /*goto*/ 0x06)
+	if_chr_deadish(CHR_COOP, /*goto*/ 0x06)
 	set_target_chr(CHR_COOP)
 
 	label(0x06)

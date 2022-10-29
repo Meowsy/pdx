@@ -88,7 +88,6 @@
 	build/ROMID/game/body.o (section); \
 	build/ROMID/game/chraction.o (section); \
 	build/ROMID/game/chrai.o (section); \
-	build/ROMID/game/chraicommands.o (section); \
 	build/ROMID/game/prop.o (section); \
 	build/ROMID/game/propobj.o (section); \
 	build/ROMID/game/propobjbss.o (section); \
@@ -136,7 +135,6 @@
 	build/ROMID/game/mainmenu.o (section); \
 	build/ROMID/game/cheats.o (section); \
 	build/ROMID/game/filemgr.o (section); \
-	build/ROMID/game/fmb.o (section); \
 	build/ROMID/game/endscreen.o (section); \
 	build/ROMID/game/gamefile.o (section); \
 	build/ROMID/game/bossfile.o (section); \
@@ -181,7 +179,6 @@
 	build/ROMID/game/wallhit.o (section); \
 	build/ROMID/game/bondview.o (section); \
 	build/ROMID/game/splat.o (section); \
-	build/ROMID/game/camdraw.o (section); \
 	build/ROMID/game/shards.o (section); \
 	build/ROMID/game/options.o (section); \
 	build/ROMID/game/game_152fa0.o (section); \

@@ -14,13 +14,10 @@
 
 /**
  * The function assumes that a pad file's data has been loaded from the ROM
- * and is pointed to by g_StageSetup.padfiledata. These pads are in a packed
- * format. During gameplay, the game uses padUnpack as needed to temporarily
- * populate pad structs from this data.
+ * and is pointed to by g_StageSetup.padfiledata.
  *
  * setupPreparePads prepares the packed data by doing the following:
  * - populates the room field (if -1)
- * - multiplies each pad's bounding box by 1 (this is effectively a no op)
  * - sets the g_StageSetup pad/waygroup/waypoint/cover pointers
  * - promotes file offsets to RAM pointers
  * - does similar things for cover by calling setupPrepareCover()
@@ -32,7 +29,6 @@ void setupPreparePads(void)
 	s32 padnum;
 	s32 numpads;
 	s32 roomnum;
-	struct pad pad;
 	struct waypoint *waypoint;
 	struct waygroup *waygroup;
 	s16 inrooms[24];
@@ -40,19 +36,15 @@ void setupPreparePads(void)
 	s32 offset;
 
 	g_PadsFile = (struct padsfileheader *)g_StageSetup.padfiledata;
-	g_PadOffsets = (u16 *)(g_StageSetup.padfiledata + 0x14);
+	g_Pads = (struct pad *)(g_StageSetup.padfiledata + 0x14);
 	padnum = 0;
 	numpads = g_PadsFile->numpads;
 
 	for (; padnum < numpads; padnum++) {
-		offset = g_PadOffsets[padnum];
-		packedpad = (struct packedpad *) &g_StageSetup.padfiledata[offset];
-		padUnpack(padnum, PADFIELD_POS | PADFIELD_BBOX, &pad);
-
 		// If room is negative (ie. not specified)
-		if (packedpad->room < 0) {
+		if (g_Pads[padnum].room < 0) {
 			roomsptr = NULL;
-			bgFindRoomsByPos(&pad.pos, inrooms, aboverooms, 20, NULL);
+			bgFindRoomsByPos(&g_Pads[padnum].pos, inrooms, aboverooms, 20, NULL);
 
 			if (inrooms[0] != -1) {
 				roomsptr = inrooms;
@@ -61,29 +53,14 @@ void setupPreparePads(void)
 			}
 
 			if (roomsptr != NULL) {
-				roomnum = cdFindFloorRoomAtPos(&pad.pos, roomsptr);
+				roomnum = cdFindFloorRoomAtPos(&g_Pads[padnum].pos, roomsptr);
 
 				if (roomnum > 0) {
-					packedpad->room = roomnum;
+					g_Pads[padnum].room = roomnum;
 				} else {
-					packedpad->room = roomsptr[0];
+					g_Pads[padnum].room = roomsptr[0];
 				}
 			}
-		}
-
-		// Scale the bbox by 1 and save it back into the packed pad data.
-		// Yeah, this is effectively doing nothing.
-		if ((*(u32 *) packedpad >> 14) & PADFLAG_HASBBOXDATA) {
-			f32 scale = 1;
-
-			pad.bbox.xmin *= scale;
-			pad.bbox.xmax *= scale;
-			pad.bbox.ymin *= scale;
-			pad.bbox.ymax *= scale;
-			pad.bbox.zmin *= scale;
-			pad.bbox.zmax *= scale;
-
-			padCopyBboxFromPad(padnum, &pad);
 		}
 	}
 

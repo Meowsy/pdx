@@ -1568,13 +1568,9 @@ void func0f02e3dc(struct coord *a, struct coord *b,struct coord *c, struct coord
 		dst->y = d->y * tmp + c->y;
 		dst->z = d->z * tmp + c->z;
 	} else if (d->x == 0 && d->z == 0) {
-		dst->x = c->x;
-		dst->y = c->y;
-		dst->z = c->z;
+		*dst = *c;
 	} else {
-		dst->x = a->x;
-		dst->y = a->y;
-		dst->z = a->z;
+		*dst = *a;
 	}
 }
 
@@ -2201,9 +2197,7 @@ void chrRunToPos(struct chrdata *chr, struct coord *pos)
 {
 	chrStopFiring(chr);
 	chr->actiontype = ACT_RUNPOS;
-	chr->act_runpos.pos.x = pos->x;
-	chr->act_runpos.pos.y = pos->y;
-	chr->act_runpos.pos.z = pos->z;
+	chr->act_runpos.pos = *pos;
 	chr->sleep = 0;
 	chr->act_runpos.neardist = 30;
 	chr->act_runpos.turnspeed = 0;
@@ -3633,9 +3627,7 @@ void chrYeetFromPos(struct chrdata *chr, struct coord *exppos, f32 force)
 		dist.y *= speed;
 		dist.z *= speed;
 
-		chr->fallspeed.x = dist.x;
-		chr->fallspeed.y = dist.y;
-		chr->fallspeed.z = dist.z;
+		chr->fallspeed = dist;
 
 		if (latangle < faceangle) {
 			angletoexplosion += M_BADTAU;
@@ -5041,9 +5033,7 @@ void chrDamage(struct chrdata *chr, f32 damage, struct coord *vector, struct gse
 							}
 
 							chr->actiontype = ACT_PREARGH;
-							chr->act_preargh.dir.x = vector->x;
-							chr->act_preargh.dir.y = vector->y;
-							chr->act_preargh.dir.z = vector->z;
+							chr->act_preargh.dir = *vector;
 							chr->act_preargh.relshotdir = angle;
 							chr->act_preargh.hitpart = hitpart;
 							chr->act_preargh.aplayernum = aplayernum;
@@ -5093,7 +5083,7 @@ void chrDie(struct chrdata *chr, s32 aplayernum)
 		chr->act_die.timeextra = 0;
 
 		chr->ailist = ailistFindById(GAILIST_AIBOT_DEAD);
-		chr->aioffset = 0;
+		chr->aioffset = chr->ailist;
 
 		mpstatsRecordDeath(aplayernum, mpPlayerGetIndex(chr));
 		botinvDropAll(chr, chr->aibot->weaponnum);
@@ -5366,25 +5356,21 @@ void chrGoPosInitMagic(struct chrdata *chr, struct waydata *waydata, struct coor
 void chrGoPosGetCurWaypointInfoWithFlags(struct chrdata *chr, struct coord *pos, s16 *rooms, u32 *flags)
 {
 	struct waypoint *waypoint = chr->act_gopos.waypoints[chr->act_gopos.curindex];
-	struct pad pad;
+	struct pad *pad;
 
 	if (waypoint) {
-		padUnpack(waypoint->padnum, PADFIELD_POS | PADFIELD_ROOM | PADFIELD_FLAGS, &pad);
+		pad = &g_Pads[waypoint->padnum];
 
-		pos->x = pad.pos.x;
-		pos->y = pad.pos.y;
-		pos->z = pad.pos.z;
+		*pos = pad->pos;
 
-		rooms[0] = pad.room;
+		rooms[0] = pad->room;
 		rooms[1] = -1;
 
 		if (flags) {
-			*flags = pad.flags;
+			*flags = pad->flags;
 		}
 	} else {
-		pos->x = chr->act_gopos.endpos.x;
-		pos->y = chr->act_gopos.endpos.y;
-		pos->z = chr->act_gopos.endpos.z;
+		*pos = chr->act_gopos.endpos;
 
 		rooms[0] = chr->act_gopos.endrooms[0];
 		rooms[1] = -1;
@@ -5493,9 +5479,7 @@ void chrGoPosInitExpensive(struct chrdata *chr)
 	chr->act_gopos.waydata.mode = WAYMODE_INIT;
 	chr->act_gopos.waydata.iter = 0;
 	chr->act_gopos.waydata.gotaimpos = false;
-	chr->act_gopos.waydata.aimpos.x = pos.x;
-	chr->act_gopos.waydata.aimpos.y = pos.y;
-	chr->act_gopos.waydata.aimpos.z = pos.z;
+	chr->act_gopos.waydata.aimpos = pos;
 
 	chrGoPosClearRestartTtl(chr);
 }
@@ -5605,19 +5589,17 @@ s16 chrPatrolCalculatePadNum(struct chrdata *chr, s32 numsteps)
 void chrPatrolGetCurWaypointInfoWithFlags(struct chrdata *chr, struct coord *pos, s16 *rooms, u32 *flags)
 {
 	s32 padnum = chrPatrolCalculatePadNum(chr, 0);
-	struct pad pad;
+	struct pad *pad;
 
-	padUnpack(padnum, PADFIELD_POS | PADFIELD_ROOM | PADFIELD_FLAGS, &pad);
+	pad = &g_Pads[padnum];
 
-	pos->x = pad.pos.x;
-	pos->y = pad.pos.y;
-	pos->z = pad.pos.z;
+	*pos = pad->pos;
 
-	rooms[0] = pad.room;
+	rooms[0] = pad->room;
 	rooms[1] = -1;
 
 	if (flags) {
-		*flags = pad.flags;
+		*flags = pad->flags;
 	}
 }
 
@@ -5664,7 +5646,6 @@ void chrNavTickMagic(struct chrdata *chr, struct waydata *waydata, f32 speed, st
 	struct coord spdc;
 	s16 spcc[8];
 	u32 stack[4];
-	struct pad pad;
 	struct coord sp5c;
 	s16 sp4c[8];
 
@@ -5691,9 +5672,7 @@ void chrNavTickMagic(struct chrdata *chr, struct waydata *waydata, f32 speed, st
 
 		if (cdTestVolume(&spf4, chr->radius, sp118, CDTYPE_ALL, CHECKVERTICAL_YES, ymax - prop->pos.y, ymin - prop->pos.y) != CDRESULT_COLLISION) {
 			// Reached end of segment with no collision
-			prop->pos.x = spf4.x;
-			prop->pos.y = spf4.y;
-			prop->pos.z = spf4.z;
+			prop->pos = spf4;
 
 			chr->ground = ground;
 			chr->manground = ground;
@@ -5726,8 +5705,7 @@ void chrNavTickMagic(struct chrdata *chr, struct waydata *waydata, f32 speed, st
 					} else {
 						if (chr->act_gopos.curindex >= 2) {
 							waypoint = chr->act_gopos.waypoints[chr->act_gopos.curindex - 2];
-							padUnpack(waypoint->padnum, PADFIELD_POS, &pad);
-							chrSetLookAngle(chr, atan2f(prop->pos.x - pad.pos.x, prop->pos.z - pad.pos.z));
+							chrSetLookAngle(chr, atan2f(prop->pos.x - g_Pads[waypoint->padnum].pos.x, prop->pos.z - g_Pads[waypoint->padnum].pos.z));
 						}
 
 						if (CHRRACE(chr) == RACE_HUMAN || CHRRACE(chr) == RACE_SKEDAR) {
@@ -5799,9 +5777,7 @@ void chrCalculatePosition(struct chrdata *chr, struct coord *pos)
 			pos->z = (pos->z - chr->prop->pos.z) * frac + chr->prop->pos.z;
 		}
 	} else {
-		pos->x = chr->prop->pos.x;
-		pos->y = chr->prop->pos.y;
-		pos->z = chr->prop->pos.z;
+		*pos = chr->prop->pos;
 	}
 }
 
@@ -6119,17 +6095,13 @@ bool chrGoToRoomPos(struct chrdata *chr, struct coord *pos, s16 *room, u32 gopos
 		if (isgopos && ismagic) {
 			chrCalculatePosition(chr, &prevpos);
 		} else {
-			prevpos.x = prop->pos.x;
-			prevpos.y = prop->pos.y;
-			prevpos.z = prop->pos.z;
+			prevpos = prop->pos;
 		}
 
 		chrStopFiring(chr);
 
 		chr->actiontype = ACT_GOPOS;
-		chr->act_gopos.endpos.x = pos->x;
-		chr->act_gopos.endpos.y = pos->y;
-		chr->act_gopos.endpos.z = pos->z;
+		chr->act_gopos.endpos = *pos;
 		roomsCopy(room, chr->act_gopos.endrooms);
 
 		chr->act_gopos.target = lastwaypoint;
@@ -6251,7 +6223,7 @@ void chrStartPatrol(struct chrdata *chr, struct path *path)
 	f32 xdiff;
 	f32 zdiff;
 	s32 *padnumptr;
-	struct pad pad;
+	struct pad *pad;
 	struct coord nextpos;
 	s16 nextrooms[8];
 	s16 rooms[8];
@@ -6268,16 +6240,16 @@ void chrStartPatrol(struct chrdata *chr, struct path *path)
 		// maybe a line of sight check?
 		if (chr->patrolnextstep >= 0 && chr->patrolnextstep < path->len) {
 			padnumptr = &path->pads[chr->patrolnextstep];
-			padUnpack(*padnumptr, PADFIELD_POS | PADFIELD_ROOM, &pad);
+			pad = &g_Pads[*padnumptr];
 
-			rooms[0] = pad.room;
+			rooms[0] = pad->room;
 			rooms[1] = -1;
 
 			chrGetBbox(prop, &radius, &ymax, &ymin);
 
 			chrSetPerimEnabled(chr, false);
 
-			if (cdTestCylMove04(&prop->pos, prop->rooms, &pad.pos, rooms, CDTYPE_BG, 1,
+			if (cdTestCylMove04(&prop->pos, prop->rooms, &pad->pos, rooms, CDTYPE_BG, 1,
 						ymax - prop->pos.y, ymin - prop->pos.y) != CDRESULT_COLLISION) {
 				nextstep = chr->patrolnextstep;
 			}
@@ -6290,10 +6262,10 @@ void chrStartPatrol(struct chrdata *chr, struct path *path)
 		if (nextstep < 0) {
 			for (i = 0; path->pads[i] >= 0; i++) {
 				padnumptr = &path->pads[i];
-				padUnpack(*padnumptr, PADFIELD_POS, &pad);
+				pad = &g_Pads[*padnumptr];
 
-				xdiff = pad.pos.x - prop->pos.x;
-				zdiff = pad.pos.z - prop->pos.z;
+				xdiff = pad->pos.x - prop->pos.x;
+				zdiff = pad->pos.z - prop->pos.z;
 				dist = xdiff * xdiff + zdiff * zdiff;
 
 				if (nextstep < 0 || dist < bestdistance) {
@@ -6304,14 +6276,14 @@ void chrStartPatrol(struct chrdata *chr, struct path *path)
 		}
 
 		padnumptr = &path->pads[nextstep];
-		padUnpack(*padnumptr, PADFIELD_POS | PADFIELD_ROOM, &pad);
+		pad = &g_Pads[*padnumptr];
 
-		rooms[0] = pad.room;
+		rooms[0] = pad->room;
 		rooms[1] = -1;
 
 		// If chr has line of sight to the pad then begin the patrol,
 		// otherwise use gopos to get to the starting pad
-		if (func0f03654c(chr, &prop->pos, prop->rooms, &pad.pos, rooms, NULL,
+		if (func0f03654c(chr, &prop->pos, prop->rooms, &pad->pos, rooms, NULL,
 					chr->radius * 1.2f, CDTYPE_PATHBLOCKER | CDTYPE_BG) != CDRESULT_COLLISION) {
 			chrStopFiring(chr);
 
@@ -6352,10 +6324,10 @@ void chrStartPatrol(struct chrdata *chr, struct path *path)
 				chr->hidden &= ~CHRHFLAG_NEEDANIM;
 			}
 		} else {
-			sp60[0] = pad.room;
+			sp60[0] = pad->room;
 			sp60[1] = -1;
 
-			chrGoToRoomPos(chr, &pad.pos, sp60, GOPOSFLAG_FORPATHSTART);
+			chrGoToRoomPos(chr, &pad->pos, sp60, GOPOSFLAG_FORPATHSTART);
 		}
 	}
 }
@@ -7119,14 +7091,11 @@ bool chrGoToPad(struct chrdata *chr, s32 padnum, u32 goposflags)
 #endif
 		{
 			s16 rooms[2];
-			struct pad pad;
 
-			padUnpack(padnum, PADFIELD_ROOM | PADFIELD_POS, &pad);
-
-			rooms[0] = pad.room;
+			rooms[0] = g_Pads[padnum].room;
 			rooms[1] = -1;
 
-			if (chrGoToRoomPos(chr, &pad.pos, rooms, goposflags)) {
+			if (chrGoToRoomPos(chr, &g_Pads[padnum].pos, rooms, goposflags)) {
 				return true;
 			}
 		}
@@ -7570,9 +7539,7 @@ bool chrConsiderGrenadeThrow(struct chrdata *chr, u32 attackflags, u32 entityid)
 		struct coord pos;
 
 		if (target) {
-			pos.x = target->pos.x;
-			pos.y = target->pos.y;
-			pos.z = target->pos.z;
+			pos = target->pos;
 		}
 
 		if (target && cdTestLos04(&chr->prop->pos, chr->prop->rooms, &pos,
@@ -8226,6 +8193,7 @@ void chrTickDead(struct chrdata *chr)
 
 	if (aibot == NULL) {
 		chr->ailist = NULL;
+		chr->aioffset = NULL;
 	}
 }
 
@@ -8644,9 +8612,7 @@ void chrTickPreArgh(struct chrdata *chr)
 
 	if (modelGetCurAnimFrame(model) >= modelGetAnimEndFrame(model)) {
 		struct coord dir;
-		dir.x = chr->act_preargh.dir.x;
-		dir.y = chr->act_preargh.dir.y;
-		dir.z = chr->act_preargh.dir.z;
+		dir = chr->act_preargh.dir;
 
 		chrReactToDamage(chr, &dir,
 				chr->act_preargh.relshotdir,
@@ -9049,9 +9015,7 @@ bool func0f03e9f4(struct chrdata *chr, struct attackanimconfig *animcfg, bool fi
 		if ((flags & ATTACKFLAG_AIMATTARGET) && targetprop->type == PROPTYPE_PLAYER) {
 			f32 eyeheight = g_Vars.players[playermgrGetPlayerNumByProp(targetprop)]->vv_eyeheight;
 
-			targetpos.x = targetprop->pos.x;
-			targetpos.y = targetprop->pos.y;
-			targetpos.z = targetprop->pos.z;
+			targetpos = targetprop->pos;
 
 			if (chr->aibot) {
 				sp174 -= eyeheight * (0.4f + (0.05f * RANDOMFRAC() * arg4));
@@ -9148,16 +9112,12 @@ bool func0f03e9f4(struct chrdata *chr, struct attackanimconfig *animcfg, bool fi
 							mtx00016798(sp108, &spc8);
 							mtx00015be0(spb4, &spc8);
 
-							spb8.x = burstrodata->pos.x;
-							spb8.y = burstrodata->pos.y;
-							spb8.z = burstrodata->pos.z;
+							spb8 = burstrodata->pos;
 
 							mtx4TransformVecInPlace(&spc8, &spb8);
 
 							sp114 = 1;
-							sp118.x = spb8.x;
-							sp118.y = spb8.y;
-							sp118.z = spb8.z;
+							sp118 = spb8;
 						}
 					} else {
 						posnode = modelGetPart(gunmodel->filedata, MODELPART_CHRGUN_0001);
@@ -9586,9 +9546,7 @@ bool chrGetGunPos(struct chrdata *chr, s32 handnum, struct coord *gunpos)
 				spac = model0001a5cc(model, part0, 0);
 				rodata = &part0->rodata->chrgunfire;
 
-				gunpos->x = rodata->pos.x;
-				gunpos->y = rodata->pos.y;
-				gunpos->z = rodata->pos.z;
+				*gunpos = rodata->pos;
 
 				mtx00015be4(camGetProjectionMtxF(), spac, &sp6c);
 				mtx4TransformVecInPlace(&sp6c, gunpos);
@@ -10043,9 +10001,7 @@ void chrTickShoot(struct chrdata *chr, s32 handnum)
 					if (fudgeforeyespy) {
 						hitprop = targetprop;
 
-						hitpos.x = hitprop->pos.x;
-						hitpos.y = hitprop->pos.y;
-						hitpos.z = hitprop->pos.z;
+						hitpos = hitprop->pos;
 					}
 				}
 
@@ -10155,9 +10111,7 @@ void chrTickShoot(struct chrdata *chr, s32 handnum)
 								} else if ((gset.weaponnum == WEAPON_DEVASTATOR && gset.weaponfunc == FUNC_SECONDARY)
 										|| gset.weaponnum == WEAPON_CROSSBOW) {
 									// Wall hugger grenade or crossbow - aim at target directly
-									aimpos.x = targetprop->pos.x;
-									aimpos.y = targetprop->pos.y;
-									aimpos.z = targetprop->pos.z;
+									aimpos = targetprop->pos;
 
 									if (targetprop->type == PROPTYPE_PLAYER) {
 										aimpos.y -= 25;
@@ -10292,9 +10246,7 @@ void chrTickShoot(struct chrdata *chr, s32 handnum)
 							s32 hitpart = HITPART_GENERAL;
 							struct chrdata *targetchr = targetprop->chr;
 
-							hitpos.x = targetprop->pos.x;
-							hitpos.y = targetprop->pos.y;
-							hitpos.z = targetprop->pos.z;
+							hitpos = targetprop->pos;
 
 							if (random() % 2) {
 								hitpos.y += 2 + random() % 10;
@@ -11348,9 +11300,7 @@ bool chrDetectDangerousObject(struct chrdata *chr, u8 flags)
 			}
 
 			if (pass && chrGetSquaredDistanceToCoord(chr, &prop->pos) < 1600) {
-				chr->runfrompos.x = g_DangerousProps[i]->pos.x;
-				chr->runfrompos.y = g_DangerousProps[i]->pos.y;
-				chr->runfrompos.z = g_DangerousProps[i]->pos.z;
+				chr->runfrompos = g_DangerousProps[i]->pos;
 
 				if (chr->aibot) {
 					chr->aibot->detecteddangerousprop = 1;
@@ -11737,17 +11687,11 @@ void func0f044b68(struct coord *arg0, struct coord *arg1, struct coord *arg2)
 	if (sp00.f[0] * sp0c.f[0] + sp00.f[2] * sp0c.f[2] > 0) {
 		// empty
 	} else {
-		sp0c.x = arg0->x;
-		sp0c.y = arg0->y;
-		sp0c.z = arg0->z;
+		sp0c = *arg0;
 
-		arg0->x = arg1->x;
-		arg0->y = arg1->y;
-		arg0->z = arg1->z;
+		*arg0 = *arg1;
 
-		arg1->x = sp0c.x;
-		arg1->y = sp0c.y;
-		arg1->z = sp0c.z;
+		*arg1 = sp0c;
 	}
 }
 
@@ -11861,29 +11805,17 @@ bool chrNavCanSeeNextPos(struct chrdata *chr, struct coord *chrpos, s16 *chrroom
 		func0f044b68(&spac, &sp94, &spd4);
 		func0f044b68(&spa0, &sp88, &spd4);
 
-		leftpos->x = spac.x;
-		leftpos->y = spac.y;
-		leftpos->z = spac.z;
+		*leftpos = spac;
 
-		rightpos->x = sp88.x;
-		rightpos->y = sp88.y;
-		rightpos->z = sp88.z;
+		*rightpos = sp88;
 	} else if (spbc) {
-		leftpos->x = spac.x;
-		leftpos->y = spac.y;
-		leftpos->z = spac.z;
+		*leftpos = spac;
 
-		rightpos->x = spa0.x;
-		rightpos->y = spa0.y;
-		rightpos->z = spa0.z;
+		*rightpos = spa0;
 	} else if (spb8) {
-		leftpos->x = sp94.x;
-		leftpos->y = sp94.y;
-		leftpos->z = sp94.z;
+		*leftpos = sp94;
 
-		rightpos->x = sp88.x;
-		rightpos->y = sp88.y;
-		rightpos->z = sp88.z;
+		*rightpos = sp88;
 	} else if (cdExamCylMove07(chrpos, chrrooms, aimpos, sp40, cdtypes, 1, ymax - prop->pos.y, ymin - prop->pos.y) != CDRESULT_COLLISION
 			&& (!arg9 || cdExamCylMove01(chrpos, aimpos, chrradius, sp40, cdtypes, CHECKVERTICAL_YES, ymax - prop->pos.y, ymin - prop->pos.y) != CDRESULT_COLLISION)) {
 		result = true;
@@ -12020,38 +11952,22 @@ bool chrNavCheckForObstacle(struct chrdata *chr, struct coord *chrpos, s16 *chrr
 
 	if (spbc && spb8) {
 		if (value1 < value2) {
-			leftpos->x = spac.x;
-			leftpos->y = spac.y;
-			leftpos->z = spac.z;
+			*leftpos = spac;
 
-			rightpos->x = spa0.x;
-			rightpos->y = spa0.y;
-			rightpos->z = spa0.z;
+			*rightpos = spa0;
 		} else {
-			leftpos->x = sp94.x;
-			leftpos->y = sp94.y;
-			leftpos->z = sp94.z;
+			*leftpos = sp94;
 
-			rightpos->x = sp88.x;
-			rightpos->y = sp88.y;
-			rightpos->z = sp88.z;
+			*rightpos = sp88;
 		}
 	} else if (spbc) {
-		leftpos->x = spac.x;
-		leftpos->y = spac.y;
-		leftpos->z = spac.z;
+		*leftpos = spac;
 
-		rightpos->x = spa0.x;
-		rightpos->y = spa0.y;
-		rightpos->z = spa0.z;
+		*rightpos = spa0;
 	} else if (spb8) {
-		leftpos->x = sp94.x;
-		leftpos->y = sp94.y;
-		leftpos->z = sp94.z;
+		*leftpos = sp94;
 
-		rightpos->x = sp88.x;
-		rightpos->y = sp88.y;
-		rightpos->z = sp88.z;
+		*rightpos = sp88;
 	} else if (cdExamCylMove07(chrpos, chrrooms, aimpos, sp40, cdtypes, 1, ymax - prop->pos.y, ymin - prop->pos.y) != CDRESULT_COLLISION
 			&& (!hasobstacle || cdExamCylMove01(chrpos, aimpos, chrradius, sp40, cdtypes, CHECKVERTICAL_YES, ymax - prop->pos.y, ymin - prop->pos.y) != CDRESULT_COLLISION)) {
 		result = true;
@@ -12136,14 +12052,10 @@ bool chrNavTryObstacle(struct chrdata *chr, struct coord *arg1, bool arg2, struc
 		if (!arg5 || func0f03645c(chr, &prop->pos, prop->rooms, &sp5c, nextpos, cdtypes)) {
 			if (arg10) {
 				waydata->gotaimposobj = true;
-				waydata->aimposobj.x = sp5c.x;
-				waydata->aimposobj.y = sp5c.y;
-				waydata->aimposobj.z = sp5c.z;
+				waydata->aimposobj = sp5c;
 			} else {
 				waydata->gotaimpos = true;
-				waydata->aimpos.x = sp5c.x;
-				waydata->aimpos.y = sp5c.y;
-				waydata->aimpos.z = sp5c.z;
+				waydata->aimpos = sp5c;
 			}
 
 			return true;
@@ -12252,9 +12164,7 @@ void chrNavTickMain(struct chrdata *chr, struct coord *nextpos, struct waydata *
 		if (0.0f);
 
 		if (waydata->mode == WAYMODE_INIT || waydata->mode == WAYMODE_RETRY) {
-			sp100.x = nextpos->x;
-			sp100.y = nextpos->y;
-			sp100.z = nextpos->z;
+			sp100 = *nextpos;
 
 			// Check to see if the chr can see the next pad. This is almost
 			// always true, but if the chr has tried to avoid an object they
@@ -12262,9 +12172,7 @@ void chrNavTickMain(struct chrdata *chr, struct coord *nextpos, struct waydata *
 			if (chrNavCanSeeNextPos(chr, &prop->pos, prop->rooms, &sp100, &waydata->obstacleleft, &waydata->obstacleright, -chr->radius, chr->radius, CDTYPE_PATHBLOCKER | CDTYPE_BG, arg3)) {
 				// Can see the next pad
 				waydata->gotaimpos = true;
-				waydata->aimpos.x = sp100.x;
-				waydata->aimpos.y = sp100.y;
-				waydata->aimpos.z = sp100.z;
+				waydata->aimpos = sp100;
 				waydata->mode = WAYMODE_HAVEAIMPOS;
 			} else if (waydata->mode == WAYMODE_INIT) {
 				waydata->mode = WAYMODE_LOST1;
@@ -12347,9 +12255,7 @@ void chrNavTickMain(struct chrdata *chr, struct coord *nextpos, struct waydata *
 				// No obstacle ahead
 				waydata->gotaimposobj = true;
 				waydata->mode = WAYMODE_INIT;
-				waydata->aimposobj.x = waydata->aimpos.x;
-				waydata->aimposobj.y = waydata->aimpos.y;
-				waydata->aimposobj.z = waydata->aimpos.z;
+				waydata->aimposobj = waydata->aimpos;
 			} else {
 				// Obstacle ahead
 				waydata->mode = WAYMODE_NEWOBSTACLE;
@@ -12495,9 +12401,7 @@ void chrNavTickMain(struct chrdata *chr, struct coord *nextpos, struct waydata *
 	}
 
 	if (!waydata->gotaimposobj) {
-		waydata->aimposobj.x = waydata->aimpos.x;
-		waydata->aimposobj.y = waydata->aimpos.y;
-		waydata->aimposobj.z = waydata->aimpos.z;
+		waydata->aimposobj = waydata->aimpos;
 	}
 
 	// Every 10 ticks, attempt to open any door in front of the chr
@@ -12570,7 +12474,7 @@ void chrNavTickMain(struct chrdata *chr, struct coord *nextpos, struct waydata *
 bool chrGoPosUpdateLiftAction(struct chrdata *chr, u32 curpadflags, bool arg2, bool arrivingatlift, s16 curpadnum, s32 nextpadnum)
 {
 	bool advance = false;
-	struct pad nextpad;
+	struct pad *nextpad;
 	u32 nextpadflags = 0;
 	f32 nextground;
 	f32 lifty;
@@ -12587,8 +12491,7 @@ bool chrGoPosUpdateLiftAction(struct chrdata *chr, u32 curpadflags, bool arg2, b
 	lifty = liftGetY(lift);
 
 	if (nextpadnum >= 0) {
-		padUnpack(nextpadnum, PADFIELD_POS | PADFIELD_ROOM | PADFIELD_FLAGS, &nextpad);
-		nextpadflags = nextpad.flags;
+		nextpadflags = nextpad->flags;
 	}
 
 	if (curpadflags & PADFLAG_AIWAITLIFT) {
@@ -12620,7 +12523,7 @@ bool chrGoPosUpdateLiftAction(struct chrdata *chr, u32 curpadflags, bool arg2, b
 
 					if (nextpadnum >= 0) {
 						// Call the lift
-						chrOpenDoor(chr, &nextpad.pos);
+						chrOpenDoor(chr, &nextpad->pos);
 					}
 				}
 			} else {
@@ -12651,9 +12554,9 @@ bool chrGoPosUpdateLiftAction(struct chrdata *chr, u32 curpadflags, bool arg2, b
 				s16 rooms[] = {0, -1};
 				u32 stack2;
 
-				rooms[0] = nextpad.room;
+				rooms[0] = nextpad->room;
 
-				nextground = cdFindFloorYColourTypeAtPos(&nextpad.pos, rooms, NULL, NULL);
+				nextground = cdFindFloorYColourTypeAtPos(&nextpad->pos, rooms, NULL, NULL);
 
 				// Begin exiting lift if lift is 30cm under destination or higher
 				advance = (lifty >= nextground - 30);
@@ -12722,7 +12625,7 @@ void chrTickGoPos(struct chrdata *chr)
 	s16 nextrooms[8];
 	struct prop *prop = chr->prop;
 	bool enteringmagic = false;
-	struct pad pad;
+	struct pad *pad;
 	bool sp240 = true;
 	struct coord curwppos;
 	s16 curwprooms[8];
@@ -12828,28 +12731,28 @@ void chrTickGoPos(struct chrdata *chr)
 		f32 sp160;
 		f32 sp156;
 		struct waypoint *next;
-		struct pad pad2;
+		struct pad *pad2;
 
 		waypoint = chr->act_gopos.waypoints[chr->act_gopos.curindex];
 
 		if (waypoint) {
-			padUnpack(waypoint->padnum, PADFIELD_FLAGS | PADFIELD_POS, &pad);
+			pad = &g_Pads[waypoint->padnum];
 
 			// Both of these functions are calculating something with the coords
 			// and are returning a boolean. There are no write operations.
-			sp188 = posIsArrivingAtPos(&chr->prevpos, &prop->pos, &pad.pos, 30);
-			sp184 = posIsArrivingLaterallyAtPos(&chr->prevpos, &prop->pos, &pad.pos, 30);
+			sp188 = posIsArrivingAtPos(&chr->prevpos, &prop->pos, &pad->pos, 30);
+			sp184 = posIsArrivingLaterallyAtPos(&chr->prevpos, &prop->pos, &pad->pos, 30);
 
-			if (pad.flags & PADFLAG_AIDUCK) {
+			if (pad->flags & PADFLAG_AIDUCK) {
 				chr->act_gopos.flags |= GOPOSFLAG_DUCK;
-			} else if (pad.flags & PADFLAG_10000) {
+			} else if (pad->flags & PADFLAG_10000) {
 				chr->act_gopos.flags |= GOPOSFLAG_WALKDIRECT;
 			}
 
-			if ((pad.flags & PADFLAG_AIWAITLIFT) || (pad.flags & PADFLAG_AIONLIFT)) {
-				advance = chrGoPosUpdateLiftAction(chr, pad.flags, sp184, sp188, waypoint->padnum, chrGoPosGetNextPadNum(chr));
+			if ((pad->flags & PADFLAG_AIWAITLIFT) || (pad->flags & PADFLAG_AIONLIFT)) {
+				advance = chrGoPosUpdateLiftAction(chr, pad->flags, sp184, sp188, waypoint->padnum, chrGoPosGetNextPadNum(chr));
 			} else {
-				if (sp188 || (sp184 && (chr->inlift || (pad.flags & PADFLAG_8000)))) {
+				if (sp188 || (sp184 && (chr->inlift || (pad->flags & PADFLAG_8000)))) {
 					advance = true;
 				}
 			}
@@ -12879,9 +12782,9 @@ void chrTickGoPos(struct chrdata *chr)
 			waypoint = chr->act_gopos.waypoints[chr->act_gopos.curindex];
 
 			if (waypoint) {
-				padUnpack(waypoint->padnum, PADFIELD_FLAGS, &pad);
+				pad = &g_Pads[waypoint->padnum];
 
-				if ((pad.flags & PADFLAG_AIWALKDIRECT) == 0) {
+				if ((pad->flags & PADFLAG_AIWALKDIRECT) == 0) {
 					// The waypoint the chr is running to doesn't have
 					// PADFLAG_AIWALKDIRECT, so the chr is able to ignore it and run
 					// towards the next one if it's in sight.
@@ -12890,26 +12793,22 @@ void chrTickGoPos(struct chrdata *chr)
 					waypoint = chr->act_gopos.waypoints[chr->act_gopos.curindex + 1];
 
 					if (waypoint) {
-						padUnpack(waypoint->padnum, PADFIELD_FLAGS, &pad);
+						pad = &g_Pads[waypoint->padnum];
 
-						if ((pad.flags & PADFLAG_AIWALKDIRECT) == 0) {
+						if ((pad->flags & PADFLAG_AIWALKDIRECT) == 0) {
 							// And this one doesn't have PADFLAG_AIWALKDIRECT either,
 							// so the chr can consider skipping this one too.
 							waypoint = chr->act_gopos.waypoints[chr->act_gopos.curindex + 2];
 
 							if (waypoint) {
-								padUnpack(waypoint->padnum, PADFIELD_ROOM | PADFIELD_POS, &pad);
+								pad = &g_Pads[waypoint->padnum];
 
-								nextpos.x = pad.pos.x;
-								nextpos.y = pad.pos.y;
-								nextpos.z = pad.pos.z;
+								nextpos = pad->pos;
 
-								nextrooms[0] = pad.room;
+								nextrooms[0] = pad->room;
 								nextrooms[1] = -1;
 							} else {
-								nextpos.x = chr->act_gopos.endpos.x;
-								nextpos.y = chr->act_gopos.endpos.y;
-								nextpos.z = chr->act_gopos.endpos.z;
+								nextpos = chr->act_gopos.endpos;
 
 								roomsCopy(chr->act_gopos.endrooms, nextrooms);
 							}
@@ -12930,42 +12829,38 @@ void chrTickGoPos(struct chrdata *chr)
 
 			if (waypoint) {
 				candosomething = (chr->act_gopos.flags & GOPOSFLAG_INIT) != 0;
-				padUnpack(waypoint->padnum, PADFIELD_FLAGS | PADFIELD_POS, &pad);
+				pad = &g_Pads[waypoint->padnum];
 
 				next = chr->act_gopos.waypoints[chr->act_gopos.curindex + 1];
 
 				if (next) {
-					padUnpack(next->padnum, PADFIELD_ROOM | PADFIELD_POS, &pad2);
+					pad2 = &g_Pads[next->padnum];
 
-					if ((pad.flags & (PADFLAG_AIWAITLIFT | PADFLAG_AIONLIFT))
-							&& (pad2.flags & (PADFLAG_AIWAITLIFT | PADFLAG_AIONLIFT))) {
+					if ((pad->flags & (PADFLAG_AIWAITLIFT | PADFLAG_AIONLIFT))
+							&& (pad2->flags & (PADFLAG_AIWAITLIFT | PADFLAG_AIONLIFT))) {
 						candosomething = false;
 					}
 				}
 
-				if ((pad.flags & PADFLAG_AIWALKDIRECT) == 0 || candosomething) {
+				if ((pad->flags & PADFLAG_AIWALKDIRECT) == 0 || candosomething) {
 					if (next) {
-						nextpos.x = pad2.pos.x;
-						nextpos.y = pad2.pos.y;
-						nextpos.z = pad2.pos.z;
+						nextpos = pad2->pos;
 
-						nextrooms[0] = pad2.room;
+						nextrooms[0] = pad2->room;
 						nextrooms[1] = -1;
 					} else {
-						nextpos.x = chr->act_gopos.endpos.x;
-						nextpos.y = chr->act_gopos.endpos.y;
-						nextpos.z = chr->act_gopos.endpos.z;
+						nextpos = chr->act_gopos.endpos;
 
 						roomsCopy(chr->act_gopos.endrooms, nextrooms);
 					}
 
 					// I suspect this is making the chr turn to face the next pad
-					if ((pad.flags & PADFLAG_AIWALKDIRECT) && candosomething) {
+					if ((pad->flags & PADFLAG_AIWALKDIRECT) && candosomething) {
 						if (true) {
-							sp180 = prop->pos.x - pad.pos.x;
-							sp176 = prop->pos.z - pad.pos.z;
-							sp172 = nextpos.x - pad.pos.x;
-							sp168 = nextpos.z - pad.pos.z;
+							sp180 = prop->pos.x - pad->pos.x;
+							sp176 = prop->pos.z - pad->pos.z;
+							sp172 = nextpos.x - pad->pos.x;
+							sp168 = nextpos.z - pad->pos.z;
 						}
 
 						sp156 = sqrtf((sp180 * sp180 + sp176 * sp176) * (sp172 * sp172 + sp168 * sp168));
@@ -12994,15 +12889,9 @@ void chrTickGoPos(struct chrdata *chr)
 		waypoint = chr->act_gopos.waypoints[chr->act_gopos.curindex];
 
 		if (waypoint) {
-			padUnpack(waypoint->padnum, PADFIELD_POS, &pad);
-
-			nextpos.x = pad.pos.x;
-			nextpos.y = pad.pos.y;
-			nextpos.z = pad.pos.z;
+			nextpos = g_Pads[waypoint->padnum].pos;
 		} else {
-			nextpos.x = chr->act_gopos.endpos.x;
-			nextpos.y = chr->act_gopos.endpos.y;
-			nextpos.z = chr->act_gopos.endpos.z;
+			nextpos = chr->act_gopos.endpos;
 
 			if (chr->aibot && chr->myaction == MA_AIBOTGETITEM) {
 				sp240 = false;
@@ -13407,7 +13296,7 @@ void cutsceneStart(u32 ailistid)
 	}
 
 	g_BgChrs[g_NumBgChrs - 1].ailist = ailistFindById(ailistid);
-	g_BgChrs[g_NumBgChrs - 1].aioffset = 0;
+	g_BgChrs[g_NumBgChrs - 1].aioffset = g_BgChrs[g_NumBgChrs - 1].ailist;
 	g_BgChrs[g_NumBgChrs - 1].aireturnlist = -1;
 }
 
@@ -13740,7 +13629,6 @@ void chrGetAttackEntityPos(struct chrdata *chr, u32 attackflags, s32 entityid, s
 {
 	struct prop *targetprop;
 	struct chrdata *targetchr;
-	struct pad pad;
 
 	if (attackflags & ATTACKFLAG_AIMATCHR) {
 		// Aiming at a chr by chrnum
@@ -13750,9 +13638,7 @@ void chrGetAttackEntityPos(struct chrdata *chr, u32 attackflags, s32 entityid, s
 			targetchr = chr;
 		}
 
-		pos->x = targetchr->prop->pos.x;
-		pos->y = targetchr->prop->pos.y;
-		pos->z = targetchr->prop->pos.z;
+		*pos = targetchr->prop->pos;
 
 		if (targetchr) {
 			chr = targetprop->chr;
@@ -13766,21 +13652,16 @@ void chrGetAttackEntityPos(struct chrdata *chr, u32 attackflags, s32 entityid, s
 	} else if (attackflags & ATTACKFLAG_AIMATPAD) {
 		// Aiming at a pad by padnum
 		s32 padnum = chrResolvePadId(chr, entityid);
-		padUnpack(padnum, PADFIELD_POS | PADFIELD_ROOM, &pad);
 
-		pos->x = pad.pos.x;
-		pos->y = pad.pos.y;
-		pos->z = pad.pos.z;
+		*pos = g_Pads[padnum].pos;
 
-		rooms[0] = pad.room;
+		rooms[0] = g_Pads[padnum].room;
 		rooms[1] = -1;
 	} else {
 		// Aiming at the chr's preconfigured target
 		targetprop = chrGetTargetProp(chr);
 
-		pos->x = targetprop->pos.x;
-		pos->y = targetprop->pos.y;
-		pos->z = targetprop->pos.z;
+		*pos = targetprop->pos;
 
 		if (targetprop->type == PROPTYPE_CHR && targetprop->chr) {
 			chr = targetprop->chr;
@@ -13961,17 +13842,12 @@ f32 chrGetDistanceToPad(struct chrdata *chr, s32 pad_id)
 	struct prop *prop = chr->prop;
 	f32 xdiff, ydiff, zdiff;
 	f32 distance = 0;
-	struct pad pad;
 	pad_id = chrResolvePadId(chr, pad_id);
 
-#if VERSION >= VERSION_NTSC_1_0
-	if (pad_id >= 0)
-#endif
-	{
-		padUnpack(pad_id, PADFIELD_POS, &pad);
-		xdiff = pad.pos.x - prop->pos.x;
-		ydiff = pad.pos.y - prop->pos.y;
-		zdiff = pad.pos.z - prop->pos.z;
+	if (pad_id >= 0) {
+		xdiff = g_Pads[pad_id].pos.x - prop->pos.x;
+		ydiff = g_Pads[pad_id].pos.y - prop->pos.y;
+		zdiff = g_Pads[pad_id].pos.z - prop->pos.z;
 		distance = sqrtf(xdiff * xdiff + ydiff * ydiff + zdiff * zdiff);
 	}
 
@@ -13983,14 +13859,13 @@ f32 chrGetSameFloorDistanceToPad(struct chrdata *chr, s32 pad_id)
 {
 	struct prop *prop = chr->prop;
 	f32 xdiff, ydiff, zdiff, ydiff_absolute;
-	struct pad pad;
 	f32 ret;
 
 	pad_id = chrResolvePadId(chr, pad_id);
-	padUnpack(pad_id, PADFIELD_POS, &pad);
-	xdiff = pad.pos.x - prop->pos.x;
-	ydiff = pad.pos.y - prop->pos.y;
-	zdiff = pad.pos.z - prop->pos.z;
+
+	xdiff = g_Pads[pad_id].pos.x - prop->pos.x;
+	ydiff = g_Pads[pad_id].pos.y - prop->pos.y;
+	zdiff = g_Pads[pad_id].pos.z - prop->pos.z;
 
 	if (ydiff > 0) {
 		ydiff_absolute = ydiff;
@@ -14029,28 +13904,17 @@ f32 chrGetLateralDistanceToPad(struct chrdata *chr, s32 pad_id)
 {
 	struct prop *prop = chr->prop;
 	f32 xdiff, zdiff;
-	struct pad pad;
-
-#if VERSION >= VERSION_NTSC_1_0
 	f32 distance = 0;
 
 	pad_id = chrResolvePadId(chr, pad_id);
 
 	if (pad_id >= 0) {
-		padUnpack(pad_id, PADFIELD_POS, &pad);
-		xdiff = pad.pos.x - prop->pos.x;
-		zdiff = pad.pos.z - prop->pos.z;
+		xdiff = g_Pads[pad_id].pos.x - prop->pos.x;
+		zdiff = g_Pads[pad_id].pos.z - prop->pos.z;
 		distance = sqrtf(xdiff * xdiff + zdiff * zdiff);
 	}
 
 	return distance;
-#else
-	pad_id = chrResolvePadId(chr, pad_id);
-	padUnpack(pad_id, PADFIELD_POS, &pad);
-	xdiff = pad.pos.x - prop->pos.x;
-	zdiff = pad.pos.z - prop->pos.z;
-	return sqrtf(xdiff * xdiff + zdiff * zdiff);
-#endif
 }
 
 f32 chrGetSquaredDistanceToCoord(struct chrdata *chr, struct coord *pos)
@@ -14075,17 +13939,12 @@ s32 chrGetPadRoom(struct chrdata *chr, s32 pad_id)
 {
 	s32 ret = -1;
 	s32 pad_id_backup = pad_id;
-	struct pad pad;
 
 	if (pad_id >= 10000) {
 		s32 resolved_pad_id = chrResolvePadId(chr, pad_id - 10000);
 
-#if VERSION >= VERSION_NTSC_1_0
-		if (resolved_pad_id >= 0)
-#endif
-		{
-			padUnpack(resolved_pad_id, PADFIELD_ROOM, &pad);
-			ret = pad.room;
+		if (resolved_pad_id >= 0) {
+			ret = g_Pads[resolved_pad_id].room;
 		}
 	} else {
 		ret = pad_id;
@@ -14318,18 +14177,13 @@ f32 chrGetDistanceFromTargetToPad(struct chrdata *chr, s32 pad_id)
 {
 	struct prop *prop = chrGetTargetProp(chr);
 	f32 xdiff, ydiff, zdiff;
-	struct pad pad;
 	f32 distance = 0;
 	pad_id = chrResolvePadId(chr, pad_id);
 
-#if VERSION >= VERSION_NTSC_1_0
-	if (pad_id >= 0)
-#endif
-	{
-		padUnpack(pad_id, PADFIELD_POS, &pad);
-		xdiff = pad.pos.x - prop->pos.x;
-		ydiff = pad.pos.y - prop->pos.y;
-		zdiff = pad.pos.z - prop->pos.z;
+	if (pad_id >= 0) {
+		xdiff = g_Pads[pad_id].pos.x - prop->pos.x;
+		ydiff = g_Pads[pad_id].pos.y - prop->pos.y;
+		zdiff = g_Pads[pad_id].pos.z - prop->pos.z;
 		distance = sqrtf(xdiff * xdiff + ydiff * ydiff + zdiff * zdiff);
 	}
 
@@ -14418,9 +14272,9 @@ void chrRestartTimer(struct chrdata *chr)
 	chr->hidden |= CHRHFLAG_TIMER_RUNNING;
 }
 
-f32 chrGetTimer(struct chrdata *chr)
+s32 chrGetTimer(struct chrdata *chr)
 {
-	return chr->timer60 * FRAMEDURATION;
+	return chr->timer60;
 }
 
 bool chrCanSeeTargetWithExtraCheck(struct chrdata *chr)
@@ -14549,11 +14403,11 @@ bool waypointIsWithin90DegreesOfPosAngle(struct waypoint *waypoint, struct coord
 {
 	u32 stack[3];
 	f32 diffangle;
-	struct pad pad;
+	struct pad *pad;
 
-	padUnpack(waypoint->padnum, PADFIELD_POS, &pad);
+	pad = &g_Pads[waypoint->padnum];
 
-	diffangle = angle - atan2f(pad.pos.x - pos->x, pad.pos.z - pos->z);
+	diffangle = angle - atan2f(pad->pos.x - pos->x, pad->pos.z - pos->z);
 
 	if (diffangle < 0) {
 		diffangle += M_BADTAU;
@@ -14718,16 +14572,14 @@ bool chrSetChrPresetToChrNearSelf(u8 checktype, struct chrdata *chr, f32 distanc
 
 bool chrSetChrPresetToChrNearPad(u32 checktype, struct chrdata *chr, f32 distance, s32 padnum)
 {
-	struct pad pad;
 	s16 rooms[2];
 
 	padnum = chrResolvePadId(chr, padnum);
-	padUnpack(padnum, PADFIELD_POS | PADFIELD_ROOM, &pad);
 
-	rooms[0] = pad.room;
+	rooms[0] = g_Pads[padnum].room;
 	rooms[1] = -1;
 
-	return chrSetChrPresetToChrNearPos(checktype, chr, distance, &pad.pos, rooms);
+	return chrSetChrPresetToChrNearPos(checktype, chr, distance, &g_Pads[padnum].pos, rooms);
 }
 
 bool chrSetChrPresetToChrNearPos(u8 checktype, struct chrdata *chr, f32 distance, struct coord *pos, s16 *rooms)
@@ -14879,7 +14731,7 @@ bool chrSetPadPresetToPadOnRouteToTarget(struct chrdata *chr)
 	struct waypoint *waypoints[5];
 	s32 numwaypoints;
 	s32 i;
-	struct pad pad;
+	struct pad *pad;
 
 	if (target->type != PROPTYPE_PLAYER || g_Vars.bondvisible) {
 		if (cdTestLos04(&prop->pos, prop->rooms, &target->pos, CDTYPE_BG)) {
@@ -14901,10 +14753,10 @@ bool chrSetPadPresetToPadOnRouteToTarget(struct chrdata *chr)
 				for (i = 0; waypoints[i] != NULL; i++) {
 					struct waypoint *wp = waypoints[i];
 
-					padUnpack(wp->padnum, PADFIELD_POS, &pad);
+					pad = &g_Pads[wp->padnum];
 
-					if (cdTestLos04(&target->pos, target->rooms, &pad.pos, CDTYPE_BG)) {
-						if (cdTestLos04(&prop->pos, prop->rooms, &pad.pos, CDTYPE_BG)) {
+					if (cdTestLos04(&target->pos, target->rooms, &pad->pos, CDTYPE_BG)) {
+						if (cdTestLos04(&prop->pos, prop->rooms, &pad->pos, CDTYPE_BG)) {
 							chr->padpreset1 = wp->padnum;
 							return true;
 						}
@@ -15013,9 +14865,7 @@ bool chrAdjustPosForSpawn(f32 chrradius, struct coord *pos, s16 *rooms, f32 angl
 			if (cdTestVolume(&testpos, chrradius, testrooms, CDTYPE_ALL, CHECKVERTICAL_YES, ymax, ymin) != CDRESULT_COLLISION
 					&& (allowonscreen || chrIsPosOffScreen(&testpos, testrooms))
 					&& (!arg6 || ground > -100000)) {
-				pos->x = testpos.x;
-				pos->y = testpos.y;
-				pos->z = testpos.z;
+				*pos = testpos;
 				roomsCopy(testrooms, rooms);
 				return true;
 			}
@@ -15063,9 +14913,7 @@ bool chrAdjustPosForSpawn(f32 chrradius, struct coord *pos, s16 *rooms, f32 angl
 		if (cdTestLos11(pos, rooms, &testpos, testrooms, CDTYPE_BG)
 				&& cdTestVolume(&testpos, chrradius, testrooms, CDTYPE_ALL, CHECKVERTICAL_YES, 200, -200.0f) != CDRESULT_COLLISION
 				&& (allowonscreen || chrIsPosOffScreen(&testpos, testrooms))) {
-			pos->x = testpos.x;
-			pos->y = testpos.y;
-			pos->z = testpos.z;
+			*pos = testpos;
 			roomsCopy(testrooms, rooms);
 			return true;
 		}
@@ -15101,9 +14949,7 @@ struct prop *chrSpawnAtCoord(s32 bodynum, s32 headnum, struct coord *pos, s16 *r
 			headnum = bodyChooseHead(bodynum);
 		}
 
-		pos2.x = pos->x;
-		pos2.y = pos->y;
-		pos2.z = pos->z;
+		pos2 = *pos;
 		roomsCopy(rooms, rooms2);
 
 #if VERSION >= VERSION_NTSC_1_0
@@ -15203,15 +15049,18 @@ struct prop *chrSpawnAtCoord(s32 bodynum, s32 headnum, struct coord *pos, s16 *r
 struct prop *chrSpawnAtPad(struct chrdata *basechr, s32 body, s32 head, s32 pad_id, u8 *ailist, u32 spawnflags)
 {
 	s32 resolved_pad_id = chrResolvePadId(basechr, pad_id);
-	struct pad pad;
+	struct pad *pad;
 	s16 room[2];
 	f32 fvalue;
-	padUnpack(resolved_pad_id, PADFIELD_POS | PADFIELD_LOOK | PADFIELD_ROOM, &pad);
-	fvalue = atan2f(pad.look.x, pad.look.z);
-	room[0] = pad.room;
+
+	pad = &g_Pads[resolved_pad_id];
+
+	fvalue = atan2f(pad->look.x, pad->look.z);
+
+	room[0] = pad->room;
 	room[1] = -1;
 
-	return chrSpawnAtCoord(body, head, &pad.pos, &room[0], fvalue, ailist, spawnflags);
+	return chrSpawnAtCoord(body, head, &pad->pos, &room[0], fvalue, ailist, spawnflags);
 }
 
 struct prop *chrSpawnAtChr(struct chrdata *basechr, s32 body, s32 head, u32 chrnum, u8 *ailist, u32 spawnflags)
@@ -15268,9 +15117,7 @@ bool chrMoveToPos(struct chrdata *chr, struct coord *pos, s16 *rooms, f32 angle,
 	struct player *player;
 	f32 ground;
 
-	pos2.x = pos->x;
-	pos2.y = pos->y;
-	pos2.z = pos->z;
+	pos2 = *pos;
 
 	roomsCopy(rooms, rooms2);
 	propSetPerimEnabled(chr->prop, false);
@@ -15287,9 +15134,7 @@ bool chrMoveToPos(struct chrdata *chr, struct coord *pos, s16 *rooms, f32 angle,
 		chr->ground = ground;
 		chr->manground = ground;
 		chr->sumground = ground * (PAL ? 8.4175090789795f : 9.999998f);
-		chr->prop->pos.x = pos2.x;
-		chr->prop->pos.y = pos2.y;
-		chr->prop->pos.z = pos2.z;
+		chr->prop->pos = pos2;
 
 		propDeregisterRooms(chr->prop);
 		roomsCopy(rooms2, chr->prop->rooms);
@@ -15763,9 +15608,7 @@ bool chr0f04c874(struct chrdata *chr, u32 angle360, struct coord *pos, u8 arg3, 
 	f32 ymin;
 	f32 radius;
 
-	chrpos.x = chr->prop->pos.x;
-	chrpos.y = chr->prop->pos.y;
-	chrpos.z = chr->prop->pos.z;
+	chrpos = chr->prop->pos;
 
 	do {
 		f32 angle360f = angle360;
@@ -15816,9 +15659,7 @@ bool chr0f04c874(struct chrdata *chr, u32 angle360, struct coord *pos, u8 arg3, 
 			scale = (tmp - 50.0f) / tmp;
 
 			if (scale < 0) {
-				pos->x = chrpos.x;
-				pos->y = chrpos.y;
-				pos->z = chrpos.z;
+				*pos = chrpos;
 			} else {
 				xdiff *= scale;
 				zdiff *= scale;
@@ -15836,9 +15677,7 @@ bool chr0f04c874(struct chrdata *chr, u32 angle360, struct coord *pos, u8 arg3, 
 
 			sqdist = xdiff * xdiff + ydiff * ydiff + zdiff * zdiff;
 
-			saved.x = pos->x;
-			saved.y = pos->y;
-			saved.z = pos->z;
+			saved = *pos;
 
 			angle360 = 360 - angle360;
 			again = true;

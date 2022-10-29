@@ -933,18 +933,14 @@ u8 func0405_init_scientist[] = {
 
 u8 func0404_scientist[] = {
 	set_shotlist(AILIST_SCIENTIST)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x2f)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2f)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x2f)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x2f)
 	goto_next(0x06)
 
 	label(0x2f)
-	dprint 'N','I','S','D','E','A','D','\n',0,
 	set_shotlist(GAILIST_IDLE)
 	set_ailist(CHR_SELF, GAILIST_IDLE)
 
 	label(0x06)
-	dprint 'N','I','S','2','\n',0,
 	if_just_injured(CHR_SELF, /*goto*/ 0x2f)
 	goto_next(0x06)
 
@@ -992,16 +988,12 @@ u8 func0404_scientist[] = {
 		chr_do_animation(ANIM_COWER_0229, -1, -1, CHRANIMFLAG_SLOWUPDATE, 10, CHR_SELF, 2)
 
 		beginloop(0x6b)
-			if_chr_dead(0x2b, /*goto*/ 0x2f)
-			if_chr_death_animation_finished(0x2b, /*goto*/ 0x2f)
-			if_chr_knockedout(0x2b, /*goto*/ 0x2f)
+			if_chr_deadish(0x2b, /*goto*/ 0x2f)
 			if_chr_stopped(/*goto*/ 0x6c)
 			reloop(0x6b)
 
 			label(0x2f)
-			if_chr_dead(0x2c, /*goto*/ 0x06)
-			if_chr_death_animation_finished(0x2c, /*goto*/ 0x06)
-			if_chr_knockedout(0x2c, /*goto*/ 0x06)
+			if_chr_deadish(0x2c, /*goto*/ 0x06)
 			if_chr_stopped(/*goto*/ 0x6c)
 		endloop(0x6b)
 
@@ -1012,16 +1004,12 @@ u8 func0404_scientist[] = {
 		chr_do_animation(ANIM_COWER_0229, -1, -1, CHRANIMFLAG_SLOWUPDATE, 10, CHR_SELF, 2)
 
 		beginloop(0x6e)
-			if_chr_dead(0x2d, /*goto*/ 0x2f)
-			if_chr_death_animation_finished(0x2d, /*goto*/ 0x2f)
-			if_chr_knockedout(0x2d, /*goto*/ 0x2f)
+			if_chr_deadish(0x2d, /*goto*/ 0x2f)
 			if_chr_stopped(/*goto*/ 0x6f)
 			reloop(0x6e)
 
 			label(0x2f)
-			if_chr_dead(0x2e, /*goto*/ 0x06)
-			if_chr_death_animation_finished(0x2e, /*goto*/ 0x06)
-			if_chr_knockedout(0x2e, /*goto*/ 0x06)
+			if_chr_deadish(0x2e, /*goto*/ 0x06)
 			if_chr_stopped(/*goto*/ 0x6f)
 		endloop(0x6e)
 
@@ -1043,7 +1031,6 @@ u8 func0404_scientist[] = {
 	goto_first(0x09)
 
 	label(0x06)
-	dprint 'T','A','L','K',' ','1','\n',0,
 	say_quip(CHR_TARGET, 0x0a, 0xff, 0x00, 0xff, 0x81, 0x03, 0x08)
 	restart_timer
 	stop_chr
@@ -1055,7 +1042,6 @@ u8 func0404_scientist[] = {
 	endloop(0x56)
 
 	label(0x06)
-	dprint 'T','A','L','K',' ','1','\n',0,
 	say_quip(CHR_TARGET, 0x0b, 0xff, 0x00, 0xff, 0x81, 0x04, 0x09)
 	restart_timer
 
@@ -1173,19 +1159,14 @@ u8 func0407_init_nasty_scientist[] = {
 
 u8 func0406_nasty_scientist[] = {
 	set_shotlist(AILIST_NASTY_SCIENTIST)
-	dprint 'N','A','S','T','Y','1','\n',0,
-	if_chr_dead(CHR_SELF, /*goto*/ 0x2f)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2f)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x2f)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x2f)
 	goto_next(0x06)
 
 	label(0x2f)
-	dprint 'N','A','S','T','Y',' ','D','E','A','D','\n',0,
 	set_shotlist(GAILIST_IDLE)
 	set_ailist(CHR_SELF, GAILIST_IDLE)
 
 	label(0x06)
-	dprint 'N','A','S','T','Y','2','\n',0,
 	if_just_injured(CHR_SELF, /*goto*/ 0x2f)
 	if_num_times_shot_lt(1, /*goto*/ 0x06)
 	label(0x2f)
@@ -1235,7 +1216,6 @@ u8 func0406_nasty_scientist[] = {
 	endloop(0x56)
 
 	label(0x06)
-	dprint 'T','A','L','K',' ','1','\n',0,
 	say_quip(CHR_TARGET, 0x0b, 0xff, 0x00, 0xff, 0x81, 0x04, 0x09)
 	restart_timer
 
@@ -2077,7 +2057,6 @@ u8 func100b_check_uplink_pc_destroyed[] = {
 };
 
 u8 func0411_yellowbot[] = {
-	dprint 'h','o','v','\n',0,
 	label(0x03)
 		begin_hovercar_path(0x05)
 		set_vehicle_speed(512, 120)
@@ -2101,11 +2080,9 @@ u8 func0411_yellowbot[] = {
 };
 
 u8 func0412_purplebot_programs[] = {
-	dprint 'h','o','v','\n',0,
 	if_difficulty_gt(DIFF_A, /*goto*/ 0x04)
 
 	// Agent
-	dprint 'm','o','v','\n',0,
 	move_object_to_pad(OBJ_PURPLEBOT, PAD_EAR_00BE)
 	goto_next(0x14)
 
@@ -2375,7 +2352,6 @@ u8 func0417_outro[] = {
 	set_ailist(CHR_DRCAROLL, GAILIST_IDLE)
 	set_ailist(CHR_K7_GUARD, GAILIST_IDLE)
 	restart_timer
-	dprint 's','h','o','t',' ','1',0,
 	camera_movement(ANIM_CUT_EAR_OUTRO_CAM_01)
 	chr_do_animation(ANIM_CUT_EAR_OUTRO_JO_01, -1, -1, CHRANIMFLAG_MOVEWHENINVIS | CHRANIMFLAG_PAUSEATEND, 0, CHR_P1P2, 2)
 	set_cutscene_weapon(CHR_P1P2, -1, -1)
@@ -2394,21 +2370,18 @@ u8 func0417_outro[] = {
 
 	wait_for_camera(0x08)
 
-	dprint 's','h','o','t',' ','2',0,
 	if_controller_button_pressed(/*goto*/ 0x06)
 	camera_movement(ANIM_CUT_EAR_OUTRO_CAM_02)
 	chr_do_animation(ANIM_CUT_EAR_OUTRO_JO_02, -1, -1, CHRANIMFLAG_MOVEWHENINVIS | CHRANIMFLAG_PAUSEATEND, 0, CHR_P1P2, 2)
 
 	wait_for_camera(0x09)
 
-	dprint 's','h','o','t',' ','3',0,
 	if_controller_button_pressed(/*goto*/ 0x06)
 	camera_movement(ANIM_CUT_EAR_OUTRO_CAM_03)
 	chr_do_animation(ANIM_CUT_EAR_OUTRO_JO_03, -1, -1, CHRANIMFLAG_MOVEWHENINVIS | CHRANIMFLAG_PAUSEATEND, 0, CHR_P1P2, 2)
 
 	wait_for_camera(0x0a)
 
-	dprint 's','h','o','t',' ','4',0,
 	if_controller_button_pressed(/*goto*/ 0x06)
 	camera_movement(ANIM_CUT_EAR_OUTRO_CAM_04)
 	chr_do_animation(ANIM_CUT_EAR_OUTRO_JO_04, -1, -1, CHRANIMFLAG_MOVEWHENINVIS | CHRANIMFLAG_PAUSEATEND, 0, CHR_P1P2, 2)
@@ -2434,7 +2407,6 @@ u8 func0417_outro[] = {
 
 	label(0x2f)
 	label(0x06)
-	dprint 's','h','o','t',' ','5',0,
 	if_controller_button_pressed(/*goto*/ 0x06)
 	unset_chr_chrflag(CHR_DRCAROLL, CHRCFLAG_HIDDEN)
 	set_chr_chrflag(CHR_DRCAROLL, CHRCFLAG_UNPLAYABLE)
@@ -2445,7 +2417,6 @@ u8 func0417_outro[] = {
 
 	wait_for_camera(0x0c)
 
-	dprint 's','h','o','t',' ','6',0,
 	if_controller_button_pressed(/*goto*/ 0x06)
 	camera_movement(ANIM_CUT_EAR_OUTRO_CAM_06)
 	chr_do_animation(ANIM_CUT_EAR_OUTRO_JO_06, -1, -1, CHRANIMFLAG_MOVEWHENINVIS | CHRANIMFLAG_PAUSEATEND, 0, CHR_P1P2, 2)
@@ -2453,7 +2424,6 @@ u8 func0417_outro[] = {
 
 	wait_for_camera(0x0d)
 
-	dprint 's','h','o','t',' ','7',0,
 	if_controller_button_pressed(/*goto*/ 0x06)
 	camera_movement(ANIM_CUT_EAR_OUTRO_CAM_07)
 	chr_do_animation(ANIM_CUT_EAR_OUTRO_JO_07, -1, -1, CHRANIMFLAG_MOVEWHENINVIS | CHRANIMFLAG_PAUSEATEND, 0, CHR_P1P2, 2)
@@ -2461,7 +2431,6 @@ u8 func0417_outro[] = {
 
 	wait_for_camera(0x0e)
 
-	dprint 's','h','o','t',' ','8',0,
 	camera_movement(ANIM_CUT_EAR_OUTRO_CAM_08)
 	chr_do_animation(ANIM_CUT_EAR_OUTRO_JO_08, -1, -1, CHRANIMFLAG_MOVEWHENINVIS | CHRANIMFLAG_PAUSEATEND, 0, CHR_P1P2, 2)
 	chr_do_animation(ANIM_CUT_EAR_OUTRO_DRC_04, -1, -1, CHRANIMFLAG_MOVEWHENINVIS | CHRANIMFLAG_PAUSEATEND, 0, CHR_DRCAROLL, 2)
@@ -2632,7 +2601,6 @@ u8 func100f_check_for_end_level[] = {
 
 		label(0x06)
 		set_stage_flag(STAGEFLAG_DRCAROLL_LOCATED)
-		dprint 's','h','o','t',' ','6',0,
 		yield
 #if VERSION < VERSION_NTSC_1_0
 		yield
@@ -2641,15 +2609,11 @@ u8 func100f_check_for_end_level[] = {
 	endloop(0x04)
 
 	label(0x2f)
-	if_chr_death_animation_finished(CHR_BOND, /*goto*/ 0x2f)
-	if_chr_dead(CHR_BOND, /*goto*/ 0x2f)
-	if_chr_knockedout(CHR_BOND, /*goto*/ 0x2f)
+	if_chr_deadish(CHR_BOND, /*goto*/ 0x2f)
 	goto_next(0x06)
 
 	label(0x2f)
-	if_chr_death_animation_finished(CHR_COOP, /*goto*/ 0x2f)
-	if_chr_dead(CHR_COOP, /*goto*/ 0x2f)
-	if_chr_knockedout(CHR_COOP, /*goto*/ 0x2f)
+	if_chr_deadish(CHR_COOP, /*goto*/ 0x2f)
 	goto_next(0x06)
 
 	label(0x2f)

@@ -1213,9 +1213,7 @@ void botApplyProtect(struct chrdata *chr, struct prop *prop)
 void botApplyDefend(struct chrdata *chr, struct coord *pos, s16 *room, f32 arg3)
 {
 	chr->aibot->command = AIBOTCMD_DEFEND;
-	chr->aibot->defendholdpos.x = pos->x;
-	chr->aibot->defendholdpos.y = pos->y;
-	chr->aibot->defendholdpos.z = pos->z;
+	chr->aibot->defendholdpos = *pos;
 	roomsCopy(room, chr->aibot->defendholdrooms);
 	chr->aibot->unk098 = arg3;
 	chr->aibot->forcemainloop = true;
@@ -1224,9 +1222,7 @@ void botApplyDefend(struct chrdata *chr, struct coord *pos, s16 *room, f32 arg3)
 void botApplyHold(struct chrdata *chr, struct coord *pos, s16 *room, f32 arg3)
 {
 	chr->aibot->command = AIBOTCMD_HOLD;
-	chr->aibot->defendholdpos.x = pos->x;
-	chr->aibot->defendholdpos.y = pos->y;
-	chr->aibot->defendholdpos.z = pos->z;
+	chr->aibot->defendholdpos = *pos;
 	roomsCopy(room, chr->aibot->defendholdrooms);
 	chr->aibot->unk098 = arg3;
 	chr->aibot->forcemainloop = true;
@@ -2775,9 +2771,7 @@ void botTickUnpaused(struct chrdata *chr)
 						} else {
 							// Token is not held - go to the pos to defend it
 							newaction = MA_AIBOTGOTOPOS;
-							aibot->gotopos.x = token->pos.x;
-							aibot->gotopos.y = token->pos.y;
-							aibot->gotopos.z = token->pos.z;
+							aibot->gotopos = token->pos;
 							roomsCopy(token->rooms, aibot->gotorooms);
 							aibot->unk04c_00 = false;
 						}
@@ -2803,9 +2797,7 @@ void botTickUnpaused(struct chrdata *chr)
 
 							if (botroomFindPos(g_ScenarioData.koh.hillrooms[0], &posinhill, &angle, &padnuminhill, &covernuminhill)) {
 								newaction = MA_AIBOTGOTOPOS;
-								aibot->gotopos.x = posinhill.x;
-								aibot->gotopos.y = posinhill.y;
-								aibot->gotopos.z = posinhill.z;
+								aibot->gotopos = posinhill;
 								roomsCopy(g_ScenarioData.koh.hillrooms, aibot->gotorooms);
 								aibot->unk04c_00 = (chr->prop->rooms[0] == g_ScenarioData.koh.hillrooms[0]) != 0;
 								aibot->hillpadnum = padnuminhill;
@@ -2825,9 +2817,7 @@ void botTickUnpaused(struct chrdata *chr)
 						// Go to the hill if not there already
 						if (botroomFindPos(g_ScenarioData.koh.hillrooms[0], &posinhill, &angle, &padnuminhill, &covernuminhill)) {
 							newaction = MA_AIBOTGOTOPOS;
-							aibot->gotopos.x = posinhill.x;
-							aibot->gotopos.y = posinhill.y;
-							aibot->gotopos.z = posinhill.z;
+							aibot->gotopos = posinhill;
 							roomsCopy(g_ScenarioData.koh.hillrooms, aibot->gotorooms);
 							aibot->unk04c_00 = (chr->prop->rooms[0] == g_ScenarioData.koh.hillrooms[0]) != 0;
 							aibot->hillpadnum = padnuminhill;
@@ -2994,14 +2984,12 @@ void botTickUnpaused(struct chrdata *chr)
 				} else if (g_MpSetup.scenario == MPSCENARIO_CAPTURETHECASE) {
 					// If the bot is holding an opponent's token, take it home
 					if (botShouldReturnCtcToken(chr)) {
-						struct pad pad;
+						struct pad *pad;
 						s32 teamindex = g_ScenarioData.ctc.teamindexes[radarGetTeamIndex(chr->team)];
 						newaction = MA_AIBOTGOTOPOS;
-						padUnpack(g_ScenarioData.ctc.spawnpadsperteam[teamindex].homepad, PADFIELD_POS | PADFIELD_ROOM, &pad);
-						aibot->gotopos.x = pad.pos.x;
-						aibot->gotopos.y = pad.pos.y;
-						aibot->gotopos.z = pad.pos.z;
-						aibot->gotorooms[0] = pad.room;
+						pad = &g_Pads[g_ScenarioData.ctc.spawnpadsperteam[teamindex].homepad];
+						aibot->gotopos = pad->pos;
+						aibot->gotorooms[0] = pad->room;
 						aibot->gotorooms[1] = -1;
 						aibot->unk04c_00 = false;
 					}

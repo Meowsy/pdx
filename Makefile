@@ -22,7 +22,7 @@ ROMID ?= ntsc-final
 #
 # If enabled, all further options are ignored and are set automatically.
 
-MATCHING = 1
+MATCHING = 0
 
 # COMPILER - Choose which compiler to use.
 #
@@ -57,7 +57,7 @@ PAL = 0
 
 ROMALLOCATION_DATA = 0x015000
 ROMALLOCATION_LIB  = 0x038800
-ROMALLOCATION_GAME = 0x144ee0
+ROMALLOCATION_GAME = 0x100000
 
 # ROM_SIZE - The desired ROM size in megabytes.
 #

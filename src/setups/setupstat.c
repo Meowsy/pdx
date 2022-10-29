@@ -343,9 +343,7 @@ u8 func0402_init_king[] = {
 u8 func0401_defend[] = {
 	set_shotlist(AILIST_DEFEND)
 	set_self_chrflag(CHRCFLAG_NOAUTOAIM)
-	if_chr_dead(CHR_SELF, /*goto*/ 0x2d)
-	if_chr_death_animation_finished(CHR_SELF, /*goto*/ 0x2d)
-	if_chr_knockedout(CHR_SELF, /*goto*/ 0x2d)
+	if_chr_deadish(CHR_SELF, /*goto*/ 0x2d)
 	goto_next(0x06)
 
 	// Dying
@@ -368,7 +366,6 @@ u8 func0401_defend[] = {
 
 		// Wait until at pad or 1 second has passed
 		beginloop(0x04)
-			dprint 'G','O',' ','T','O',' ','P','A','D','\n',0,
 			if_enemy_distance_lt_and_los(2540, /*goto*/ 0x08)
 			if_chr_distance_to_pad_lt(CHR_SELF, 200, PAD_PRESET, /*goto*/ 0x06)
 			if_timer_gt(60, /*goto*/ 0x2d)
@@ -405,10 +402,7 @@ u8 func0401_defend[] = {
 		endloop(0x8f)
 
 		label(0x2d)
-		if_chr_knockedout(CHR_TARGET, /*goto*/ 0x2d)
-		if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x2d)
-		if_chr_dead(CHR_TARGET, /*goto*/ 0x2d)
-		dprint 'D','E','T','E','C','T','E','D','\n',0,
+		if_chr_deadish(CHR_TARGET, /*goto*/ 0x2d)
 		set_returnlist(CHR_SELF, AILIST_DEFEND)
 		set_shotlist(AILIST_DEFEND)
 		set_ailist(CHR_SELF, GAILIST_COMBAT_WITH_TARGET)
@@ -453,7 +447,6 @@ u8 func1003_spawn_maians[] = {
 
 		// Successful spawn
 		label(0x8e)
-		dprint 'C','R','E','A','T','E','D',' ','1','\n',0,
 		yield
 		subtract_morale(1)
 		yield
@@ -476,7 +469,6 @@ u8 func1003_spawn_maians[] = {
 		restart_timer
 
 		beginloop(0x08)
-			dprint 'S','Q','U','A','D',' ','F','U','L','L','\n',0,
 			if_timer_gt(300, /*goto*/ 0x2d)
 		endloop(0x08)
 
@@ -533,17 +525,13 @@ u8 func0404_maian[] = {
 
 	label(0x03)
 		set_target_chr(CHR_KING1)
-		if_chr_dead(CHR_KING1, /*goto*/ 0x8f)
-		if_chr_death_animation_finished(CHR_KING1, /*goto*/ 0x8f)
-		if_chr_knockedout(CHR_KING1, /*goto*/ 0x8f)
+		if_chr_deadish(CHR_KING1, /*goto*/ 0x8f)
 		goto_next(0x2d)
 
 		// King 1 dead
 		label(0x8f)
 		set_target_chr(CHR_KING2)
-		if_chr_dead(CHR_KING2, /*goto*/ 0x90)
-		if_chr_death_animation_finished(CHR_KING2, /*goto*/ 0x90)
-		if_chr_knockedout(CHR_KING2, /*goto*/ 0x90)
+		if_chr_deadish(CHR_KING2, /*goto*/ 0x90)
 		goto_next(0x2d)
 
 		// King 2 dead
@@ -557,11 +545,8 @@ u8 func0404_maian[] = {
 		try_run_to_target(/*goto*/ 0x04)
 
 		beginloop(0x04)
-			dprint 'G','O',' ','T','O',' ','P','A','D','\n',0,
 			if_enemy_distance_lt_and_los(2540, /*goto*/ 0x08)
-			if_chr_dead(CHR_TARGET, /*goto*/ 0x06)
-			if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x06)
-			if_chr_knockedout(CHR_TARGET, /*goto*/ 0x06)
+			if_chr_deadish(CHR_TARGET, /*goto*/ 0x06)
 		endloop(0x04)
 
 		// King died while running to him
@@ -570,10 +555,7 @@ u8 func0404_maian[] = {
 
 		// Maian has line of sight to king
 		label(0x08)
-		dprint 'D','E','T','E','C','T','E','D','\n',0,
-		if_chr_dead(CHR_TARGET, /*goto*/ 0x06)
-		if_chr_death_animation_finished(CHR_TARGET, /*goto*/ 0x06)
-		if_chr_knockedout(CHR_TARGET, /*goto*/ 0x06)
+		if_chr_deadish(CHR_TARGET, /*goto*/ 0x06)
 		set_returnlist(CHR_SELF, AILIST_MAIAN)
 		set_shotlist(AILIST_MAIAN)
 		set_ailist(CHR_SELF, GAILIST_COMBAT_WITH_TARGET)
@@ -616,7 +598,6 @@ u8 func1004_spawn_king1_skedar[] = {
 
 		// Successful spawn
 		label(0x8e)
-		dprint 'C','R','E','A','T','E','D',' ','1','\n',0,
 		yield
 		subtract_morale(1)
 		yield
@@ -641,7 +622,6 @@ u8 func1004_spawn_king1_skedar[] = {
 
 		beginloop(0x08)
 			if_stage_flag_eq(STAGEFLAG_KING1_DEAD, TRUE, /*goto*/ 0x0e)
-			dprint 'S','Q','U','A','D',' ','F','U','L','L','\n',0,
 			if_num_chrs_in_squadron_gt(3, GROUP_MAIANS, /*goto*/ 0x2e)
 			if_timer_gt(60, /*goto*/ 0x2d)
 			label(0x2e)
@@ -902,12 +882,10 @@ u8 func0406_skedar[] = {
 	try_run_to_target(/*goto*/ 0x04)
 
 	beginloop(0x04)
-		dprint 'G','O',' ','T','O',' ','P','A','D','\n',0,
 		if_enemy_distance_lt_and_los(2540, /*goto*/ 0x08)
 	endloop(0x04)
 
 	label(0x08)
-	dprint 'D','E','T','E','C','T','E','D','\n',0,
 	set_returnlist(CHR_SELF, AILIST_SKEDAR)
 	set_shotlist(AILIST_SKEDAR)
 	set_ailist(CHR_SELF, GAILIST_COMBAT_WITH_TARGET)
@@ -916,9 +894,7 @@ u8 func0406_skedar[] = {
 
 u8 func1005_check_leader_dead[] = {
 	beginloop(0x03)
-		if_chr_death_animation_finished(CHR_MAIAN_LEADER, /*goto*/ 0x2d)
-		if_chr_dead(CHR_MAIAN_LEADER, /*goto*/ 0x2d)
-		if_chr_knockedout(CHR_MAIAN_LEADER, /*goto*/ 0x2d)
+		if_chr_deadish(CHR_MAIAN_LEADER, /*goto*/ 0x2d)
 	endloop(0x03)
 
 	label(0x2d)
@@ -932,9 +908,7 @@ u8 func1009_check_king1_dead[] = {
 	set_object_flag(OBJ_BRIDGE, OBJFLAG_DEACTIVATED)
 
 	beginloop(0x03)
-		if_chr_death_animation_finished(CHR_KING1, /*goto*/ 0x2d)
-		if_chr_dead(CHR_KING1, /*goto*/ 0x2d)
-		if_chr_knockedout(CHR_KING1, /*goto*/ 0x2d)
+		if_chr_deadish(CHR_KING1, /*goto*/ 0x2d)
 	endloop(0x03)
 
 	label(0x2d)
@@ -951,9 +925,7 @@ u8 func100a_check_king2_dead[] = {
 	if_difficulty_lt(DIFF_SA, /*goto*/ 0x0e)
 
 	beginloop(0x03)
-		if_chr_death_animation_finished(CHR_KING2, /*goto*/ 0x2d)
-		if_chr_dead(CHR_KING2, /*goto*/ 0x2d)
-		if_chr_knockedout(CHR_KING2, /*goto*/ 0x2d)
+		if_chr_deadish(CHR_KING2, /*goto*/ 0x2d)
 	endloop(0x03)
 
 	label(0x2d)
@@ -969,9 +941,7 @@ u8 func100b_check_king3_dead[] = {
 	if_difficulty_lt(DIFF_PA, /*goto*/ 0x0e)
 
 	beginloop(0x03)
-		if_chr_death_animation_finished(CHR_KING3, /*goto*/ 0x2d)
-		if_chr_dead(CHR_KING3, /*goto*/ 0x2d)
-		if_chr_knockedout(CHR_KING3, /*goto*/ 0x2d)
+		if_chr_deadish(CHR_KING3, /*goto*/ 0x2d)
 	endloop(0x03)
 
 	label(0x2d)
@@ -998,16 +968,12 @@ u8 func1007_check_end_level[] = {
 
 	// Check Jo not dead
 	label(0x2d)
-	if_chr_death_animation_finished(CHR_BOND, /*goto*/ 0x2d)
-	if_chr_dead(CHR_BOND, /*goto*/ 0x2d)
-	if_chr_knockedout(CHR_BOND, /*goto*/ 0x2d)
+	if_chr_deadish(CHR_BOND, /*goto*/ 0x2d)
 	goto_next(0x06)
 
 	// Check Velvet not dead
 	label(0x2d)
-	if_chr_death_animation_finished(CHR_COOP, /*goto*/ 0x2d)
-	if_chr_dead(CHR_COOP, /*goto*/ 0x2d)
-	if_chr_knockedout(CHR_COOP, /*goto*/ 0x2d)
+	if_chr_deadish(CHR_COOP, /*goto*/ 0x2d)
 	goto_next(0x06)
 
 	// Mission failed

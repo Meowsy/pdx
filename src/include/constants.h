@@ -21,9 +21,12 @@
 #define MINFLOAT ((float)-3.40282346638528860e+38)
 #define MAXFLOAT ((float)3.40282346638528860e+38)
 
+#define AILABEL(ailist, upper, lower) ((ailist) + ((upper) << 8 | (lower)))
+
 #define ABS(val)            ((val) > 0 ? (val) : -(val))
 #define ABSF(val)           ((val) > 0.0f ? (val) : -(val))
 #define ALIGN2(val)         (((val) | 1) ^ 0x1)
+#define ALIGN4(val)         ((((val) + 0x3) | 0x3) ^ 0x3)
 #define ALIGN8(val)         ((((val) + 0x7) | 0x7) ^ 0x7)
 #define ALIGN16(val)        ((((val) + 0xf) | 0xf) ^ 0xf)
 #define ALIGN64(val)        (((((u32)(val)) + 0x3f) | 0x3f) ^ 0x3f)
@@ -31,13 +34,13 @@
 #define CHRRACE(chr)        (chr ? chr->race : RACE_HUMAN)
 #define CRASH()             *(u8 *)0 = 69
 #define CYCLES_PER_FRAME    ((s32) OS_CPU_COUNTER / (PAL ? 50 : 60))
-#define IS4MB()             (g_Is4Mb == true)
-#define IS8MB()             (g_Is4Mb != true)
+#define IS4MB()             0
+#define IS8MB()             1
 #define LINEHEIGHT          (VERSION == VERSION_JPN_FINAL ? 14 : 11)
 #define MIXCOLOUR(dialog, property) dialog->transitionfrac < 0.0f ? g_MenuColourPalettes[dialog->type].property : colourBlend(g_MenuColourPalettes[dialog->type2].property, g_MenuColourPalettes[dialog->type].property, dialog->colourweight)
 #define MPCHR(index)        ((index) < 4 ? &g_PlayerConfigsArray[index].base : &g_BotConfigsArray[(index) - 4].base)
-#define PLAYERCOUNT()       ((g_Vars.players[0] ? 1 : 0) + (g_Vars.players[1] ? 1 : 0) + (g_Vars.players[2] ? 1 : 0) + (g_Vars.players[3] ? 1 : 0))
-#define RANDOMFRAC()        (random() * (1.0f / U32_MAX))
+#define PLAYERCOUNT()       g_Vars.playercount
+#define RANDOMFRAC()        randomfrac()
 #define SECSTOTIME240(secs) (secs * 240)
 #define SECSTOTIME60(secs)  (secs * 60)
 #define PFS(device)         (device == SAVEDEVICE_GAMEPAK ? NULL : &g_Pfses[device])
@@ -86,6 +89,7 @@
 #define N64CHAR(c)          (c == ' ' ? 0x0f : (c >= 'A' && c <= 'Z' ? c - 0x27 : c - 0x20))
 
 #define PORTAL_IS_CLOSED(portalnum) ((g_BgPortals[portalnum].flags & PORTALFLAG_CLOSED) && (g_BgPortals[portalnum].flags & PORTALFLAG_FORCEOPEN) == 0)
+#define PORTAL_IS_OPEN(portalnum) (!PORTAL_IS_CLOSED(portalnum))
 
 #ifdef __sgi
 #define ALIGNED16
@@ -657,9 +661,9 @@ enum cheatcats {
 #define CIQUIP_ANNOYED  2
 #define CIQUIP_THANKS   3
 
-#define CMD_LABEL 0x0002
-#define CMD_END   0x0004
-#define CMD_PRINT 0x00b5
+#define CMD_LABEL     0x9400
+#define CMD_END       0x9600
+#define CMD_GOTOFIRST 0x0100
 
 // Collision detection
 #define CDRESULT_ERROR       -1
@@ -3882,12 +3886,12 @@ enum mpweapons {
 #define SQUADRON_0E 0x0e
 #define SQUADRON_0F 0x0f
 
-#define STACKSIZE_RMON  0x300
+#define STACKSIZE_RMON  0x40
 #define STACKSIZE_IDLE  0x40
 #define STACKSIZE_SCHED 0x400
 #define STACKSIZE_MAIN  0x9800
 #define STACKSIZE_AUDIO 0x1000
-#define STACKSIZE_FAULT 0x2000
+#define STACKSIZE_FAULT 0x40
 #define STACKSIZE_RESET 0x100
 
 #define STACK_START (0x80400000 \

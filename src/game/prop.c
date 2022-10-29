@@ -611,21 +611,13 @@ struct prop *shotCalculateHits(s32 handnum, bool arg1, struct coord *arg2, struc
 
 	bgun0f0a9494(arg6);
 
-	shotdata.gunpos.x = gunpos->x;
-	shotdata.gunpos.y = gunpos->y;
-	shotdata.gunpos.z = gunpos->z;
+	shotdata.gunpos = *gunpos;
 
-	shotdata.unk00.x = arg2->x;
-	shotdata.unk00.y = arg2->y;
-	shotdata.unk00.z = arg2->z;
+	shotdata.unk00 = *arg2;
 
-	shotdata.dir.x = dir->x;
-	shotdata.dir.y = dir->y;
-	shotdata.dir.z = dir->z;
+	shotdata.dir = *dir;
 
-	shotdata.unk0c.x = arg3->x;
-	shotdata.unk0c.y = arg3->y;
-	shotdata.unk0c.z = arg3->z;
+	shotdata.unk0c = *arg3;
 
 	gsetPopulateFromCurrentPlayer(handnum, &shotdata.gset);
 	func = gsetGetWeaponFunction(&shotdata.gset);
@@ -708,9 +700,7 @@ struct prop *shotCalculateHits(s32 handnum, bool arg1, struct coord *arg2, struc
 
 					sp694 = sp664;
 
-					hitpos.x = sp664.unk00.x;
-					hitpos.y = sp664.unk00.y;
-					hitpos.z = sp664.unk00.z;
+					hitpos = sp664.unk00;
 				}
 			}
 		}
@@ -746,9 +736,7 @@ struct prop *shotCalculateHits(s32 handnum, bool arg1, struct coord *arg2, struc
 	hitindex = -1;
 
 	if (shotdata.hits[0].prop) {
-		spa0.x = shotdata.hits[0].pos.x;
-		spa0.y = shotdata.hits[0].pos.y;
-		spa0.z = shotdata.hits[0].pos.z;
+		spa0 = shotdata.hits[0].pos;
 		hitindex = 0;
 	}
 
@@ -782,9 +770,7 @@ struct prop *shotCalculateHits(s32 handnum, bool arg1, struct coord *arg2, struc
 				if (shotdata.hits[i].unk4d) {
 					sp6cc = true;
 					doexplosiveshells = explosiveshells;
-					hitpos.x = shotdata.hits[i].pos.x;
-					hitpos.y = shotdata.hits[i].pos.y;
-					hitpos.z = shotdata.hits[i].pos.z;
+					hitpos = shotdata.hits[i].pos;
 				} else if (shotdata.hits[i].unk4c
 						|| (explosiveshells && (obj->type == OBJTYPE_GLASS || obj->type == OBJTYPE_TINTEDGLASS))) {
 					s1++;
@@ -792,16 +778,12 @@ struct prop *shotCalculateHits(s32 handnum, bool arg1, struct coord *arg2, struc
 					if (s1 >= shotdata.penetration) {
 						sp6cc = true;
 						doexplosiveshells = explosiveshells;
-						hitpos.x = shotdata.hits[i].pos.x;
-						hitpos.y = shotdata.hits[i].pos.y;
-						hitpos.z = shotdata.hits[i].pos.z;
+						hitpos = shotdata.hits[i].pos;
 					}
 				}
 
 				if (doexplosiveshells) {
-					sp8c.x = shotdata.hits[i].pos.x;
-					sp8c.y = shotdata.hits[i].pos.y;
-					sp8c.z = shotdata.hits[i].pos.z;
+					sp8c = shotdata.hits[i].pos;
 
 					func0f065e74(&root->pos, root->rooms, &sp8c, sp7c);
 					explosionCreateSimple(0, &sp8c, sp7c, EXPLOSIONTYPE_PHOENIX, g_Vars.currentplayernum);
@@ -1082,9 +1064,7 @@ void func0f061fa8(struct shotdata *shotdata, struct prop *prop, f32 arg2, s32 hi
 			hit->model = model;
 			hit->unk4c = arg9;
 			hit->unk4d = arg10;
-			hit->pos.x = arg11->x;
-			hit->pos.y = arg11->y;
-			hit->pos.z = arg11->z;
+			hit->pos = *arg11;
 
 			fVar8 = sqrtf(arg12->f[0] * arg12->f[0] + arg12->f[1] * arg12->f[1] + arg12->f[2] * arg12->f[2]);
 
@@ -2208,7 +2188,7 @@ void propsTickPlayer(bool islastplayer)
 void propsTickPadEffects(void)
 {
 	s32 i;
-	struct pad pad;
+	struct pad *pad;
 	u32 stack;
 	struct coord up;
 	s16 rooms[2];
@@ -2219,36 +2199,34 @@ void propsTickPadEffects(void)
 		for (i = 0; i <= g_LastPadEffectIndex; i++) {
 			struct padeffectobj *effect = &g_PadEffects[i];
 
-			padUnpack(effect->pad, PADFIELD_ROOM, &pad);
+			pad = &g_Pads[effect->pad];
 
-			if (roomIsOnscreen(pad.room)) {
+			if (roomIsOnscreen(pad->room)) {
 				switch (effect->effect) {
 				case PADEFFECT_SPARKS:
 				case PADEFFECT_SPARKS2:
-					rooms[0] = pad.room;
+					rooms[0] = pad->room;
 					rooms[1] = -1;
 
-					padUnpack(effect->pad, PADFIELD_POS | PADFIELD_UP, &pad);
-
-					up.x = -pad.up.x;
-					up.y = -pad.up.y;
-					up.z = -pad.up.z;
+					up.x = -pad->up.x;
+					up.y = -pad->up.y;
+					up.z = -pad->up.z;
 
 					if ((random() % 2048) <= 50) {
-						sparksCreate(rooms[0], NULL, &pad.pos, &up, &pad.up, SPARKTYPE_ENVIRONMENTAL1);
-						propsnd0f0939f8(NULL, NULL, propsndGetRandomSparkSound(), -1, -1, 0, 0, 0, &pad.pos, -1, rooms, -1, -1, -1, -1);
+						sparksCreate(rooms[0], NULL, &pad->pos, &up, &pad->up, SPARKTYPE_ENVIRONMENTAL1);
+						propsnd0f0939f8(NULL, NULL, propsndGetRandomSparkSound(), -1, -1, 0, 0, 0, &pad->pos, -1, rooms, -1, -1, -1, -1);
 					}
 
 					if ((random() % 2048) <= 15) {
-						sparksCreate(rooms[0], NULL, &pad.pos, &up, &pad.up, SPARKTYPE_ENVIRONMENTAL1);
-						sparksCreate(rooms[0], NULL, &pad.pos, &up, &pad.up, SPARKTYPE_ENVIRONMENTAL2);
-						propsnd0f0939f8(NULL, NULL, propsndGetRandomSparkSound(), -1, -1, 0, 0, 0, &pad.pos, -1, rooms, -1, -1, -1, -1);
+						sparksCreate(rooms[0], NULL, &pad->pos, &up, &pad->up, SPARKTYPE_ENVIRONMENTAL1);
+						sparksCreate(rooms[0], NULL, &pad->pos, &up, &pad->up, SPARKTYPE_ENVIRONMENTAL2);
+						propsnd0f0939f8(NULL, NULL, propsndGetRandomSparkSound(), -1, -1, 0, 0, 0, &pad->pos, -1, rooms, -1, -1, -1, -1);
 					}
 
 					if ((random() % 2048) <= 5) {
-						sparksCreate(rooms[0], NULL, &pad.pos, &up, &pad.up, SPARKTYPE_ENVIRONMENTAL1);
-						sparksCreate(rooms[0], NULL, &pad.pos, &up, &pad.up, SPARKTYPE_ENVIRONMENTAL3);
-						propsnd0f0939f8(NULL, NULL, propsndGetRandomSparkSound(), -1, -1, 0, 0, 0, &pad.pos, -1, rooms, -1, -1, -1, -1);
+						sparksCreate(rooms[0], NULL, &pad->pos, &up, &pad->up, SPARKTYPE_ENVIRONMENTAL1);
+						sparksCreate(rooms[0], NULL, &pad->pos, &up, &pad->up, SPARKTYPE_ENVIRONMENTAL3);
+						propsnd0f0939f8(NULL, NULL, propsndGetRandomSparkSound(), -1, -1, 0, 0, 0, &pad->pos, -1, rooms, -1, -1, -1, -1);
 					}
 					break;
 				case PADEFFECT_OUTROSMOKE:
@@ -2272,11 +2250,10 @@ void propsTickPadEffects(void)
 						break;
 					}
 
-					rooms2[0] = pad.room;
+					rooms2[0] = pad->room;
 					rooms2[1] = -1;
 
-					padUnpack(effect->pad, PADFIELD_POS | PADFIELD_UP, &pad);
-					smokeCreateAtPadEffect(effect, &pad.pos, rooms2, type);
+					smokeCreateAtPadEffect(effect, &pad->pos, rooms2, type);
 					break;
 				case PADEFFECT_01:
 					break;

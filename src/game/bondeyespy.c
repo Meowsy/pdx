@@ -201,9 +201,7 @@ s32 eyespyCalculateNewPosition(struct coord *vel)
 
 		if (result == CDRESULT_NOCOLLISION) {
 			// Apply the destination
-			eyespyprop->pos.x = dstpos.x;
-			eyespyprop->pos.y = dstpos.y;
-			eyespyprop->pos.z = dstpos.z;
+			eyespyprop->pos = dstpos;
 
 			propDeregisterRooms(eyespyprop);
 
@@ -563,9 +561,7 @@ bool eyespyTryLaunch(void)
 	insafe = stageGetIndex(g_Vars.stagenum) == STAGEINDEX_G5BUILDING
 		&& g_Vars.currentplayer->prop->rooms[0] == 0x53;
 
-	playerpos.x = g_Vars.currentplayer->prop->pos.x;
-	playerpos.y = g_Vars.currentplayer->prop->pos.y;
-	playerpos.z = g_Vars.currentplayer->prop->pos.z;
+	playerpos = g_Vars.currentplayer->prop->pos;
 
 	chr->soundtimer = TICKS(10);
 
@@ -736,7 +732,7 @@ void eyespyProcessInput(bool allowbuttons)
 		exitpressed = c1buttons & R_TRIG;
 		activatepressed = c1buttons & B_BUTTON;
 	} else if (controlmode <= CONTROLMODE_14) {
-		aimpressed = c1buttons & (L_TRIG | R_TRIG);
+		aimpressed = c1buttons & (0 | R_TRIG);
 		shootpressed = c1buttons & Z_TRIG;
 		exitpressed = c1buttons & A_BUTTON;
 		activatepressed = c1buttons & B_BUTTON;
@@ -816,18 +812,18 @@ void eyespyProcessInput(bool allowbuttons)
 			forwardspeed = c1sticky;
 		}
 
-		ascendspeed = (c1buttons & (U_CBUTTONS | U_JPAD) ? 1 : 0) - (c1buttons & (D_CBUTTONS | D_JPAD) ? 1 : 0);
-		sidespeed = (c1buttons & (R_CBUTTONS | R_JPAD) ? 1 : 0) - (c1buttons & (L_CBUTTONS | L_JPAD) ? 1 : 0);
+		ascendspeed = (c1buttons & (U_CBUTTONS | 0) ? 1 : 0) - (c1buttons & (D_CBUTTONS | 0) ? 1 : 0);
+		sidespeed = (c1buttons & (R_CBUTTONS | 0) ? 1 : 0) - (c1buttons & (L_CBUTTONS | 0) ? 1 : 0);
 	} else if (controlmode <= CONTROLMODE_14) {
 		if (aimpressed) {
 			domovecentre = false;
 			pitchspeed = c1sticky;
 		} else {
 			ascendspeed = c1sticky * 0.25f;
-			forwardspeed = (c1buttons & (U_CBUTTONS | U_JPAD) ? 24.0f : 0) - (c1buttons & (D_CBUTTONS | D_JPAD) ? 24.0f : 0);
+			forwardspeed = (c1buttons & (U_CBUTTONS | 0) ? 24.0f : 0) - (c1buttons & (D_CBUTTONS | 0) ? 24.0f : 0);
 		}
 
-		sidespeed = (c1buttons & (R_CBUTTONS | R_JPAD) ? 1 : 0) - (c1buttons & (L_CBUTTONS | L_JPAD) ? 1 : 0);
+		sidespeed = (c1buttons & (R_CBUTTONS | 0) ? 1 : 0) - (c1buttons & (L_CBUTTONS | 0) ? 1 : 0);
 	} else if (controlmode == CONTROLMODE_21 || controlmode == CONTROLMODE_23) {
 		forwardspeed = c1sticky;
 
@@ -867,9 +863,7 @@ void eyespyProcessInput(bool allowbuttons)
 		g_Vars.currentplayer->eyespy->startuptimer60 = TICKS(50);
 	}
 
-	chr->prevpos.x = g_Vars.currentplayer->eyespy->prop->pos.x;
-	chr->prevpos.y = g_Vars.currentplayer->eyespy->prop->pos.y;
-	chr->prevpos.z = g_Vars.currentplayer->eyespy->prop->pos.z;
+	chr->prevpos = g_Vars.currentplayer->eyespy->prop->pos;
 
 	roomsCopy(g_Vars.currentplayer->eyespy->prop->rooms, prevrooms);
 

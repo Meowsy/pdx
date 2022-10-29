@@ -482,11 +482,11 @@ u32 frGetDifficulty(void)
 void frInitDefaults(void)
 {
 	s32 i;
-	struct pad pad;
+	struct pad *pad;
 
 	g_FrNumSounds = 0;
 
-	padUnpack(g_FrPads[0], PADFIELD_POS, &pad);
+	pad = &g_Pads[g_FrPads[0]];
 
 	g_FrData.maxactivetargets = 0;
 	g_FrData.goalscore = 0;
@@ -498,9 +498,7 @@ void frInitDefaults(void)
 	g_FrData.speed = 1;
 
 	for (i = 0; i < ARRAYCOUNT(g_FrData.targets); i++) {
-		g_FrData.targets[i].dstpos.x = pad.pos.x;
-		g_FrData.targets[i].dstpos.y = pad.pos.y;
-		g_FrData.targets[i].dstpos.z = pad.pos.z;
+		g_FrData.targets[i].dstpos = pad->pos;
 
 #if VERSION >= VERSION_NTSC_1_0
 		g_FrData.targets[i].dstpos.z += 6.0f * i;
@@ -838,7 +836,6 @@ bool frExecuteTargetScript(s32 targetnum)
 		s32 index = FRSCRIPTINDEX_TARGETS + g_FrData.targets[targetnum].scriptindex;
 		u8 *script = &g_FrRomData[g_FrScriptOffsets[index]];
 		s32 offset = g_FrData.targets[targetnum].scriptoffset;
-		struct pad pad;
 		s32 frpadnum;
 
 		switch (script[offset]) {
@@ -856,11 +853,7 @@ bool frExecuteTargetScript(s32 targetnum)
 
 			g_FrData.targets[targetnum].frpadnum = frpadnum;
 
-			padUnpack(g_FrPads[frpadnum], PADFIELD_POS, &pad);
-
-			g_FrData.targets[targetnum].dstpos.x = pad.pos.x;
-			g_FrData.targets[targetnum].dstpos.y = pad.pos.y;
-			g_FrData.targets[targetnum].dstpos.z = pad.pos.z;
+			g_FrData.targets[targetnum].dstpos = g_Pads[g_FrPads[frpadnum]].pos;
 
 #if VERSION >= VERSION_NTSC_1_0
 			g_FrData.targets[targetnum].dstpos.z += 6.0f * targetnum;
@@ -966,22 +959,18 @@ void frInitTargets(void)
 					g_FrData.targets[i].active = false;
 				}
 
-				padUnpack(g_FrPads[g_FrData.targets[i].frpadindex], PADFIELD_POS, &pad);
-
-				pos.f[0] = pad.pos.f[0];
-				pos.f[1] = pad.pos.f[1];
+				pos.f[0] = g_Pads[g_FrPads[g_FrData.targets[i].frpadindex]].pos.f[0];
+				pos.f[1] = g_Pads[g_FrPads[g_FrData.targets[i].frpadindex]].pos.f[1];
 #if VERSION >= VERSION_NTSC_1_0
-				pos.f[2] = pad.pos.f[2] + 6.0f * i;
+				pos.f[2] = g_Pads[g_FrPads[g_FrData.targets[i].frpadindex]].pos.f[2] + 6.0f * i;
 #else
-				pos.f[2] = pad.pos.f[2];
+				pos.f[2] = g_Pads[g_FrPads[g_FrData.targets[i].frpadindex]].pos.f[2];
 #endif
 
 				frExecuteTargetScript(i);
 
 				if (g_FrData.targets[i].travelspeed == -1) {
-					pos.x = g_FrData.targets[i].dstpos.x;
-					pos.y = g_FrData.targets[i].dstpos.y;
-					pos.z = g_FrData.targets[i].dstpos.z;
+					pos = g_FrData.targets[i].dstpos;
 				}
 
 				count++;
@@ -990,17 +979,9 @@ void frInitTargets(void)
 			}
 
 			if (obj->flags2 & OBJFLAG2_INVISIBLE) {
-#if VERSION < VERSION_NTSC_1_0
-				padUnpack(g_FrPads[g_FrData.targets[i].frpadindex], PADFIELD_POS, &pad);
-
-				pos.x = 0.0f;
-				pos.y = 5000.0f;
-				pos.z = 0.0f;
-#else
 				pos.x = 0.0f;
 				pos.y = 5000.0f;
 				pos.z = 6.0f * i;
-#endif
 			}
 
 			if (g_FrData.targets[i].flags & FRTARGETFLAG_SPAWNFACINGAWAY) {
@@ -1014,9 +995,7 @@ void frInitTargets(void)
 			mtx4ToMtx3(&sp144, sp108);
 			mtx3Copy(sp108, obj->realrot);
 
-			prop->pos.x = pos.x;
-			prop->pos.y = pos.y;
-			prop->pos.z = pos.z;
+			prop->pos = pos;
 
 			func0f069c70(obj, true, false);
 		}
@@ -2016,9 +1995,7 @@ void frTick(void)
 #endif
 				{
 					// Target is stopping
-					newpos.x = g_FrData.targets[i].dstpos.x;
-					newpos.y = g_FrData.targets[i].dstpos.y;
-					newpos.z = g_FrData.targets[i].dstpos.z;
+					newpos = g_FrData.targets[i].dstpos;
 
 					g_FrData.targets[i].scriptenabled = true;
 					g_FrData.targets[i].travelling = false;
@@ -2038,9 +2015,7 @@ void frTick(void)
 					}
 				}
 
-				prop->pos.x = newpos.x;
-				prop->pos.y = newpos.y;
-				prop->pos.z = newpos.z;
+				prop->pos = newpos;
 
 				func0f069c70(obj, true, false);
 			}
