@@ -1285,7 +1285,7 @@ void frEndSession(bool hidetargets)
 		for (i = 0; i < g_MaxExplosions; i++) {
 			g_Explosions[i].age = 256;
 
-			for (j = 0; j < 40; j++) {
+			for (j = 0; j < ARRAYCOUNT(g_Explosions[0].parts); j++) {
 				g_Explosions[i].parts[j].frame = 0;
 			}
 		}
@@ -1294,7 +1294,7 @@ void frEndSession(bool hidetargets)
 		for (i = 0; i < g_MaxSmokes; i++) {
 			g_Smokes[i].age = 256;
 
-			for (j = 0; j < 10; j++) {
+			for (j = 0; j < ARRAYCOUNT(g_Smokes[0].parts); j++) {
 				g_Smokes[i].parts[j].size = 0;
 			}
 		}

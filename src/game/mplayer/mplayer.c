@@ -1565,7 +1565,7 @@ void mpCalculatePlayerTitle(struct mpplayerconfig *mpplayer)
 	s32 sum;
 	s32 i;
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < ARRAYCOUNT(tiers); i++) {
 		if (mpplayer->kills >= tiers[i] * 60) {
 			tallies[0]++;
 		} else {
@@ -1573,7 +1573,7 @@ void mpCalculatePlayerTitle(struct mpplayerconfig *mpplayer)
 		}
 	}
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < ARRAYCOUNT(tiers); i++) {
 		if (mpplayer->gameswon >= tiers[i] * 3) {
 			tallies[1]++;
 		} else {
@@ -1581,7 +1581,7 @@ void mpCalculatePlayerTitle(struct mpplayerconfig *mpplayer)
 		}
 	}
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < ARRAYCOUNT(tiers); i++) {
 		if (mpplayer->accuracymedals >= tiers[i] * 3) {
 			tallies[2]++;
 		} else {
@@ -1589,7 +1589,7 @@ void mpCalculatePlayerTitle(struct mpplayerconfig *mpplayer)
 		}
 	}
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < ARRAYCOUNT(tiers); i++) {
 		if (mpplayer->headshotmedals >= tiers[i] * 3) {
 			tallies[3]++;
 		} else {
@@ -1597,7 +1597,7 @@ void mpCalculatePlayerTitle(struct mpplayerconfig *mpplayer)
 		}
 	}
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < ARRAYCOUNT(tiers); i++) {
 		if (mpplayer->killmastermedals >= tiers[i] * 3) {
 			tallies[4]++;
 		} else {
@@ -1605,7 +1605,7 @@ void mpCalculatePlayerTitle(struct mpplayerconfig *mpplayer)
 		}
 	}
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < ARRAYCOUNT(tiers); i++) {
 		if (mpplayer->time >= tiers[i] * 3600) {
 			tallies[5]++;
 		} else {
@@ -1613,7 +1613,7 @@ void mpCalculatePlayerTitle(struct mpplayerconfig *mpplayer)
 		}
 	}
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < ARRAYCOUNT(tiers); i++) {
 		if (mpplayer->distance >= tiers[i] * 300) {
 			tallies[6]++;
 		} else {
@@ -1621,7 +1621,7 @@ void mpCalculatePlayerTitle(struct mpplayerconfig *mpplayer)
 		}
 	}
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < ARRAYCOUNT(tiers); i++) {
 		if (mpplayer->damagedealt >= tiers[i] * 3) {
 			tallies[7]++;
 		} else {
@@ -1629,7 +1629,7 @@ void mpCalculatePlayerTitle(struct mpplayerconfig *mpplayer)
 		}
 	}
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < ARRAYCOUNT(tiers); i++) {
 		if (mpplayer->ammoused >= tiers[i] * 1500) {
 			tallies[8]++;
 		} else {
@@ -1637,7 +1637,7 @@ void mpCalculatePlayerTitle(struct mpplayerconfig *mpplayer)
 		}
 	}
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < ARRAYCOUNT(tiers); i++) {
 		if (mpplayer->survivormedals >= tiers[i] * 3) {
 			tallies[9]++;
 		} else {
@@ -1647,7 +1647,7 @@ void mpCalculatePlayerTitle(struct mpplayerconfig *mpplayer)
 
 	sum = 0;
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < ARRAYCOUNT(tiers); i++) {
 		sum = sum + tallies[i];
 	}
 

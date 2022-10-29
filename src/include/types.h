@@ -4317,7 +4317,7 @@ struct mpsetup {
 };
 
 struct bossfile {
-	/*0x00*/ char teamnames[8][12];
+	/*0x00*/ char teamnames[MAX_TEAMS][12];
 	/*0x60*/ u8 locktype;
 	/*0x61*/ u8 unk89;
 	/*0x62*/ u8 usingmultipletunes;
@@ -5238,7 +5238,7 @@ struct mpconfigsim {
 
 struct mpconfig {
 	struct mpsetup setup;
-	struct mpconfigsim simulants[8];
+	struct mpconfigsim simulants[MAX_BOTS];
 };
 
 struct mpweapon {
@@ -5255,7 +5255,7 @@ struct mpweapon {
 
 struct mpstrings {
 	char description[200];
-	char aibotnames[8][15];
+	char aibotnames[MAX_BOTS][15];
 };
 
 struct mpconfigfull {
