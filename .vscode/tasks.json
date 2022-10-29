@@ -6,7 +6,7 @@
         {
             "label": "Build NTSC-U",
             "type": "shell",
-            "command": "make -j16 PIRACYCHECKS=0 MATCHING=0 ISV64=1",
+            "command": "make -j16 MATCHING=0 ISV64=1",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -16,14 +16,14 @@
         {
             "label": "Build PAL",
             "type": "shell",
-            "command": "make -j16 PIRACYCHECKS=0 MATCHING=0 ISV64=1 ROMID=pal-final",
+            "command": "make -j16 MATCHING=0 ISV64=1 ROMID=pal-final",
             "problemMatcher": [],
             "group": "build"
         },
         {
             "label": "Build NTSC-J",
             "type": "shell",
-            "command": "make -j16 PIRACYCHECKS=0 MATCHING=0 ISV64=1 ROMID=jpn-final",
+            "command": "make -j16 MATCHING=0 ISV64=1 ROMID=jpn-final",
             "problemMatcher": [],
             "group": "build"
         },
@@ -41,6 +41,7 @@
             "type": "shell",
             "command": [
                 "cp ${workspaceFolder}/build/ntsc-final/pd.z64 /mnt/c/PD/pdx.z64 ;",
+                "cp ${workspaceFolder}/build/ntsc-final/pd.xdelta /mnt/c/PD/PDX.xdelta ;",
                 "/mnt/c/RetroArch-Win64/retroarch.exe -L \"C:\\RetroArch-Win64\\cores\\mupen64plus_next_libretro.dll\" \"C:\\PD\\pdx.z64\" --verbose --log-file \"C:\\PD\\pdx.log\""
             ]
         }
