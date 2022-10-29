@@ -251,6 +251,8 @@ struct g_vars {
 	
               s32 hashumanbuddy;
               s32 aibuddytype[4];
+			  u8 mpmgg_mpweaponnum;
+			  s32 mpmgg_weaponnum;
 };
 
 struct weaponobj;

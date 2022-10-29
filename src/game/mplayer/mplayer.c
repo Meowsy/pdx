@@ -483,6 +483,8 @@ void mpInit(void)
 		| MPOPTION_PAC_SHOWONRADAR;
 
 	g_Vars.mphilltime = 10;
+	g_Vars.mpmgg_mpweaponnum = MPWEAPON_DY357LX;
+	g_Vars.mpmgg_weaponnum = WEAPON_DY357LX;
 
 	func0f187fec();
 
@@ -877,6 +879,8 @@ bool mpIsUnlockedGun(s32 mpweaponnum)
 bool mpIsValidGoldenGun(s32 mpweaponnum)
 {
 	switch (mpweaponnum) {
+		case MPWEAPON_DY357LX:
+			return true;
 		case MPWEAPON_NONE:
 		case MPWEAPON_LAPTOPGUN:
 		case MPWEAPON_DRAGON:
@@ -961,7 +965,8 @@ void mpSetWeaponSlot(s32 slot, s32 mpweaponnum, bool (*condition)(s32))
 	}
 
 	if (slot == ARRAYCOUNT(g_MpSetup.weapons)) {
-		g_ScenarioData.mgg.mpweaponnum = optionindex;
+		g_Vars.mpmgg_mpweaponnum = optionindex;
+		g_Vars.mpmgg_weaponnum = g_MpWeapons[optionindex].weaponnum;
 	} else {
 		g_MpSetup.weapons[slot] = optionindex;
 	}
@@ -974,7 +979,7 @@ s32 mpGetWeaponSlot(s32 slot, bool (*condition)(s32))
 	s32 weaponslot;
 
 	if (slot == ARRAYCOUNT(g_MpSetup.weapons)) {
-		weaponslot = g_ScenarioData.mgg.mpweaponnum;
+		weaponslot = g_Vars.mpmgg_mpweaponnum;
 	} else {
 		weaponslot = g_MpSetup.weapons[slot];
 	}
@@ -999,7 +1004,7 @@ struct mpweapon *func0f188e24(s32 arg0)
 
 	switch (g_MpSetup.scenario) {
 	case MPSCENARIO_GOLDENGUN:
-		scenarioweapon = g_ScenarioData.mgg.mpweaponnum;
+		scenarioweapon = g_Vars.mpmgg_mpweaponnum;
 		break;
 	default:
 		scenarioweapon = MPWEAPON_DISABLED;

@@ -134,7 +134,7 @@ s32 botactCouldFireWeaponWithCurrentAmmoReserves(struct aibot *aibot, s32 weapon
 		return false;
 	}
 
-	if (!botactHasWeapon(aibot, g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum)) {
+	if (!botactHasWeapon(aibot, g_Vars.mpmgg_weaponnum)) {
 		return false;
 	}
 

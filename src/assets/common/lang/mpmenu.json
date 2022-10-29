@@ -58,5 +58,15 @@
         "fr": "-Nouveau-\n",
         "de": "-Neu-\n",
         "es": "-Nuevo-\n"
+    },
+    {
+        "id": "L_MPMENU_HIGHLIGHTGOLDENGUN",
+        "en": "Highlight Golden Gun\n",
+        "gb": "Highlight Golden Gun\n",
+        "jp": "黄金銃の\\h83ba\\h8482\n",
+        "it": "Mostra Pistola d'oro\n",
+        "fr": "Montrer le pistolet d'or\n",
+        "de": "Goldenen Colt anzeigen\n",
+        "es": "Mostrar Pistola de Oro\n"
     }
 ]

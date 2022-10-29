@@ -11,7 +11,7 @@ bool invHasGoldenGun(void)
 	}
 
 	if (g_Vars.currentplayer->isdead == false) {
-		return invHasSingleWeaponExcAllGuns(g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum);
+		return invHasSingleWeaponExcAllGuns(g_Vars.mpmgg_weaponnum);
 	}
 
 	return false;
@@ -24,45 +24,10 @@ bool invGoldenGunEquipped(s32 mpchrnum)
 	}
 
 	if (mpchrnum < PLAYERCOUNT()) { // Human
-		return g_Vars.players[mpchrnum]->gunctrl.weaponnum == g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum;
+		return g_Vars.players[mpchrnum]->gunctrl.weaponnum == g_Vars.mpmgg_weaponnum;
 	} else { // Simulant
-		return g_MpAllChrPtrs[mpchrnum]->aibot->weaponnum == g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum;
+		return g_MpAllChrPtrs[mpchrnum]->aibot->weaponnum == g_Vars.mpmgg_weaponnum;
 	}
-}
-
-#define GOLDENGUN_DEFAULTMPWEAPONNUM WEAPON_DY357LX
-
-enum mggoptions {
-	MGGOPTION_HIGHLIGHTGOLDENGUN,
-	MGGOPTION_SHOWGOLDENGUNONRADAR,
-};
-
-s32 menuhandlerMggCheckboxOption(s32 operation, struct menuitem *item, union handlerdata *data)
-{
-	switch (operation) {
-	case MENUOP_GET:
-		switch (item->param3) {
-		case MGGOPTION_HIGHLIGHTGOLDENGUN:
-			return g_ScenarioData.mgg.highlightgoldengun;
-		case MGGOPTION_SHOWGOLDENGUNONRADAR:
-			return g_ScenarioData.mgg.showgoldengunonradar;
-		default:
-			return true;
-		}
-	case MENUOP_SET:
-		switch (item->param3) {
-		case MGGOPTION_HIGHLIGHTGOLDENGUN:
-			g_ScenarioData.mgg.highlightgoldengun = data->checkbox.value;
-			break;
-		case MGGOPTION_SHOWGOLDENGUNONRADAR:
-			g_ScenarioData.mgg.showgoldengunonradar = data->checkbox.value;
-			break;
-		default:
-			return 0;
-		}
-	}
-
-	return 0;
 }
 
 struct menuitem g_MggOptionsMenuItems[] = {
@@ -134,17 +99,17 @@ struct menuitem g_MggOptionsMenuItems[] = {
 		MENUITEMTYPE_CHECKBOX,
 		0,
 		MENUITEMFLAG_LOCKABLEMINOR,
-		L_MPMENU_230, // "Highlight Target"
-		MGGOPTION_HIGHLIGHTGOLDENGUN,
-		menuhandlerMggCheckboxOption,
+		L_MPMENU_HIGHLIGHTGOLDENGUN, // "Highlight Golden Gun"
+		MPOPTION_MGG_HIGHLIGHTGOLDENGUN,
+		menuhandlerMpCheckboxOption,
 	},
 	{
 		MENUITEMTYPE_CHECKBOX,
 		0,
 		MENUITEMFLAG_LOCKABLEMINOR,
 		L_MPMENU_238, // "Show on Radar"
-		MGGOPTION_SHOWGOLDENGUNONRADAR,
-		menuhandlerMggCheckboxOption,
+		MPOPTION_MGG_SHOWONRADAR,
+		menuhandlerMpCheckboxOption,
 	},
 	{
 		MENUITEMTYPE_SEPARATOR,
@@ -178,8 +143,9 @@ void mggInit(void)
 {
 	s32 i;
 
-	if (!mpIsValidGoldenGun(g_ScenarioData.mgg.mpweaponnum)) {
-		g_ScenarioData.mgg.mpweaponnum = GOLDENGUN_DEFAULTMPWEAPONNUM;
+	if (!mpIsValidGoldenGun(g_Vars.mpmgg_mpweaponnum)) {
+		g_Vars.mpmgg_mpweaponnum = MPWEAPON_DY357LX;
+		g_Vars.mpmgg_weaponnum = WEAPON_DY357LX;
 	}
 
 	g_ScenarioData.mgg.goldengun = NULL;
@@ -227,7 +193,7 @@ void mggTick(void)
 			if (prop->type == PROPTYPE_WEAPON) {
 				struct weaponobj *weapon = prop->weapon;
 
-				if (weapon->weaponnum == g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum) {
+				if (weapon->weaponnum == g_Vars.mpmgg_weaponnum) {
 					g_ScenarioData.mgg.goldengun = prop;
 				}
 			}
@@ -239,24 +205,23 @@ void mggTick(void)
 
 void mggReadSave(struct savebuffer *buffer)
 {
-	g_ScenarioData.mgg.highlightgoldengun = savebufferReadBits(buffer, 1);
-	g_ScenarioData.mgg.showgoldengunonradar = savebufferReadBits(buffer, 1);
-	g_ScenarioData.mgg.mpweaponnum = savebufferReadBits(buffer, 6);
-	
-	if (!mpIsValidGoldenGun(g_ScenarioData.mgg.mpweaponnum)) {
-		g_ScenarioData.mgg.mpweaponnum = GOLDENGUN_DEFAULTMPWEAPONNUM;
+	g_Vars.mpmgg_mpweaponnum = savebufferReadBits(buffer, 8);
+
+	if (!mpIsValidGoldenGun(g_Vars.mpmgg_mpweaponnum)) {
+		g_Vars.mpmgg_mpweaponnum = MPWEAPON_DY357LX;
 	}
+
+	g_Vars.mpmgg_weaponnum = g_MpWeapons[g_Vars.mpmgg_mpweaponnum].weaponnum;
 }
 
 void mggWriteSave(struct savebuffer *buffer)
 {
-	if (!mpIsValidGoldenGun(g_ScenarioData.mgg.mpweaponnum)) {
-		g_ScenarioData.mgg.mpweaponnum = GOLDENGUN_DEFAULTMPWEAPONNUM;
+	if (!mpIsValidGoldenGun(g_Vars.mpmgg_mpweaponnum)) {
+		g_Vars.mpmgg_mpweaponnum = MPWEAPON_DY357LX;
+		g_Vars.mpmgg_weaponnum = WEAPON_DY357LX;
 	}
 
-	savebufferOr(buffer, g_ScenarioData.mgg.highlightgoldengun, 1);
-	savebufferOr(buffer, g_ScenarioData.mgg.showgoldengunonradar, 1);
-	savebufferOr(buffer, g_ScenarioData.mgg.mpweaponnum, 6);
+	savebufferOr(buffer, g_Vars.mpmgg_mpweaponnum, 8);
 }
 
 void mggCalculatePlayerScore(struct mpchrconfig *mpchr, s32 mpchrnum, s32 *score, s32 *deaths)
@@ -277,7 +242,7 @@ Gfx *mggRadarExtra(Gfx *gdl)
 	struct scenariodata_mgg *data = &g_ScenarioData.mgg;
 	struct coord dist;
 
-	if (g_ScenarioData.mgg.showgoldengunonradar) {
+	if (g_MpSetup.options & MPOPTION_MGG_SHOWONRADAR) {
 		// Show the Golden Gun
 		if (data->goldengun && data->goldengun->type != PROPTYPE_PLAYER && data->goldengun->type != PROPTYPE_CHR) {
 			dist.x = data->goldengun->pos.x - g_Vars.currentplayer->prop->pos.x;
@@ -293,7 +258,7 @@ Gfx *mggRadarExtra(Gfx *gdl)
 
 bool mggRadarChr(Gfx **gdl, struct prop *prop)
 {
-	if ((g_ScenarioData.mgg.showgoldengunonradar) && g_ScenarioData.mgg.goldengun) {
+	if ((g_MpSetup.options & MPOPTION_MGG_SHOWONRADAR) && g_ScenarioData.mgg.goldengun) {
 		if (prop == g_ScenarioData.mgg.goldengun &&
 				(prop->type == PROPTYPE_PLAYER || prop->type == PROPTYPE_CHR)) {
 			struct coord dist;
@@ -317,7 +282,7 @@ bool mggRadarChr(Gfx **gdl, struct prop *prop)
 
 bool mggHighlightProp(struct prop *prop, s32 *colour)
 {
-	if (g_ScenarioData.mgg.highlightgoldengun) {
+	if (g_MpSetup.options & MPOPTION_MGG_HIGHLIGHTGOLDENGUN) {
 		bool highlight = false;
 
 		if (prop == g_ScenarioData.mgg.goldengun) {

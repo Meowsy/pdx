@@ -372,7 +372,7 @@ u32 botPickupProp(struct prop *prop, struct chrdata *chr)
 			} else if (weapon->weaponnum == WEAPON_DATAUPLINK) {
 				result = scenarioPickUpUplink(chr, prop);
 			} else {
-				if (g_MpSetup.scenario == MPSCENARIO_GOLDENGUN && weapon->weaponnum == g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum) {
+				if (g_MpSetup.scenario == MPSCENARIO_GOLDENGUN && weapon->weaponnum == g_Vars.mpmgg_weaponnum) {
 					scenarioPickUpGoldenGun(chr, prop);
 				}
 

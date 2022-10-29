@@ -454,7 +454,7 @@ s32 mpGetWeaponSlotByWeaponNum(s32 weaponnum)
 		}
 	}
 
-	if (g_MpSetup.scenario == MPSCENARIO_GOLDENGUN && weaponnum == g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum) {
+	if (g_MpSetup.scenario == MPSCENARIO_GOLDENGUN && weaponnum == g_Vars.mpmgg_weaponnum) {
 		result = ARRAYCOUNT(g_MpSetup.weapons);
 	}
 
@@ -939,18 +939,18 @@ void botinvTick(struct chrdata *chr)
 		if (g_MpSetup.scenario == MPSCENARIO_GOLDENGUN) {
 			if (g_ScenarioData.mgg.goldengun == chr->prop) {
 				// Bot has the Golden Gun
-				s32 goldengunnum = g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum;
+				s32 goldengunnum = g_Vars.mpmgg_weaponnum;
 				bool allowsPrimary = botinvAllowsWeapon(chr, goldengunnum, FUNC_PRIMARY);
 				bool allowsSecondary = botinvAllowsWeapon(chr, goldengunnum, FUNC_SECONDARY);
 				if (allowsPrimary || allowsSecondary) {
 					if (aibot->weaponnum == goldengunnum) {
 						if (botactCouldFireWeaponWithCurrentAmmoReserves(aibot, goldengunnum)) {
-							newweaponnum = g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum;
+							newweaponnum = g_Vars.mpmgg_weaponnum;
 							keepcurrentweapon = true;
 						}
 					} else {
 						// Switch to the Golden Gun
-						newweaponnum = g_MpWeapons[g_ScenarioData.mgg.mpweaponnum].weaponnum;
+						newweaponnum = g_Vars.mpmgg_weaponnum;
 						newfuncnum = allowsPrimary ? FUNC_PRIMARY : FUNC_SECONDARY;
 						keepcurrentweapon = true;
 					}
