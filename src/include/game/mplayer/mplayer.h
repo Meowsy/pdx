@@ -97,6 +97,7 @@ s32 mpFindBotProfile(s32 type, s32 difficulty);
 void mpGenerateBotNames(void);
 s32 mpPlayerGetIndex(struct chrdata *chr);
 struct chrdata *mpGetChrFromPlayerIndex(s32 index);
+struct gset mpPlayerGetGset(struct chrdata *chr);
 s32 func0f18d074(s32 index);
 s32 func0f18d0e8(s32 arg0);
 void mpplayerfileLoadGunFuncs(struct savebuffer *buffer, s32 playernum);

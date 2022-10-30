@@ -36,7 +36,7 @@ struct mpscenario {
 	void *unk3c; // never hooked into nor fired
 	void (*readsavefunc)(struct savebuffer *buffer);
 	void (*writesavefunc)(struct savebuffer *buffer);
-	void (*handledeathfunc)(s32 aplayernum, s32 vplayernum);
+	void (*handledeathfunc)(s32 aplayernum, s32 vplayernum, struct gset gset);
 };
 
 extern struct mpscenario g_MpScenarios[NUM_MPSCENARIOS];

@@ -169,7 +169,7 @@ void mggTick(void)
 
 		if (invHasGoldenGun()) {
 			g_ScenarioData.mgg.goldengun = g_Vars.currentplayer->prop;
-			break;
+			return;
 		}
 	}
 
@@ -180,25 +180,48 @@ void mggTick(void)
 		for (i = PLAYERCOUNT(); i < g_MpNumChrs; i++) {
 			if (g_MpAllChrPtrs[i]->aibot->hasuplink) {
 				g_ScenarioData.mgg.goldengun = g_MpAllChrPtrs[i]->prop;
-				break;
+				return;
+			}
+		}
+	}
+
+	if (g_ScenarioData.mgg.goldengun == NULL && g_Vars.mpmgg_weaponnum == WEAPON_LAPTOPGUN) {
+		for (i = 0; i < g_MaxThrownLaptops; i++) {
+			if (g_ThrownLaptops[i].weaponnum == g_Vars.mpmgg_weaponnum) {
+				g_ScenarioData.mgg.goldengun = g_ThrownLaptops[i].base.prop;
+				return;
 			}
 		}
 	}
 
 	if (g_ScenarioData.mgg.goldengun == NULL) {
 		// Check if the Golden Gun is on the ground
+		struct prop *weapongoldengun = NULL;
+
 		prop = g_Vars.activeprops;
 
 		while (prop) {
-			if (prop->type == PROPTYPE_WEAPON) {
+			if (prop->type == PROPTYPE_WEAPON && weapongoldengun == NULL) {
 				struct weaponobj *weapon = prop->weapon;
 
-				if (weapon->weaponnum == g_Vars.mpmgg_weaponnum) {
+				if (weapon->weaponnum == g_Vars.mpmgg_weaponnum && prop->timetoregen == 0) {
+					weapongoldengun = prop;
+				}
+			} else if (prop->type == PROPTYPE_OBJ && prop->obj->type == OBJTYPE_AUTOGUN) {
+				struct autogunobj *laptop = (struct autogunobj *)prop->obj;
+
+				if (laptop->weaponnum == g_Vars.mpmgg_weaponnum) {
 					g_ScenarioData.mgg.goldengun = prop;
+					return;
 				}
 			}
 
 			prop = prop->next;
+		}
+
+		if (weapongoldengun) {
+			g_ScenarioData.mgg.goldengun = weapongoldengun;
+			return;
 		}
 	}
 }
@@ -298,7 +321,7 @@ bool mggHighlightProp(struct prop *prop, s32 *colour)
 	return false;
 }
 
-void mggHandleDeath(s32 aplayernum, s32 vplayernum)
+void mggHandleDeath(s32 aplayernum, s32 vplayernum, struct gset gset)
 {
 	char text[64];
 
@@ -307,7 +330,7 @@ void mggHandleDeath(s32 aplayernum, s32 vplayernum)
 			if (scenarioChrsAreSameTeam(aplayernum, vplayernum)) {
 				sprintf(text, "%s%s", langGet(L_MPWEAPONS_008), langGet(L_MPWEAPONS_009)); // "You're supposed to look\nafter your friends!"
 				scenarioCreateHudmsg(aplayernum, text);
-			} else if (invGoldenGunEquipped(aplayernum)) {
+			} else if (gset.weaponnum == g_Vars.mpmgg_weaponnum) {
 				g_ScenarioData.mgg.numpoints[aplayernum]++;
 				scenarioCreateHudmsg(aplayernum, langGet(L_MPWEAPONS_GOLDENGUNKILL)); // "Another glittering end!"
 			}

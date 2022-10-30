@@ -1668,6 +1668,7 @@ struct autogunobj { // objtype 0x0d
 	/*0xa8*/ u8 targetteam;
 	/*0xa9*/ u8 ammoquantity;
 	/*0xaa*/ s16 nextchrtest;
+	         s32 weaponnum;
 };
 
 struct linkgunsobj { // objtype 0x0e

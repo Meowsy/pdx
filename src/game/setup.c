@@ -868,6 +868,7 @@ void setupCreateAutogun(struct autogunobj *autogun, s32 cmdindex)
 	autogun->firing = false;
 	autogun->ammoquantity = 255;
 	autogun->shotbondsum = 0;
+	autogun->weaponnum = WEAPON_RCP45;
 
 	if (autogun->targetpad >= 0) {
 		u32 stack1;

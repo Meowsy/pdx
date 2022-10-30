@@ -882,7 +882,6 @@ bool mpIsValidGoldenGun(s32 mpweaponnum)
 		case MPWEAPON_DY357LX:
 			return true;
 		case MPWEAPON_NONE:
-		case MPWEAPON_LAPTOPGUN:
 		case MPWEAPON_DRAGON:
 #if VERSION != VERSION_JPN_FINAL
 		case MPWEAPON_COMBATKNIFE:
@@ -4893,6 +4892,19 @@ struct chrdata *mpGetChrFromPlayerIndex(s32 index)
 	}
 
 	return NULL;
+}
+
+struct gset mpPlayerGetGset(struct chrdata *chr)
+{
+	if (chr->aibot) {
+		struct gset gset = { chr->aibot->weaponnum, 0, 0, chr->aibot->gunfunc };
+		return gset;
+	} else if (chr->prop->type == PROPTYPE_PLAYER) {
+		return g_Vars.players[playermgrGetPlayerNumByProp(chr->prop)]->hands[HAND_RIGHT].gset;
+	} else {
+		struct gset gset = { chr->gunprop->weapon->weaponnum, 0, 0, FUNC_PRIMARY }; // Can guards even use secondary functions?
+		return gset;
+	}
 }
 
 s32 func0f18d074(s32 index)

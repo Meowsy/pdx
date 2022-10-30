@@ -1570,10 +1570,10 @@ void scenarioHandleActivatedProp(struct chrdata *chr, struct prop *prop)
 /**
  * Handle a player or bot dying.
  */
-void scenarioHandleDeath(s32 aplayernum, s32 vplayernum)
+void scenarioHandleDeath(s32 aplayernum, s32 vplayernum, struct gset gset)
 {
 	if (g_MpScenarios[g_MpSetup.scenario].handledeathfunc) {
-		g_MpScenarios[g_MpSetup.scenario].handledeathfunc(aplayernum, vplayernum);
+		g_MpScenarios[g_MpSetup.scenario].handledeathfunc(aplayernum, vplayernum, gset);
 	}
 }
 

@@ -2934,7 +2934,7 @@ void botTickUnpaused(struct chrdata *chr)
 								aibot->attackingplayernum = mpPlayerGetIndex(goldengunchr);
 								aibot->abortattacktimer60 = -1;
 							}
-						} else {
+						} else if (g_ScenarioData.mgg.goldengun->type == PROPTYPE_WEAPON) {
 							// The Golden Gun is not held by anyone - fetch it
 							newaction = MA_AIBOTGOTOPROP;
 							aibot->gotoprop = g_ScenarioData.mgg.goldengun;

@@ -9745,7 +9745,7 @@ void autogunTickShoot(struct prop *autogunprop)
 				struct prop *targetprop = autogun->target;
 				struct modelnode *flashnode;
 				struct modelnode *posnode = NULL;
-				struct gset gset = { WEAPON_RCP45, 0, 0, FUNC_PRIMARY };
+				struct gset gset = { autogun->weaponnum, 0, 0, FUNC_PRIMARY };
 				struct prop *ownerprop = NULL;
 				struct chrdata *ownerchr = NULL;
 				s32 ownerplayernum = (obj->hidden & 0xf0000000) >> 28;
@@ -9837,7 +9837,8 @@ void autogunTickShoot(struct prop *autogunprop)
 							struct model *hitmodel = NULL;
 							s32 hitside = -1;
 							s32 hitpart = HITPART_GENERAL;
-							f32 damage = gsetGetDamage(&gset);
+							struct gset damagegset = { WEAPON_RCP45, 0, 0, FUNC_PRIMARY };
+							f32 damage = gsetGetDamage(&damagegset);
 							struct chrdata *hitchr = hitprop->chr;
 
 							if (g_Vars.normmplayerisrunning) {
@@ -11535,12 +11536,25 @@ void objInitMatrices(struct prop *prop)
 
 bool propCanRegen(struct prop *prop)
 {
-	if (g_MpSetup.scenario == MPSCENARIO_GOLDENGUN
-			&& prop->type == PROPTYPE_WEAPON
-			&& prop->weapon->weaponnum == g_Vars.mpmgg_weaponnum
-			&& g_ScenarioData.mgg.goldengun != NULL
-			&& g_ScenarioData.mgg.goldengun != prop) {
-		return false;
+	if (g_MpSetup.scenario == MPSCENARIO_GOLDENGUN) {
+		if (prop->type == PROPTYPE_WEAPON && prop->weapon->weaponnum == g_Vars.mpmgg_weaponnum) {
+			if (g_ScenarioData.mgg.goldengun == NULL) {
+				pdxDebugPrintf("There is no Golden Gun.\n");
+				if (g_Vars.mpmgg_weaponnum == WEAPON_LAPTOPGUN) {
+					int i;
+					for (i = 0; i < g_MaxThrownLaptops; i++) {
+						if (g_ThrownLaptops[i].weaponnum == g_Vars.mpmgg_weaponnum) {
+							pdxDebugPrintf("Thrown laptop %i is Golden Gun despite there not being a Golden Gun?\n", i);
+							return false;
+						}
+					}
+				}
+				return true;
+			} else {
+				pdxDebugPrintf("Spawn blocked.\n");
+				return false;
+			}
+		}
 	}
 
 	return true;
@@ -19160,6 +19174,7 @@ struct autogunobj *laptopDeploy(s32 modelnum, struct gset *gset, struct chrdata 
 			laptop->barrelspeed = 0;
 			laptop->barrelrot = 0;
 			laptop->shotbondsum = 0;
+			laptop->weaponnum = gset->weaponnum;
 
 			if (chr->aibot) {
 				laptop->ammoquantity = botactTryRemoveAmmoFromReserve(chr->aibot, WEAPON_LAPTOPGUN, FUNC_PRIMARY, 200);
