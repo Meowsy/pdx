@@ -1,0 +1,32 @@
+{
+    "configurations": [
+        {
+            "name": "WSL",
+            "includePath": [
+                "${workspaceFolder}/src/**",
+                "${workspaceFolder}/src/generated/ntsc-final/**",
+                "${workspaceFolder}/include/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "VERSION=2",
+                "MINFLOAT=((float)-3.40282346638528860e+38)",
+                "MAXFLOAT=((float)3.40282346638528860e+38)",
+                "_LANGUAGE_C",
+                "_MIPS_SZLONG=32",
+                "PAL=0",
+                "ISV64=1",
+                "MATCHING=0"
+            ],
+            "windowsSdkVersion": "10.0.19041.0",
+            "compilerPath": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.31.31103/bin/Hostx64/x64/cl.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64",
+            "configurationProvider": "ms-vscode.makefile-tools"
+        }
+    ],
+    "version": 4
+}
