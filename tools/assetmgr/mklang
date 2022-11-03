@@ -11,10 +11,39 @@ def main():
     data = fd.read()
     fd.close()
 
+    rows = json.loads(data)
+
+    commonpath = sys.argv[1].replace(os.environ['ROMID'], 'common')
+    if (os.path.exists(commonpath)):
+        fd = open(commonpath, 'r')
+        data = fd.read()
+        fd.close()
+        rowscommon = json.loads(data)
+
+        for addition in rowscommon:
+            replaced = False
+            if (isinstance(addition["id"], str)):
+                idtable = [ addition["id"] ]
+            else:
+                idtable = addition["id"]
+            if ("aka" in addition):
+                if (isinstance(addition["aka"], str)):
+                    idtable += [ addition["aka"] ]
+                else:
+                    idtable += addition["aka"]
+            for aka in idtable:
+                index = listgetindexofid(rows, aka)
+                if (index >= 0):
+                    if (replaced):
+                        del rows[index]
+                    else:
+                        rows[index] = addition
+                        replaced = True
+            if (replaced == False):
+                rows += [ addition ]
+
     basename = os.path.basename(sys.argv[1]).replace('.json', '')
     shortname = get_shortname(basename)
-
-    rows = json.loads(data)
 
     if sys.argv[2] == 'en':
         make_header(rows, shortname)
@@ -30,9 +59,12 @@ def make_header(rows, shortname):
     filename = 'lang/%s.h' % shortname
     terminator = 'L_%s_END' % shortname.upper()
     start = banks.index(shortname) * 512
-    assetmgr.write_enums(typename, enums, filename, terminator, start=start)
+    assetmgr.write_enums(typename, enums, filename, terminator, start=start, rows=rows)
 
 def make_object(rows, basename, key):
+    if len(rows) > 512:
+        raise Exception(f"Text overflow; \"{basename}.json\" has {len(rows)} rows, which is {len(rows) - 512} more than supported.")
+
     binary = make_binary(rows, key)
     zipped = assetmgr.zip(binary)
 
@@ -50,7 +82,7 @@ def make_object(rows, basename, key):
     assetmgr.write_object(zipped, filename)
 
 def make_binary(rows, key):
-    if len(rows) == 0:
+    if len(rows) == 0 or (os.environ['ROMID'] == 'ntsc-final' and key != 'en') or (os.environ['ROMID'] != 'jpn-final' and key == 'jp'):
         return (0).to_bytes(16, 'big')
 
     output = bytes()
@@ -452,5 +484,11 @@ jpnchars = {
 	'倒': 0x86b9,
 	'須': 0x86c9,
 }
+
+def listgetindexofid(list, id):
+    for i in range(len(list)):
+        if list[i]["id"] == id:
+            return i
+    return -1
 
 main()
