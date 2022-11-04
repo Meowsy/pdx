@@ -608,25 +608,25 @@ $(B_DIR)/assets/animations.o: $(A_DIR)/animations.json
 	tools/assetmgr/mkanims
 
 # Lang
-$(B_DIR)/assets/files/L%E.o: $(A_DIR)/lang/%.json $(C_DIR)/lang/%.json
+$(B_DIR)/assets/files/L%E.o: $(A_DIR)/lang/%.json $(C_DIR)/lang/%.json tools/assetmgr/mklang
 	tools/assetmgr/mklang $< en
 
-$(B_DIR)/assets/files/L%J.o: $(A_DIR)/lang/%.json $(C_DIR)/lang/%.json
+$(B_DIR)/assets/files/L%J.o: $(A_DIR)/lang/%.json $(C_DIR)/lang/%.json tools/assetmgr/mklang
 	tools/assetmgr/mklang $< jp
 
-$(B_DIR)/assets/files/L%P.o: $(A_DIR)/lang/%.json $(C_DIR)/lang/%.json
+$(B_DIR)/assets/files/L%P.o: $(A_DIR)/lang/%.json $(C_DIR)/lang/%.json tools/assetmgr/mklang
 	tools/assetmgr/mklang $< gb
 
-$(B_DIR)/assets/files/L%_str_f.o: $(A_DIR)/lang/%.json $(C_DIR)/lang/%.json
+$(B_DIR)/assets/files/L%_str_f.o: $(A_DIR)/lang/%.json $(C_DIR)/lang/%.json tools/assetmgr/mklang
 	tools/assetmgr/mklang $< fr
 
-$(B_DIR)/assets/files/L%_str_g.o: $(A_DIR)/lang/%.json $(C_DIR)/lang/%.json
+$(B_DIR)/assets/files/L%_str_g.o: $(A_DIR)/lang/%.json $(C_DIR)/lang/%.json tools/assetmgr/mklang
 	tools/assetmgr/mklang $< de
 
-$(B_DIR)/assets/files/L%_str_i.o: $(A_DIR)/lang/%.json $(C_DIR)/lang/%.json
+$(B_DIR)/assets/files/L%_str_i.o: $(A_DIR)/lang/%.json $(C_DIR)/lang/%.json tools/assetmgr/mklang
 	tools/assetmgr/mklang $< it
 
-$(B_DIR)/assets/files/L%_str_s.o: $(A_DIR)/lang/%.json $(C_DIR)/lang/%.json
+$(B_DIR)/assets/files/L%_str_s.o: $(A_DIR)/lang/%.json $(C_DIR)/lang/%.json tools/assetmgr/mklang
 	tools/assetmgr/mklang $< es
 
 # Pads
