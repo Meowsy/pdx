@@ -1,0 +1,550 @@
+[
+    {
+        "id": "Fun",
+        "name": "L_MPWEAPONS_118",
+        "cheats": [
+            {
+                "id": "CHEAT_DKMODE",
+                "name": "L_MPWEAPONS_082",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_CHICAGO",
+                    "difficulty": "DIFF_A"
+                }
+            },
+            {
+                "id": "CHEAT_SMALLJO",
+                "name": "L_MPWEAPONS_085",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_G5BUILDING",
+                    "difficulty": "DIFF_A"
+                }
+            },
+            {
+                "id": "CHEAT_SMALLCHARACTERS",
+                "name": "L_MPWEAPONS_086",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_INFILTRATION",
+                    "difficulty": "DIFF_A"
+                }
+            },
+            {
+                "id": "CHEAT_TEAMHEADSONLY",
+                "name": "L_MPWEAPONS_091",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_AIRBASE",
+                    "difficulty": "DIFF_A"
+                }
+            },
+            {
+                "id": "CHEAT_PLAYASELVIS",
+                "name": "L_MPWEAPONS_092",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_RESCUE",
+                    "difficulty": "DIFF_PA",
+                    "time": "7:59"
+                }
+            },
+            {
+                "id": "CHEAT_SLOMO",
+                "name": "L_MPWEAPONS_081",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_INVESTIGATION",
+                    "difficulty": "DIFF_A"
+                }
+            }
+        ]
+    },
+    {
+        "id": "Gameplay",
+        "name": "L_MPWEAPONS_119",
+        "cheats": [
+            {
+                "id": "CHEAT_INVINCIBLE",
+                "name": "L_MPWEAPONS_077",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_ESCAPE",
+                    "difficulty": "DIFF_A",
+                    "time": "3:50"
+                }
+            },
+            {
+                "id": "CHEAT_CLOAKINGDEVICE",
+                "name": "L_MPWEAPONS_076",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_G5BUILDING",
+                    "difficulty": "DIFF_A",
+                    "time": "1:40"
+                },
+                "transferpak": true
+            },
+            {
+                "id": "CHEAT_MARQUIS",
+                "name": "L_MPWEAPONS_095",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_DEFECTION",
+                    "difficulty": "DIFF_SA",
+                    "time": "1:30"
+                },
+                "incompatible": [
+                    "CHEAT_ENEMYROCKETS"
+                ]
+            },
+            {
+                "id": "CHEAT_JOSHIELD",
+                "name": "L_MPWEAPONS_088",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_DEEPSEA",
+                    "difficulty": "DIFF_A"
+                }
+            },
+            {
+                "id": "CHEAT_SUPERSHIELD",
+                "name": "L_MPWEAPONS_089",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_DEFENSE",
+                    "difficulty": "DIFF_A",
+                    "time": "1:45"
+                }
+            },
+            {
+                "id": "CHEAT_ENEMYSHIELDS",
+                "name": "L_MPWEAPONS_087",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_DEFENSE",
+                    "difficulty": "DIFF_A"
+                }
+            },
+            {
+                "id": "CHEAT_ENEMYROCKETS",
+                "name": "L_MPWEAPONS_093",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_PELAGIC",
+                    "difficulty": "DIFF_A"
+                },
+                "incompatible": [
+                    "CHEAT_MARQUIS"
+                ]
+            },
+            {
+                "id": "CHEAT_PERFECTDARKNESS",
+                "name": "L_MPWEAPONS_096",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_CRASHSITE",
+                    "difficulty": "DIFF_A"
+                }
+            }
+        ]
+    },
+    {
+        "id": "WeaponsForJoInSolo",
+        "name": "L_MPWEAPONS_122",
+        "cheats": [
+            {
+                "id": "CHEAT_ROCKETLAUNCHER",
+                "name": "L_MPWEAPONS_027",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_EXTRACTION",
+                    "difficulty": "DIFF_A"
+                },
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_SNIPERRIFLE",
+                "name": "L_MPWEAPONS_103",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_VILLA",
+                    "difficulty": "DIFF_A"
+                },
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_SUPERDRAGON",
+                "name": "L_MPWEAPONS_105",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_ESCAPE",
+                    "difficulty": "DIFF_A"
+                },
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_LAPTOPGUN",
+                "name": "L_MPWEAPONS_106",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_AIRFORCEONE",
+                    "difficulty": "DIFF_A"
+                },
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_PHOENIX",
+                "name": "L_MPWEAPONS_107",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_ATTACKSHIP",
+                    "difficulty": "DIFF_A"
+                },
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_PSYCHOSISGUN",
+                "name": "L_MPWEAPONS_108",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_CHICAGO",
+                    "difficulty": "DIFF_PA",
+                    "time": "2:00"
+                },
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_TRENTSMAGNUM",
+                "name": "L_MPWEAPONS_083",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_CRASHSITE",
+                    "difficulty": "DIFF_A",
+                    "time": "2:50"
+                },
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_FARSIGHT",
+                "name": "L_MPWEAPONS_084",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_DEEPSEA",
+                    "difficulty": "DIFF_PA",
+                    "time": "7:27"
+                },
+                "soloonly": true
+            }
+        ]
+    },
+    {
+        "id": "ClassicWeaponsForJoInSolo",
+        "name": "L_MPWEAPONS_123",
+        "cheats": [
+            {
+                "id": "CHEAT_PP9I",
+                "name": "L_MPWEAPONS_109",
+                "unlock": {
+                    "type": "CHEATFLAG_FIRINGRANGE",
+                    "challenges": {
+                        "WEAPON_FALCON2": "FRDIFFICULTY_GOLD",
+                        "WEAPON_FALCON2_SCOPE": "FRDIFFICULTY_GOLD",
+                        "WEAPON_FALCON2_SILENCER": "FRDIFFICULTY_GOLD"
+                    }
+                },
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_CC13",
+                "name": "L_MPWEAPONS_110",
+                "unlock": {
+                    "type": "CHEATFLAG_FIRINGRANGE",
+                    "challenges": {
+                        "WEAPON_MAGSEC4": "FRDIFFICULTY_GOLD",
+                        "WEAPON_MAULER": "FRDIFFICULTY_GOLD",
+                        "WEAPON_PHOENIX": "FRDIFFICULTY_GOLD",
+                        "WEAPON_DY357MAGNUM": "FRDIFFICULTY_GOLD",
+                        "WEAPON_DY357LX": "FRDIFFICULTY_GOLD"
+                    }
+                },
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_KL01313",
+                "name": "L_MPWEAPONS_111",
+                "unlock": {
+                    "type": "CHEATFLAG_FIRINGRANGE",
+                    "challenges": {
+                        "WEAPON_CMP150": "FRDIFFICULTY_GOLD",
+                        "WEAPON_CYCLONE": "FRDIFFICULTY_GOLD",
+                        "WEAPON_CALLISTO": "FRDIFFICULTY_GOLD",
+                        "WEAPON_RCP120": "FRDIFFICULTY_GOLD"
+                    }
+                },
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_KF7SPECIAL",
+                "name": "L_MPWEAPONS_112",
+                "unlock": {
+                    "type": "CHEATFLAG_FIRINGRANGE",
+                    "challenges": {
+                        "WEAPON_LAPTOPGUN": "FRDIFFICULTY_GOLD",
+                        "WEAPON_DRAGON": "FRDIFFICULTY_GOLD",
+                        "WEAPON_K7AVENGER": "FRDIFFICULTY_GOLD",
+                        "WEAPON_AR34": "FRDIFFICULTY_GOLD",
+                        "WEAPON_SUPERDRAGON": "FRDIFFICULTY_GOLD"
+                    }
+                },
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_ZZT",
+                "name": "L_MPWEAPONS_113",
+                "unlock": {
+                    "type": "CHEATFLAG_FIRINGRANGE",
+                    "challenges": {
+                        "WEAPON_SHOTGUN": "FRDIFFICULTY_GOLD",
+                        "WEAPON_SNIPERRIFLE": "FRDIFFICULTY_GOLD",
+                        "WEAPON_ROCKETLAUNCHER": "FRDIFFICULTY_GOLD",
+                        "WEAPON_SLAYER": "FRDIFFICULTY_GOLD"
+                    }
+                },
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_DMC",
+                "name": "L_MPWEAPONS_114",
+                "unlock": {
+                    "type": "CHEATFLAG_FIRINGRANGE",
+                    "challenges": {
+                        "WEAPON_TIMEDMINE": "FRDIFFICULTY_GOLD",
+                        "WEAPON_PROXIMITYMINE": "FRDIFFICULTY_GOLD",
+                        "WEAPON_REMOTEMINE": "FRDIFFICULTY_GOLD"
+                    }
+                },
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_AR53",
+                "name": "L_MPWEAPONS_115",
+                "unlock": {
+                    "type": "CHEATFLAG_FIRINGRANGE",
+                    "challenges": {
+                        "WEAPON_FARSIGHT": "FRDIFFICULTY_GOLD",
+                        "WEAPON_CROSSBOW": "FRDIFFICULTY_GOLD",
+                        "WEAPON_COMBATKNIFE": "FRDIFFICULTY_GOLD",
+                        "WEAPON_GRENADE": "FRDIFFICULTY_GOLD"
+                    }
+                },
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_RCP45",
+                "name": "L_MPWEAPONS_116",
+                "unlock": {
+                    "type": "CHEATFLAG_FIRINGRANGE",
+                    "challenges": {
+                        "WEAPON_TRANQUILIZER": "FRDIFFICULTY_GOLD",
+                        "WEAPON_REAPER": "FRDIFFICULTY_GOLD",
+                        "WEAPON_DEVASTATOR": "FRDIFFICULTY_GOLD"
+                    }
+                },
+                "soloonly": true
+            }
+        ]
+    },
+    {
+        "id": "Weapons",
+        "name": "L_MPWEAPONS_120",
+        "cheats": [
+            {
+                "id": "CHEAT_CLASSICSIGHT",
+                "name": "L_MPWEAPONS_090",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_DEFECTION",
+                    "difficulty": "DIFF_A"
+                },
+                "invalidating": false
+            },
+            {
+                "id": "CHEAT_UNLIMITEDAMMOLAPTOP",
+                "name": "L_MPWEAPONS_094",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_AIRFORCEONE",
+                    "difficulty": "DIFF_PA",
+                    "time": "3:55"
+                }
+            },
+            {
+                "id": "CHEAT_HURRICANEFISTS",
+                "name": "L_MPWEAPONS_075",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_EXTRACTION",
+                    "difficulty": "DIFF_A",
+                    "time": "2:03"
+                },
+                "transferpak": true
+            },
+            {
+                "id": "CHEAT_UNLIMITEDAMMO",
+                "name": "L_MPWEAPONS_079",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_PELAGIC",
+                    "difficulty": "DIFF_SA",
+                    "time": "7:07"
+                }
+            },
+            {
+                "id": "CHEAT_UNLIMITEDAMMONORELOADS",
+                "name": "L_MPWEAPONS_080",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_AIRBASE",
+                    "difficulty": "DIFF_SA",
+                    "time": "3:11"
+                }
+            },
+            {
+                "id": "CHEAT_XRAYSCANNER",
+                "name": "L_MPWEAPONS_104",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_RESCUE",
+                    "difficulty": "DIFF_A"
+                },
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_RTRACKER",
+                "name": "L_MPWEAPONS_101",
+                "unlock": {
+                    "type": "CHEATFLAG_COMPLETION",
+                    "stage": "SOLOSTAGEINDEX_SKEDARRUINS",
+                    "difficulty": "DIFF_A"
+                },
+                "transferpak": true
+            },
+            {
+                "id": "CHEAT_ALLGUNS",
+                "name": "L_MPWEAPONS_078",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_SKEDARRUINS",
+                    "difficulty": "DIFF_PA",
+                    "time": "5:31"
+                },
+                "soloonly": true,
+                "transferpak": true
+            }
+        ]
+    },
+    {
+        "id": "Buddies",
+        "name": "L_MPWEAPONS_121",
+        "cheats": [
+            {
+                "id": "CHEAT_VELVETDARK",
+                "name": "L_MPWEAPONS_117",
+                "incompatible": [
+                    "CHEAT_PUGILIST",
+                    "CHEAT_HOTSHOT",
+                    "CHEAT_HITANDRUN",
+                    "CHEAT_ALIEN"
+                ],
+                "invalidating": false,
+                "buddy": true,
+                "soloonly": true
+
+            },
+            {
+                "id": "CHEAT_PUGILIST",
+                "name": "L_MPWEAPONS_097",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_INVESTIGATION",
+                    "difficulty": "DIFF_PA",
+                    "time": "6:30"
+                },
+                "incompatible": [
+                    "CHEAT_VELVETDARK",
+                    "CHEAT_HOTSHOT",
+                    "CHEAT_HITANDRUN",
+                    "CHEAT_ALIEN"
+                ],
+                "buddy": true,
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_HOTSHOT",
+                "name": "L_MPWEAPONS_098",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_INFILTRATION",
+                    "difficulty": "DIFF_SA",
+                    "time": "5:00"
+                },
+                "incompatible": [
+                    "CHEAT_VELVETDARK",
+                    "CHEAT_PUGILIST",
+                    "CHEAT_HITANDRUN",
+                    "CHEAT_ALIEN"
+                ],
+                "buddy": true,
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_HITANDRUN",
+                "name": "L_MPWEAPONS_099",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_VILLA",
+                    "difficulty": "DIFF_SA",
+                    "time": "2:30"
+                },
+                "incompatible": [
+                    "CHEAT_VELVETDARK",
+                    "CHEAT_PUGILIST",
+                    "CHEAT_HOTSHOT",
+                    "CHEAT_ALIEN"
+                ],
+                "buddy": true,
+                "soloonly": true
+            },
+            {
+                "id": "CHEAT_ALIEN",
+                "name": "L_MPWEAPONS_100",
+                "unlock": {
+                    "type": "CHEATFLAG_TIMED",
+                    "stage": "SOLOSTAGEINDEX_ATTACKSHIP",
+                    "difficulty": "DIFF_SA",
+                    "time": "5:17"
+                },
+                "incompatible": [
+                    "CHEAT_VELVETDARK",
+                    "CHEAT_PUGILIST",
+                    "CHEAT_HOTSHOT",
+                    "CHEAT_HITANDRUN"
+                ],
+                "buddy": true,
+                "soloonly": true
+            }
+        ]
+    },
+    {
+        "id": "Debug",
+        "name": "L_MPWEAPONS_DEBUG",
+        "cheats": [
+            {
+                "id": "CHEAT_UNLOCKALLCONTENT",
+                "name": "L_MPWEAPONS_UNLOCKALLCONTENT",
+                "invalidating": false
+            }
+        ]
+    }
+]

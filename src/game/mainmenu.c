@@ -411,7 +411,7 @@ s32 menuhandlerAlternativeTitle(s32 operation, struct menuitem *item, union hand
 {
 	switch (operation) {
 	case MENUOP_CHECKHIDDEN:
-		if (g_Vars.stagenum != STAGE_CITRAINING || (u8)g_AltTitleUnlocked == false) {
+		if (g_Vars.stagenum != STAGE_CITRAINING || ((u8)g_AltTitleUnlocked == false && !cheatIsAllContentUnlocked())) {
 			return true;
 		}
 		break;
@@ -694,7 +694,7 @@ struct menudialogdef g_PreAndPostMissionBriefingMenuDialog = {
 	L_OPTIONS_247, // "Briefing"
 	g_PreAndPostMissionBriefingMenuItems,
 	menudialogBriefing,
-	MENUDIALOGFLAG_DISABLEITEMSCROLL,
+	MENUDIALOGFLAG_DISABLEITEMSCROLL | MENUDIALOGFLAG_FULLSCREEN_JPN,
 	NULL,
 };
 
@@ -818,7 +818,7 @@ struct menudialogdef g_AcceptMissionMenuDialog = {
 	(u32)&soloMenuTitleStageOverview,
 	g_AcceptMissionMenuItems,
 	menudialog00103608,
-	MENUDIALOGFLAG_STARTSELECTS | MENUDIALOGFLAG_DISABLEITEMSCROLL,
+	MENUDIALOGFLAG_STARTSELECTS | MENUDIALOGFLAG_DISABLEITEMSCROLL | MENUDIALOGFLAG_FULLSCREEN_JPN,
 	&g_PreAndPostMissionBriefingMenuDialog,
 };
 
@@ -959,6 +959,10 @@ bool isStageDifficultyUnlocked(s32 stageindex, s32 difficulty)
 {
 	s32 s;
 	s32 d;
+
+	if (cheatIsAllContentUnlocked()) {
+		return true;
+	}
 
 	// Handle special missions
 	if (stageindex > SOLOSTAGEINDEX_SKEDARRUINS) {
@@ -1141,6 +1145,10 @@ s32 menuhandlerPdMode(s32 operation, struct menuitem *item, union handlerdata *d
 		menuPushDialog(&g_PdModeSettingsMenuDialog);
 		break;
 	case MENUOP_CHECKHIDDEN:
+		if (cheatIsAllContentUnlocked()) {
+			return false;
+		}
+
 		if (g_GameFile.besttimes[SOLOSTAGEINDEX_SKEDARRUINS][DIFF_PA] == 0) {
 			return true;
 		}
@@ -1263,6 +1271,10 @@ s32 getMaxAiBuddies(void)
 	s32 extra = 0;
 	s32 max = 1 - g_MissionConfig.difficulty;
 	s32 d;
+
+	if (cheatIsAllContentUnlocked()) {
+		return ARRAYCOUNT(g_Vars.aibuddies);
+	}
 
 	for (d = 0; d != 3; d++) {
 		if ((g_GameFile.coopcompletions[d] | 0xfffe0000) == 0xffffffff) {
@@ -1762,6 +1774,14 @@ s32 getNumUnlockedSpecialStages(void)
 	s32 offsetforduel = 1;
 	s32 i;
 
+	if (cheatIsAllContentUnlocked()) {
+		if (g_MissionConfig.iscoop || g_MissionConfig.isanti) {
+			return 3;
+		} else {
+			return 4;
+		}
+	}
+
 	for (i = 0; i < 3; i++) {
 		if (g_GameFile.besttimes[SOLOSTAGEINDEX_SKEDARRUINS][i]) {
 			next = i + 1;
@@ -1785,6 +1805,10 @@ s32 func0f104720(s32 value)
 {
 	s32 next = 0;
 	s32 d;
+
+	if (cheatIsAllContentUnlocked()) {
+		return ARRAYCOUNT(g_StageNames) - 4 + value;
+	}
 
 	for (d = 0; d != 3; d++) {
 		if (g_GameFile.besttimes[SOLOSTAGEINDEX_SKEDARRUINS][d]) {
@@ -1856,7 +1880,7 @@ s32 menuhandlerMissionList(s32 operation, struct menuitem *item, union handlerda
 
 			data->list.value++;
 
-			if (!stageiscomplete) {
+			if (!stageiscomplete && !cheatIsAllContentUnlocked()) {
 				break;
 			}
 		}
@@ -2283,7 +2307,7 @@ struct menudialogdef g_SoloMissionControlStyleMenuDialog = {
 	L_OPTIONS_236, // "Control"
 	g_SoloMissionControlStyleMenuItems,
 	NULL,
-	MENUDIALOGFLAG_0400,
+	MENUDIALOGFLAG_0400 | MENUDIALOGFLAG_FULLSCREEN,
 	NULL,
 };
 
@@ -2318,7 +2342,7 @@ struct menudialogdef g_CiControlStyleMenuDialog = {
 	L_OPTIONS_236, // "Control"
 	g_CiControlStyleMenuItems,
 	NULL,
-	MENUDIALOGFLAG_0400,
+	MENUDIALOGFLAG_0400 | MENUDIALOGFLAG_FULLSCREEN,
 	NULL,
 };
 
@@ -2353,7 +2377,7 @@ struct menudialogdef g_CiControlStylePlayer2MenuDialog = {
 	L_OPTIONS_236, // "Control"
 	g_CiControlStylePlayer2MenuItems,
 	NULL,
-	MENUDIALOGFLAG_0400,
+	MENUDIALOGFLAG_0400 | MENUDIALOGFLAG_FULLSCREEN,
 	NULL,
 };
 
@@ -4589,7 +4613,11 @@ s32 menuhandlerCinema(s32 operation, struct menuitem *item, union handlerdata *d
 	switch (operation) {
 	case MENUOP_GETOPTIONCOUNT:
 		// Add one for Play All option
-		data->list.value = g_CutsceneCountsByMission[getNumCompletedMissions()] + 1;
+		if (cheatIsAllContentUnlocked()) {
+			data->list.value = ARRAYCOUNT(g_Cutscenes) + 1;
+		} else {
+			data->list.value = g_CutsceneCountsByMission[getNumCompletedMissions()] + 1;
+		}
 		break;
 	case MENUOP_GETOPTIONTEXT:
 		if (data->list.value == 0) {
@@ -4602,7 +4630,11 @@ s32 menuhandlerCinema(s32 operation, struct menuitem *item, union handlerdata *d
 			// Play all
 			s32 index = getNumCompletedMissions();
 			g_Vars.autocutgroupcur = 0;
-			g_Vars.autocutgroupleft = g_CutsceneCountsByMission[index];
+			if (cheatIsAllContentUnlocked()) {
+				g_Vars.autocutgroupleft = g_CutsceneCountsByMission[ARRAYCOUNT(g_CutsceneCountsByMission) - 1];
+			} else {
+				g_Vars.autocutgroupleft = g_CutsceneCountsByMission[index];
+			}
 			menuPopDialog();
 			menuStop();
 		} else {
@@ -4765,11 +4797,11 @@ char *mainMenuTextLabel(struct menuitem *item)
 		L_MPWEAPONS_133, // "Cheat Counter-Operative"
 	};
 
-	if (g_CheatsEnabledBank0 || g_CheatsEnabledBank1) {
-		return langGet(withcheats[item->param]);
+	if (item->param == 1) {
+		return langGet(cheatAreMultiInvalidatingCheatsEnabled() ? withcheats[item->param] : nocheats[item->param]);
+	} else {
+		return langGet(cheatAreSoloInvalidatingCheatsEnabled() ? withcheats[item->param] : nocheats[item->param]);
 	}
-
-	return langGet(nocheats[item->param]);
 }
 
 struct menuitem g_MainMenuMenuItems[] = {

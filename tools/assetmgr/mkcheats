@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+
+import assetmgr
+import json
+import sys
+
+def main():
+    fd = open(sys.argv[1], 'r')
+    data = fd.read()
+    fd.close()
+
+    data = json.loads(data)
+
+    sourcefile = assetmgr.TouchAverseFile('src/generated/common/cheats.c')
+    sourcefile.write('#include <ultra64.h>\n#include "constants.h"\n#include "game/cheats.h"\n#include "bss.h"\n#include "data.h"\n#include "types.h"\n\n#define TIME(mins, secs) (mins * 60 + secs)\n#define m\n#define s\n\n')
+
+    
+    sourcefile.write('struct cheat g_Cheats[NUM_CHEATS] = {\n')
+    for category in data:
+        for cheat in category['cheats']:
+            sourcefile.write('\t{\n\t\t%s,\n' % cheat['name'])
+            flags = []
+            if 'unlock' in cheat:
+                flags += [ cheat['unlock']['type'] ]
+            else:
+                flags += [ 'CHEATFLAG_ALWAYSAVAILABLE' ]
+            if 'alwayson' in cheat and cheat['alwayson'] == True:
+                flags += [ 'CHEATFLAG_ALWAYSON' ]
+            if 'transferpak' in cheat and cheat['transferpak'] == True:
+                flags += [ 'CHEATFLAG_TRANSFERPAK' ]
+            if not 'invalidating' in cheat or 'invalidating' in cheat and cheat['invalidating'] == True:
+                flags += [ 'CHEATFLAG_INVALIDATING' ]
+            if 'soloonly' in cheat and cheat['soloonly'] == True:
+                flags += [ 'CHEATFLAG_SOLOONLY' ]
+            if 'multionly' in cheat and cheat['multionly'] == True:
+                flags += [ 'CHEATFLAG_MULTIONLY' ]
+            if 'buddy' in cheat and cheat['buddy'] == True:
+                flags += [ 'CHEATFLAG_BUDDY' ]
+            if 'unlock' in cheat:
+                if cheat['unlock']['type'] == 'CHEATFLAG_TIMED':
+                    m = cheat['unlock']['time'].split(':')
+                    s = int(m[1].strip())
+                    m = int(m[0].strip())
+                    sourcefile.write('\t\tTIME(%s m, %s s),\n' % (m, s))
+                else:
+                    sourcefile.write('\t\t0,\n')
+                if cheat['unlock']['type'] == 'CHEATFLAG_TIMED' or cheat['unlock']['type'] == 'CHEATFLAG_COMPLETION':
+                    sourcefile.write('\t\t%s,\n\t\t%s,\n' % (cheat['unlock']['stage'], cheat['unlock']['difficulty']))
+                else:
+                    sourcefile.write('\t\t0,\n\t\t0,\n')
+            else:
+                sourcefile.write('\t\t0,\n\t\t0,\n\t\t0,\n')
+
+            sourcefile.write('\t\t%s,\n' % " | ".join(flags))
+
+            if 'incompatible' in cheat:
+                sourcefile.write('\t\t{\n')
+                for incompatible in cheat['incompatible']:
+                    sourcefile.write('\t\t\t%s,\n' % incompatible)
+                sourcefile.write('\t\t\tCHEAT_NONE\n\t\t},\n')
+            else:
+                sourcefile.write('\t\t{ CHEAT_NONE },\n')
+            if 'unlock' in cheat and cheat['unlock']['type'] == 'CHEATFLAG_FIRINGRANGE':
+                sourcefile.write('\t\t{\n')
+                for frchallenge in cheat['unlock']['challenges']:
+                    sourcefile.write('\t\t\t{\n')
+                    sourcefile.write('\t\t\t\t%s,\n' % frchallenge)
+                    sourcefile.write('\t\t\t\t%s,\n' % cheat['unlock']['challenges'][frchallenge])
+                    sourcefile.write('\t\t\t},\n')
+                sourcefile.write('\t\t},\n')
+            else:
+                sourcefile.write('\t\t{ },\n')
+            sourcefile.write('\n\t},\n')
+
+    sourcefile.write('};\n\n')
+
+    for category in data:
+        sourcefile.write('struct menuitem g_Cheats%sMenuItems[] = {\n' % category['id'])
+        for cheat in category['cheats']:
+            sourcefile.write('\t{\n\t\tMENUITEMTYPE_CHECKBOX,\n\t\t%s,\n\t\t0,\n\t\t(u32)&cheatGetNameIfUnlocked,\n\t\t0,\n\t\tcheatCheckboxMenuHandler,\n\t},\n' % cheat['id'])
+        sourcefile.write('\t{\n\t\tMENUITEMTYPE_SEPARATOR,\n\t\t0,\n\t\t0,\n\t\t0x00000096,\n\t\t0,\n\t\tNULL,\n\t},\n\t{\n\t\tMENUITEMTYPE_MARQUEE,\n\t\t0,\n\t\tMENUITEMFLAG_SMALLFONT | MENUITEMFLAG_MARQUEE_FADEBOTHSIDES,\n\t\t(u32)&cheatGetMarquee,\n\t\t0,\n\t\tNULL,\n\t},\n\t{\n\t\tMENUITEMTYPE_SEPARATOR,\n\t\t0,\n\t\t0,\n\t\t0x00000096,\n\t\t0,\n\t\tNULL,\n\t},\n\t{\n\t\tMENUITEMTYPE_SELECTABLE,\n\t\t0,\n\t\tMENUITEMFLAG_SELECTABLE_CLOSESDIALOG | MENUITEMFLAG_SELECTABLE_CENTRE,\n\t\tL_MPMENU_477, // "Done"\n\t\t0,\n\t\tNULL,\n\t},\n\t{ MENUITEMTYPE_END },\n};\n\nstruct menudialogdef g_Cheats%sMenuDialog = {\n\tMENUDIALOGTYPE_DEFAULT,\n\t%s,\n\tg_Cheats%sMenuItems,\n\tcheatMenuHandleDialog,\n\tMENUDIALOGFLAG_FULLSCREEN_JPN,\n\tNULL,\n};\n\n' % (category['id'], category['name'], category['id']))
+
+    sourcefile.write('struct menuitem g_CheatsMenuItems[] = {\n')
+
+    cheatrows = []
+
+    for category in data:
+        sourcefile.write('\t{\n\t\tMENUITEMTYPE_SELECTABLE,\n\t\t0,\n\t\tMENUITEMFLAG_SELECTABLE_OPENSDIALOG,\n\t\t%s,\n\t\t0,\n\t\t(void *)&g_Cheats%sMenuDialog,\n\t},\n' % (category['name'], category['id']))
+        cheatrows += [row['id'] for row in category['cheats']]
+
+    sourcefile.write('\t{\n\t\tMENUITEMTYPE_SEPARATOR,\n\t\t0,\n\t\t0,\n\t\t0x00000096,\n\t\t0,\n\t\tNULL,\n\t},\n\t{\n\t\tMENUITEMTYPE_SELECTABLE,\n\t\t0,\n\t\t0,\n\t\tL_MPWEAPONS_217, // "Turn off all Cheats"\n\t\t0,\n\t\tcheatMenuHandleTurnOffAllCheats,\n\t},\n\t{\n\t\tMENUITEMTYPE_SEPARATOR,\n\t\t0,\n\t\t0,\n\t\t0x00000096,\n\t\t0,\n\t\tNULL,\n\t},\n\t{\n\t\tMENUITEMTYPE_SELECTABLE,\n\t\t0,\n\t\tMENUITEMFLAG_SELECTABLE_CLOSESDIALOG | MENUITEMFLAG_SELECTABLE_CENTRE,\n\t\tL_MPMENU_477, // "Done"\n\t\t0,\n\t\tNULL,\n\t},\n\t{ MENUITEMTYPE_END },\n};\n\nstruct menudialogdef g_CheatsMenuDialog = {\n\tMENUDIALOGTYPE_DEFAULT,\n\tL_MPMENU_476, // "Cheats"\n\tg_CheatsMenuItems,\n\tcheatMenuHandleDialog,\n\tMENUDIALOGFLAG_FULLSCREEN_JPN,\n\tNULL,\n};\n')
+
+    sourcefile.close()
+
+    assetmgr.write_enums('cheatnum', ['CHEAT_NONE'] + cheatrows, 'cheats.h', 'NUM_CHEATS', start=-1, dir='common')
+
+main()

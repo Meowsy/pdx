@@ -3978,11 +3978,10 @@ void playerTick(bool arg0)
 				prop = NULL;
 
 				// If no buddy cheats are active, spawn Velvet
-				if ((g_CheatsActiveBank0 & (
-								1 << CHEAT_PUGILIST
-								| 1 << CHEAT_HOTSHOT
-								| 1 << CHEAT_HITANDRUN
-								| 1 << CHEAT_ALIEN)) == 0) {
+				if (!cheatIsActive(CHEAT_PUGILIST) &&
+								!cheatIsActive(CHEAT_HOTSHOT) &&
+								!cheatIsActive(CHEAT_HITANDRUN) &&
+								!cheatIsActive(CHEAT_ALIEN)) {
 					if (stageGetIndex(g_Vars.stagenum) == STAGEINDEX_AIRBASE) {
 						prop = chrSpawnAtCoord(BODY_DARK_COMBAT, HEAD_VD,
 								&g_Vars.currentplayer->prop->pos,

@@ -1,5 +1,8 @@
+import filecmp
 import os
+import shutil
 import subprocess
+import tempfile
 
 def align4(value):
     return (value + 3 | 3) ^ 3
@@ -21,11 +24,13 @@ def pad16(binary):
 
     return binary
 
-def write_enums(typename, names, filename, terminator, start=0, rows=None):
-    filename = 'src/generated/%s/%s' % (os.environ['ROMID'], filename)
+def write_enums(typename, names, filename, terminator, start=0, rows=None, dir=None):
+    if dir == None:
+        dir = os.environ['ROMID']
+    filename = 'src/generated/%s/%s' % (dir, filename)
     mkpath(filename)
 
-    fd = open(filename, 'w')
+    fd = TouchAverseFile(filename, binary=False)
     fd.write('/**\n')
     fd.write(' * This file was generated automatically. Changes may be overwritten.\n')
     fd.write(' */\n')
@@ -138,3 +143,28 @@ def writefile(filename, contents):
     fd = open(filename, 'wb')
     fd.write(contents)
     fd.close()
+
+class TouchAverseFile:
+    def __init__(self, filename, binary=False):
+        if (binary == True):
+            mode = 'wb'
+        else:
+            mode = 'w'
+        self.destfilename = filename
+        if (not os.path.exists(self.destfilename)):
+            self.file = open(self.destfilename, mode, encoding='utf-8')
+            self.tempfilename = None
+        else:
+            self.file = tempfile.NamedTemporaryFile(mode, encoding='utf-8', delete=False)
+            self.tempfilename = self.file.name
+    def close(self):
+        self.file.close()
+        if (self.tempfilename == None):
+            return
+
+        if not filecmp.cmp(self.tempfilename, self.destfilename, shallow = False):
+            shutil.copyfile(self.tempfilename, self.destfilename)
+
+        os.remove(self.tempfilename)
+    def write(self, value):
+        self.file.write(value)

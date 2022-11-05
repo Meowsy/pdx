@@ -25,6 +25,7 @@
 #include "game/propobj.h"
 #include "game/shards.h"
 #include "game/wallhit.h"
+#include "game/cheats.h"
 #include "bss.h"
 #include "lib/vi.h"
 #include "lib/dma.h"
@@ -180,6 +181,10 @@ void frSetWeaponFound(s32 weaponnum)
 
 s32 ciIsStageComplete(s32 stageindex)
 {
+	if (cheatIsAllContentUnlocked()) {
+		return true;
+	}
+
 	return g_GameFile.besttimes[stageindex][0]
 		|| g_GameFile.besttimes[stageindex][1]
 		|| g_GameFile.besttimes[stageindex][2];
@@ -218,6 +223,10 @@ bool frIsWeaponAvailable(s32 weapon)
 	}
 
 	if (weapon == WEAPON_FALCON2 || weapon == WEAPON_CMP150) {
+		return true;
+	}
+
+	if (cheatIsAllContentUnlocked() && weapon <= WEAPON_XRAYSCANNER) {
 		return true;
 	}
 
@@ -310,59 +319,27 @@ u32 frGetWeaponScriptIndex(u32 weaponnum)
 	return 0;
 }
 
-s32 frIsClassicWeaponUnlocked(u32 weapon)
+s32 frIsCheatUnlocked(struct cheat *cheat)
 {
-	switch (weapon) {
-	case WEAPON_PP9I:
-		return ciGetFiringRangeScore(0) == 3
-			&& ciGetFiringRangeScore(1) == 3
-			&& ciGetFiringRangeScore(2) == 3;
-	case WEAPON_CC13:
-		return ciGetFiringRangeScore(3) == 3
-			&& ciGetFiringRangeScore(4) == 3
-			&& ciGetFiringRangeScore(5) == 3
-			&& ciGetFiringRangeScore(6) == 3
-			&& ciGetFiringRangeScore(7) == 3;
-	case WEAPON_KL01313:
-		return ciGetFiringRangeScore(8) == 3
-			&& ciGetFiringRangeScore(9) == 3
-			&& ciGetFiringRangeScore(10) == 3
-			&& ciGetFiringRangeScore(11) == 3;
-	case WEAPON_KF7SPECIAL:
-		return ciGetFiringRangeScore(12) == 3
-			&& ciGetFiringRangeScore(13) == 3
-			&& ciGetFiringRangeScore(14) == 3
-			&& ciGetFiringRangeScore(15) == 3
-			&& ciGetFiringRangeScore(16) == 3;
-	case WEAPON_ZZT:
-		return ciGetFiringRangeScore(17) == 3
-			&& ciGetFiringRangeScore(18) == 3
-			&& ciGetFiringRangeScore(24) == 3
-			&& ciGetFiringRangeScore(25) == 3;
-	case WEAPON_DMC:
-#if VERSION >= VERSION_NTSC_1_0
-		return ciGetFiringRangeScore(29) == 3
-			&& ciGetFiringRangeScore(30) == 3
-			&& ciGetFiringRangeScore(31) == 3;
-#else
-		return ciGetFiringRangeScore(29) == 3
-			&& ciGetFiringRangeScore(30) == 3
-			&& ciGetFiringRangeScore(32) == 3
-			&& ciGetFiringRangeScore(33) == 3
-			&& ciGetFiringRangeScore(34) == 3;
-#endif
-	case WEAPON_AR53:
-		return ciGetFiringRangeScore(19) == 3
-			&& ciGetFiringRangeScore(20) == 3
-			&& ciGetFiringRangeScore(26) == 3
-			&& ciGetFiringRangeScore(28) == 3;
-	case WEAPON_RCP45:
-		return ciGetFiringRangeScore(21) == 3
-			&& ciGetFiringRangeScore(22) == 3
-			&& ciGetFiringRangeScore(23) == 3;
+	s32 i = 0;
+
+	if (!cheat->frdata) {
+		return true;
 	}
 
-	return false;
+	if (cheatIsAllContentUnlocked()) {
+		return true;
+	}
+
+	for (i = 0; i < ARRAYCOUNT(cheat->frdata); i++) {
+		if (cheat->frdata[i].weaponnum == 0 && cheat->frdata[i].difficulty == 0) {
+			return true;
+		} else if (ciGetFiringRangeScore(frGetWeaponIndexByWeapon(cheat->frdata[i].weaponnum)) <= cheat->frdata[i].difficulty) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 s32 frGetSlot(void)
@@ -2594,6 +2571,10 @@ bool ciIsHangarBioUnlocked(u32 bioindex)
 {
 	u32 stage;
 
+	if (cheatIsAllContentUnlocked()) {
+		return true;
+	}
+
 	switch (bioindex) {
 	case HANGARBIO_INSTITUTE:
 	case HANGARBIO_HOVERCRATE:
@@ -4015,3 +3996,9 @@ Gfx *frRenderHud(Gfx *gdl)
 	return text0f153780(gdl);
 }
 #endif
+
+u16 g_FiringRangeDifficultyNames[NUM_FRDIFFICULTIES] = {
+	L_MPMENU_439, // "Bronze"
+	L_MPMENU_440, // "Silver"
+	L_MPMENU_441, // "Gold"
+};

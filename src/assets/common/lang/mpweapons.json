@@ -1,2 +1,62 @@
 [
+    {
+        "id": "L_MPWEAPONS_FIRINGRANGECHALLENGE",
+        "en": "firing range challenge",
+        "gb": "firing range challenge",
+        "jp": "射撃場チャレンジ",
+        "it": "sfida al poligono di tiro",
+        "fr": "défi du champ de tir",
+        "de": "Schießstand Herausforderung",
+        "es": "desafío de campo de tiro"
+    },
+    {
+        "id": "L_MPWEAPONS_FIRINGRANGECHALLENGES",
+        "en": "firing range challenges",
+        "gb": "firing range challenges",
+        "jp": "射撃場チャレンジ",
+        "it": "sfide del poligono di tiro",
+        "fr": "défis du champ de tir",
+        "de": "Schießstand Herausforderungen",
+        "es": "desafíos del campo de tiro"
+    },
+    {
+        "id": "L_MPWEAPONS_OXFORDAND",
+        "en": ", and ",
+        "gb": " and ",
+        "jp": "と",
+        "it": " e ",
+        "fr": " et ",
+        "de": " und ",
+        "es": " y "
+    },
+    {
+        "id": "L_MPWEAPONS_COMMA",
+        "en": ", ",
+        "gb": ", ",
+        "jp": ", ",
+        "it": ", ",
+        "fr": ", ",
+        "de": ", ",
+        "es": ", "
+    },
+    {
+        "id": "L_MPWEAPONS_DEBUG",
+        "en": "Debug\n",
+        "gb": "Debug\n",
+        "jp": "デバッグ\n",
+        "it": "Debug\n",
+        "fr": "Déboguer\n",
+        "de": "Debuggen\n",
+        "es": "Depurar\n"
+    },
+    {
+        "id": "L_MPWEAPONS_UNLOCKALLCONTENT",
+        "en": "Unlock All Content\n",
+        "gb": "Unlock All Content\n",
+        "jp": "すべてのコンテンツのロックを解除\n",
+        "it": "Sblocca tutti i contenuti\n",
+        "fr": "Déverrouiller tout le contenu\n",
+        "de": "Alle Inhalte freischalten\n",
+        "es": "Desbloquear Todo el Contenido\n"
+    }
 ]

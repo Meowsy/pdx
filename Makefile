@@ -168,6 +168,7 @@ A_DIR := src/assets/$(ROMID)
 B_DIR := build/$(ROMID)
 C_DIR := src/assets/common
 E_DIR := extracted/$(ROMID)
+G_DIR := src/generated/common
 
 ifneq ($(strip $(MIPS_BINUTILS_PREFIX)),)
     TOOLCHAIN := $(MIPS_BINUTILS_PREFIX)
@@ -215,7 +216,7 @@ LANG_O_FILES := \
 PADS_O_FILES := $(patsubst $(A_DIR)/pads/%.json, $(B_DIR)/assets/files/bgdata/bg_%_padsZ.o, $(PADS_JSON_FILES))
 TILES_O_FILES := $(patsubst $(A_DIR)/tiles/%.json, $(B_DIR)/assets/files/bgdata/bg_%_tilesZ.o, $(TILES_JSON_FILES))
 
-C_FILES := $(shell find src/lib src/game src/inflate -name '*.c')
+C_FILES := $(shell find src/lib src/game src/inflate -name '*.c') $(shell find src/generated -name '*.c' | sed 's/generated\/common/generated/g')
 S_FILES := $(shell find src/lib src/game src/preamble -name '*.s')
 
 C_O_FILES := $(patsubst src/%.c, $(B_DIR)/%.o, $(C_FILES))
@@ -605,6 +606,7 @@ ASSETMGR_O_FILES := \
 	$(TILES_O_FILES) \
 	$(B_DIR)/assets/sequences.o \
 	$(B_DIR)/assets/textureslist.o \
+    $(G_DIR)/cheats.h \
 
 # Anims
 $(B_DIR)/assets/animations.o: $(A_DIR)/animations.json
@@ -655,6 +657,10 @@ $(B_DIR)/assets/files/bgdata/bg_%_tilesZ.o: $(A_DIR)/tiles/%.json
 # Tiles - but this is the zipped non-obj, for make test
 $(B_DIR)/assets/files/bgdata/bg_%_tilesZ: $(A_DIR)/tiles/%.json
 	tools/assetmgr/mktiles $<
+
+# Cheats
+$(G_DIR)/cheats.h $(G_DIR)/cheats.c: $(C_DIR)/cheats.json tools/assetmgr/mkcheats
+	tools/assetmgr/mkcheats $<
 
 ################################################################################
 # Files
@@ -769,6 +775,10 @@ $(B_DIR)/%.o: src/%.c $(ASSETMGR_O_FILES) $(RECOMP_FILES)
 	@mkdir -p $(dir $@)
 	$(CC) -c $(CFLAGS) $(OPT_LVL) -o $@ $<
 
+$(B_DIR)/generated/%.o: src/generated/common/%.c $(ASSETMGR_O_FILES) $(RECOMP_FILES)
+	@mkdir -p $(dir $@)
+	$(CC) -c $(CFLAGS) $(OPT_LVL) -o $@ $<
+
 $(B_DIR)/%.o: src/%.s
 	@mkdir -p $(dir $@)
 	cpp -P -Wno-trigraphs -I include -I include/PR -I src/include $(C_DEFINES) -D_LANGUAGE_ASSEMBLY -D_MIPSEB $< | $(AS) $(ASFLAGS) -o $@
@@ -789,4 +799,4 @@ allclean:
 	rm -rf build/*
 
 codeclean:
-	find $(B_DIR)/game $(B_DIR)/inflate $(B_DIR)/lib -name '*.o' -delete
+	find $(B_DIR)/game $(B_DIR)/generated $(B_DIR)/inflate $(B_DIR)/lib -name '*.o' -delete

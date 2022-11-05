@@ -4,13 +4,10 @@
 #include "data.h"
 #include "types.h"
 
-extern struct menudialogdef g_CheatsMenuDialog;
-extern struct menudialogdef g_CheatsFunMenuDialog;
-extern struct menudialogdef g_CheatsGameplayMenuDialog;
-extern struct menudialogdef g_CheatsSoloWeaponsMenuDialog;
-extern struct menudialogdef g_CheatsClassicWeaponsMenuDialog;
-extern struct menudialogdef g_CheatsWeaponsMenuDialog;
-extern struct menudialogdef g_CheatsBuddiesMenuDialog;
+#define cheatIsAllContentUnlocked()	(g_Cheats[CHEAT_UNLOCKALLCONTENT].active)
+#define cheatIsInvalid(cheat_id)	(cheat_id < 0 || cheat_id >= NUM_CHEATS)
+
+extern struct cheat g_Cheats[NUM_CHEATS];
 
 u32 cheatIsUnlocked(s32 cheat_id);
 bool cheatIsActive(s32 cheat_id);
@@ -26,7 +23,9 @@ s32 cheatGetTime(s32 cheat_id);
 char *cheatGetName(s32 cheat_id);
 s32 cheatMenuHandleDialog(s32 operation, struct menudialogdef *dialogdef, union handlerdata *data);
 s32 cheatCheckboxMenuHandler(s32 operation, struct menuitem *item, union handlerdata *data);
-s32 cheatMenuHandleBuddyCheckbox(s32 operation, struct menuitem *item, union handlerdata *data);
 s32 cheatMenuHandleTurnOffAllCheats(s32 operation, struct menuitem *item, union handlerdata *data);
+s32 cheatAreInvalidatingCheatsActive();
+s32 cheatAreSoloInvalidatingCheatsEnabled();
+s32 cheatAreMultiInvalidatingCheatsEnabled();
 
 #endif

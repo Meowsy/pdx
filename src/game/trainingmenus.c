@@ -263,12 +263,6 @@ s32 frTrainingStatsMenuDialog(s32 operation, struct menudialogdef *dialogdef, un
  */
 s32 frDifficultyDropdownMenuHandler(s32 operation, struct menuitem *item, union handlerdata *data)
 {
-	u16 names[] = {
-		L_MPMENU_439, // "Bronze"
-		L_MPMENU_440, // "Silver"
-		L_MPMENU_441, // "Gold"
-	};
-
 	switch (operation) {
 	case MENUOP_GETOPTIONCOUNT:
 		data->dropdown.value = ciGetFiringRangeScore(frGetSlot()) + 1;
@@ -278,7 +272,7 @@ s32 frDifficultyDropdownMenuHandler(s32 operation, struct menuitem *item, union 
 		}
 		break;
 	case MENUOP_GETOPTIONTEXT:
-		return (s32) langGet(names[data->dropdown.value]);
+		return (s32) langGet(g_FiringRangeDifficultyNames[data->dropdown.value]);
 	case MENUOP_SET:
 		frSetDifficulty(data->dropdown.value);
 		menuPushDialog(&g_FrTrainingInfoPreGameMenuDialog);
@@ -352,15 +346,9 @@ char *frMenuTextFailReason(struct menuitem *item)
 
 char *frMenuTextDifficultyName(struct menuitem *item)
 {
-	u16 names[] = {
-		L_MPMENU_439, // "Bronze"
-		L_MPMENU_440, // "Silver"
-		L_MPMENU_441, // "Gold"
-	};
-
 	struct frdata *frdata = frGetData();
 
-	return langGet(names[frdata->difficulty]);
+	return langGet(g_FiringRangeDifficultyNames[frdata->difficulty]);
 }
 
 char *frMenuTextTimeTakenValue(struct menuitem *item)

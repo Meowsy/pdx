@@ -223,4 +223,5 @@
 	build/ROMID/game/training.o (section); \
 	build/ROMID/game/trainingmenus.o (section); \
 	build/ROMID/game/modeldef.o (section); \
-	build/ROMID/game/game_1a78b0.o (section);
+	build/ROMID/game/game_1a78b0.o (section); \
+	build/ROMID/generated/cheats.o (section);

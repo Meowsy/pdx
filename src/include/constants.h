@@ -388,54 +388,20 @@
 #define CHANNEL_9  9
 #define CHANNEL_10 10
 
-#define CHEAT_HURRICANEFISTS         0
-#define CHEAT_CLOAKINGDEVICE         1
-#define CHEAT_INVINCIBLE             2
-#define CHEAT_ALLGUNS                3
-#define CHEAT_UNLIMITEDAMMO          4
-#define CHEAT_UNLIMITEDAMMONORELOADS 5
-#define CHEAT_SLOMO                  6
-#define CHEAT_DKMODE                 7
-#define CHEAT_TRENTSMAGNUM           8
-#define CHEAT_FARSIGHT               9
-#define CHEAT_SMALLJO                10
-#define CHEAT_SMALLCHARACTERS        11
-#define CHEAT_ENEMYSHIELDS           12
-#define CHEAT_JOSHIELD               13
-#define CHEAT_SUPERSHIELD            14
-#define CHEAT_CLASSICSIGHT           15
-#define CHEAT_TEAMHEADSONLY          16
-#define CHEAT_PLAYASELVIS            17
-#define CHEAT_ENEMYROCKETS           18
-#define CHEAT_UNLIMITEDAMMOLAPTOP    19
-#define CHEAT_MARQUIS                20
-#define CHEAT_PERFECTDARKNESS        21
-#define CHEAT_PUGILIST               22
-#define CHEAT_HOTSHOT                23
-#define CHEAT_HITANDRUN              24
-#define CHEAT_ALIEN                  25
-#define CHEAT_RTRACKER               26
-#define CHEAT_ROCKETLAUNCHER         27
-#define CHEAT_SNIPERRIFLE            28
-#define CHEAT_XRAYSCANNER            29
-#define CHEAT_SUPERDRAGON            30
-#define CHEAT_LAPTOPGUN              31
-#define CHEAT_PHOENIX                32
-#define CHEAT_PSYCHOSISGUN           33
-#define CHEAT_PP9I                   34
-#define CHEAT_CC13                   35
-#define CHEAT_KL01313                36
-#define CHEAT_KF7SPECIAL             37
-#define CHEAT_ZZT                    38
-#define CHEAT_DMC                    39
-#define CHEAT_AR53                   40
-#define CHEAT_RCP45                  41
+#include "../generated/common/cheats.h"
 
-#define CHEATFLAG_TIMED       0
-#define CHEATFLAG_ALWAYSON    1
-#define CHEATFLAG_TRANSFERPAK 2
-#define CHEATFLAG_COMPLETION  4
-#define CHEATFLAG_FIRINGRANGE 8
+enum cheatflag {
+	CHEATFLAG_TIMED = 0,
+	CHEATFLAG_ALWAYSON = 1,
+	CHEATFLAG_TRANSFERPAK = 2,
+	CHEATFLAG_COMPLETION = 4,
+	CHEATFLAG_FIRINGRANGE = 8,
+	CHEATFLAG_ALWAYSAVAILABLE = 16,
+	CHEATFLAG_INVALIDATING = 32,
+	CHEATFLAG_SOLOONLY = 64,
+	CHEATFLAG_MULTIONLY = 128,
+	CHEATFLAG_BUDDY = 256
+};
 
 #define CHECKSUM_PLACEHOLDER 0x99aabbcc
 
@@ -965,6 +931,7 @@
 #define FRDIFFICULTY_BRONZE 0
 #define FRDIFFICULTY_SILVER 1
 #define FRDIFFICULTY_GOLD   2
+#define NUM_FRDIFFICULTIES  3
 
 #define FRFAILREASON_NOTFAILED         0
 #define FRFAILREASON_OUTOFAMMO         1
@@ -1572,6 +1539,12 @@
 #define MENUDIALOGFLAG_0400              0x0400
 #define MENUDIALOGFLAG_DROPOUTONCLOSE    0x0800
 #define MENUDIALOGFLAG_1000              0x1000
+#define MENUDIALOGFLAG_FULLSCREEN        0x2000
+#if VERSION == VERSION_JPN_FINAL
+#define MENUDIALOGFLAG_FULLSCREEN_JPN    0x2000
+#else
+#define MENUDIALOGFLAG_FULLSCREEN_JPN    0x0000
+#endif
 
 #define MENUDIALOGSTATE_PREOPEN    0
 #define MENUDIALOGSTATE_OPENING    1
@@ -3008,7 +2981,6 @@
 
 #define NUM_BODIES            151
 #define NUM_CHALLENGES        30
-#define NUM_CHEATS            42
 #define NUM_CYCLEABLE_WEAPONS 45
 #define NUM_EXPLOSIONTYPES    26
 #define NUM_FIRESLOTS         20
