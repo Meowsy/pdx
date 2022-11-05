@@ -544,6 +544,10 @@
                 "id": "CHEAT_UNLOCKALLCONTENT",
                 "name": "L_MPWEAPONS_UNLOCKALLCONTENT",
                 "invalidating": false
+            },
+            {
+                "id": "CHEAT_JOPHASE",
+                "name": "L_MPWEAPONS_JOPHASE"
             }
         ]
     }

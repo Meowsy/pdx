@@ -118,6 +118,9 @@ void cheatActivate(s32 cheat_id)
 
 		setCurrentPlayerNum(prevplayernum);
 		break;
+	case CHEAT_JOPHASE:
+		g_Vars.bondcollisions = false;
+		break;
 	}
 
 	g_Cheats[cheat_id].active = true;
@@ -150,6 +153,9 @@ void cheatDeactivate(s32 cheat_id)
 
 			setCurrentPlayerNum(prevplayernum);
 		}
+		break;
+	case CHEAT_JOPHASE:
+		g_Vars.bondcollisions = true;
 		break;
 	}
 
