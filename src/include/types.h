@@ -244,6 +244,9 @@ struct g_vars {
 	/*0x508*/ u32 unk000508;
 	/*0x50c*/ u32 unk00050c;
 	/*0x510*/ f32 unk000510;
+
+			  u8 mpmgg_mpweaponnum;
+			  s32 mpmgg_weaponnum;
 };
 
 struct weaponobj;
@@ -1644,7 +1647,8 @@ struct hangingmonitorsobj { // objtype 0x0c
 struct autogunobj { // objtype 0x0d
 	struct defaultobj base;
 	/*0x5c*/ s16 targetpad;
-	/*0x5e*/ s8 firing;
+	/*0x5e*/ u8 firing : 1;
+	         u8 weaponnum : 7;
 	/*0x5f*/ u8 firecount;
 	/*0x60*/ f32 yzero;
 	/*0x64*/ f32 ymaxleft;
@@ -4358,6 +4362,16 @@ struct scenariodata_htb {
 	s16 padnums[60];
 };
 
+struct scenariodata_mgg {
+	s16 numpads;
+	s16 padnums[60];
+	s32 numpoints[MAX_MPCHRS];
+	struct prop *goldengun;
+	u8 mpweaponnum;
+	u8 highlightgoldengun : 1;
+	u8 showgoldengunonradar : 1;
+};
+
 struct htmterminal {
 	u32 unk00;
 	struct prop *prop;
@@ -4427,6 +4441,7 @@ struct scenariodata {
 		struct scenariodata_pac pac;
 		struct scenariodata_koh koh;
 		struct scenariodata_ctc ctc;
+		struct scenariodata_mgg mgg;
 	};
 };
 

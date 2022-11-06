@@ -1,5 +1,16 @@
 [
     {
+        "id": "L_MPWEAPONS_000",
+        "aka": [ "L_MPWEAPONS_PLAYERHASTHEITEM" ],
+        "en": "%s has the\n%s.\n",
+        "gb": "%s has the\n%s.\n",
+        "jp": "%s は\n%sを\n\\h82ddに\\h82f6れた\n",
+        "it": "%s ha il\n%s\n",
+        "fr": "%s obtient:\n%s\n",
+        "de": "%s hat den\n%s\n",
+        "es": "%s tiene el\n%s\n"
+    },
+    {
         "id": "L_MPWEAPONS_FIRINGRANGECHALLENGE",
         "en": "firing range challenge",
         "gb": "firing range challenge",
@@ -68,5 +79,15 @@
         "fr": "Fantôme Joanna\n",
         "de": "Geist Jo\n",
         "es": "Fantasma Joanna\n"
+    },
+    {
+        "id": "L_MPWEAPONS_GOLDENGUNKILL",
+        "en": "Another glittering end!\n",
+        "gb": "Another glittering end!\n",
+        "jp": "オニを\\h82d9した！\n",
+        "it": "Un'altra morte scintillante!\n",
+        "fr": "Une autre mort étincelante!\n",
+        "de": "Ein weiterer glitzernder Tod!\n",
+        "es": "¡Otra muerte chispeante!\n"
     }
 ]

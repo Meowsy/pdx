@@ -1,2 +1,72 @@
 [
+    {
+        "id": "L_MPMENU_THEGOLDENGUN",
+        "en": "The Golden Gun",
+        "gb": "The Golden Gun",
+        "jp": "ゴールデンガン",
+        "it": "La pistola d'oro",
+        "fr": "Au pistolet d'or",
+        "de": "Dem Goldenen Colt",
+        "es": "La Pistola de Oro"
+    },
+    {
+        "id": "L_MPMENU_GOLDENGUN",
+        "en": "Golden Gun",
+        "gb": "Golden Gun",
+        "jp": "黄金銃",
+        "it": "Pistola d'oro",
+        "fr": "Pistolet d'or",
+        "de": "Goldenen Colt",
+        "es": "Pistola de Oro"
+    },
+    {
+        "id": "L_MPMENU_GOLDENGUNCOLON",
+        "en": "Golden Gun:\n",
+        "gb": "Golden Gun:\n",
+        "jp": "黄金銃\n",
+        "it": "Pistola d'oro:\n",
+        "fr": "Pistolet d'or:\n",
+        "de": "Goldenen Colt:\n",
+        "es": "Pistola de Oro:\n"
+    },
+    {
+        "id": "L_MPMENU_GOLDENGUNOPT",
+        "en": "Golden Gun\n",
+        "gb": "Golden Gun\n",
+        "jp": "黄金銃\n",
+        "it": "Pistola d'oro\n",
+        "fr": "Pistolet d'or\n",
+        "de": "Goldenen Colt\n",
+        "es": "Pistola de Oro\n"
+    },
+    {
+        "id": "L_MPMENU_GOLDENGUNOPTIONS",
+        "en": "Golden Gun Options\n",
+        "gb": "Golden Gun Options\n",
+        "jp": "黄金銃\n",
+        "it": "Opzioni pistola d'oro\n",
+        "fr": "Options pistolet d'or\n",
+        "de": "Goldenen Colt-Optionen\n",
+        "es": "Opciones de Pistola de Oro\n"
+    },
+    {
+        "id": "L_OPTIONS_NEWGAMEMODES",
+        "en": "-New-\n",
+        "gb": "-New-\n",
+        "jp": "Ｎｅｗ\n",
+        "it": "-Nuovo-\n",
+        "fr": "-Nouveau-\n",
+        "de": "-Neu-\n",
+        "es": "-Nuevo-\n"
+    },
+    {
+        "id": "L_MPMENU_HIGHLIGHTGOLDENGUN",
+        "en": "Highlight Golden Gun\n",
+        "gb": "Highlight Golden Gun\n",
+        "jp": "黄金銃の\\h83ba\\h8482\n",
+        "it": "Mostra Pistola d'oro\n",
+        "fr": "Montrer le pistolet d'or\n",
+        "de": "Goldenen Colt anzeigen\n",
+        "es": "Mostrar Pistola de Oro\n"
+    }
 ]

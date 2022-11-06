@@ -731,6 +731,9 @@ void setupPlaceWeapon(struct weaponobj *weapon, s32 cmdindex)
 				weapon->base.modelnum = mpweapon->model;
 				weapon->base.extrascale = mpweapon->extrascale;
 				giveweapon = mpweapon->giveweapon;
+				if (mpweapon->weaponnum == g_Vars.mpmgg_weaponnum && g_ScenarioData.mgg.goldengun != NULL) {
+					giveweapon = false;
+				}
 
 				if (mpweapon->weaponnum == WEAPON_MPSHIELD) {
 					struct shieldobj *shield = (struct shieldobj *)weapon;
@@ -865,6 +868,7 @@ void setupCreateAutogun(struct autogunobj *autogun, s32 cmdindex)
 	autogun->firing = false;
 	autogun->ammoquantity = 255;
 	autogun->shotbondsum = 0;
+	autogun->weaponnum = WEAPON_RCP45;
 
 	if (autogun->targetpad >= 0) {
 		u32 stack1;

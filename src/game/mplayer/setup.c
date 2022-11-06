@@ -273,17 +273,21 @@ s32 menuhandlerMpControlStyle(s32 operation, struct menuitem *item, union handle
 
 s32 menuhandlerMpWeaponSlot(s32 operation, struct menuitem *item, union handlerdata *data)
 {
+	bool (*condition)(s32) = item->param3 == ARRAYCOUNT(g_MpSetup.weapons) ? &mpIsValidGoldenGun : &mpIsUnlockedGun;
+
 	switch (operation) {
+	case MENUOP_CHECKHIDDEN:
+		return item->param3 == ARRAYCOUNT(g_MpSetup.weapons) && g_MpSetup.scenario != MPSCENARIO_GOLDENGUN;
 	case MENUOP_GETOPTIONCOUNT:
-		data->dropdown.value = mpGetNumWeaponOptions();
+		data->dropdown.value = mpGetNumWeaponOptions(condition);
 		break;
 	case MENUOP_GETOPTIONTEXT:
-		return (s32) mpGetWeaponLabel(data->dropdown.value);
+		return (s32) mpGetWeaponLabel(data->dropdown.value, condition);
 	case MENUOP_SET:
-		mpSetWeaponSlot(item->param3, data->dropdown.value);
+		mpSetWeaponSlot(item->param3, data->dropdown.value, condition);
 		break;
 	case MENUOP_GETSELECTEDINDEX:
-		data->dropdown.value = mpGetWeaponSlot(item->param3);
+		data->dropdown.value = mpGetWeaponSlot(item->param3, condition);
 	}
 
 	return 0;
@@ -291,7 +295,9 @@ s32 menuhandlerMpWeaponSlot(s32 operation, struct menuitem *item, union handlerd
 
 char *mpMenuTextWeaponNameForSlot(struct menuitem *item)
 {
-	return mpGetWeaponLabel(mpGetWeaponSlot(item->param));
+	bool (*condition)(s32) = item->param3 == ARRAYCOUNT(g_MpSetup.weapons) ? &mpIsValidGoldenGun : &mpIsUnlockedGun;
+
+	return mpGetWeaponLabel(mpGetWeaponSlot(item->param, condition), condition);
 }
 
 s32 menuhandlerMpWeaponSetDropdown(s32 operation, struct menuitem *item, union handlerdata *data)
@@ -1226,6 +1232,14 @@ struct menuitem g_MpWeaponsMenuItems[] = {
 		menuhandlerMpWeaponSlot,
 	},
 	{
+		MENUITEMTYPE_DROPDOWN,
+		0,
+		MENUITEMFLAG_DROPDOWN_BELOW | MENUITEMFLAG_LOCKABLEMINOR,
+		L_MPMENU_GOLDENGUNCOLON, // "Golden Gun:"
+		ARRAYCOUNT(g_MpSetup.weapons),
+		menuhandlerMpWeaponSlot,
+	},
+	{
 		MENUITEMTYPE_SEPARATOR,
 		0,
 		0,
@@ -2105,7 +2119,7 @@ char *mpMenuTextMpconfigMarquee(struct menuitem *item)
 			// "%s:  Scenario: %s   Arena: %s    Simulants: %d"
 			sprintf(g_StringPointer, langGet(L_MPMENU_140),
 					filename,
-					langGet(g_MpScenarioOverviews[scenarionum].name),
+					langGet(g_MpScenarios[scenarionum].name),
 					langGet(g_MpArenas[arenanum].name),
 					numsims);
 		} else {
@@ -2115,7 +2129,7 @@ char *mpMenuTextMpconfigMarquee(struct menuitem *item)
 		// "%s:  Scenario: %s   Arena: %s    Simulants: %d"
 		sprintf(g_StringPointer, langGet(L_MPMENU_140),
 				filename,
-				langGet(g_MpScenarioOverviews[scenarionum].name),
+				langGet(g_MpScenarios[scenarionum].name),
 				langGet(g_MpArenas[arenanum].name),
 				numsims);
 #endif

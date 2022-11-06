@@ -36,44 +36,6 @@
 #include "data.h"
 #include "types.h"
 
-/**
- * There are six multiplayer scenarios:
- *
- * - Combat
- * - Hold the Briefcase (HTB)
- * - Capture the Case (CTC)
- * - Hack that Mac (HTM) - labelled as Hacker Central
- * - King of the Hill (KOH)
- * - Pop a Cap (PAC)
- *
- * Each scenario registers callback functions for certain events. For example,
- * code elsewhere in the game may call scenarioTick, then scenarioTick checks
- * if the current scenario has a tick callback defined (eg. htbTick). If so,
- * that scenario's callback is run.
- */
-
-struct mpscenario {
-	struct menudialogdef *optionsdialog;
-	void (*initfunc)(void);
-	s32 (*numpropsfunc)(void);
-	void (*initpropsfunc)(void);
-	void (*tickfunc)(void);
-	void (*tickchrfunc)(struct chrdata *chr);
-	Gfx *(*hudfunc)(Gfx *gdl);
-	void (*calcscorefunc)(struct mpchrconfig *mpchr, s32 chrnum, s32 *score, s32 *deaths);
-	Gfx *(*radarextrafunc)(Gfx *gdl);
-	bool (*radarchrfunc)(Gfx **gdl, struct prop *prop);
-	bool (*highlightpropfunc)(struct prop *prop, s32 *colour);
-	bool (*spawnfunc)(f32 arg0, struct coord *pos, s16 *rooms, struct prop *prop, f32 *arg4);
-	s32 (*maxteamsfunc)(void);
-	bool (*isroomhighlightedfunc)(s16 room);
-	void (*highlightroomfunc)(s16 room, s32 *arg1, s32 *arg2, s32 *arg3);
-	void *unk3c; // never hooked into nor fired
-	void (*readsavefunc)(struct savebuffer *buffer);
-	void (*writesavefunc)(struct savebuffer *buffer);
-};
-
-#if VERSION >= VERSION_JPN_FINAL
 char *scenarioRemoveLineBreaks(char *src, s32 stringnum)
 {
 	static char strings[2][30];
@@ -91,7 +53,6 @@ char *scenarioRemoveLineBreaks(char *src, s32 stringnum)
 
 	return strings[stringnum];
 }
-#endif
 
 struct scenariodata g_ScenarioData;
 
@@ -171,93 +132,179 @@ s32 menuhandlerMpSlowMotion(s32 operation, struct menuitem *item, union handlerd
 #include "scenarios/kingofthehill.inc"
 #include "scenarios/hackthatmac.inc"
 #include "scenarios/popacap.inc"
+#include "scenarios/goldengun.inc"
 
 // Define the scenario callbacks
 struct mpscenario g_MpScenarios[] = {
 	{
-		&g_MpCombatOptionsMenuDialog,
+		L_MPMENU_246,                 // "Combat"
+		L_MPMENU_253,                 // "Combat"
+		0,                            // Required Feature
+		false,                        // Team Only
+		&g_MpCombatOptionsMenuDialog, // Options Dialog
+		NULL,                         // Init Scenario
+		NULL,                         // Number of Props
+		NULL,                         // Init Props
+		NULL,                         // Tick Scenario
+		NULL,                         // Tick Chr
+		NULL,                         // Render HUD
+		NULL,                         // Calculate Player Score
+		NULL,                         // Radar Extra
+		NULL,                         // Radar Chr
+		NULL,                         // Highlight Prop
+		NULL,                         // Choose Spawn Location
+		NULL,                         // Get Max Teams
+		NULL,                         // Is Room Highlighted?
+		NULL,                         // Highlight Room
+		NULL,                         // Never hooked into nor fired
+		NULL,                         // Read Save
+		NULL,                         // Write Save
+		NULL,                         // Handle Death
 	}, {
-		&g_HtbOptionsMenuDialog,
-		htbInit,
-		htbNumProps,
-		htbInitProps,
-		htbTick,
-		htbTickChr,
-		htbRenderHud,
-		htbCalculatePlayerScore,
-		htbRadarExtra,
-		htbRadarChr,
-		htbHighlightProp,
+		L_MPMENU_247,                 // "Hold the Briefcase"
+		L_MPMENU_254,                 // "Briefcase"
+		MPFEATURE_SCENARIO_HTB,       // Required Feature
+		false,                        // Team Only
+		&g_HtbOptionsMenuDialog,      // Options Dialog
+		htbInit,                      // Init Scenario
+		htbNumProps,                  // Number of Props
+		htbInitProps,                 // Init Props
+		htbTick,                      // Tick Scenario
+		htbTickChr,                   // Tick Chr
+		htbRenderHud,                 // Render HUD
+		htbCalculatePlayerScore,      // Calculate Player Score
+		htbRadarExtra,                // Radar Extra
+		htbRadarChr,                  // Radar Chr
+		htbHighlightProp,             // Highlight Prop
+		NULL,                         // Choose Spawn Location
+		NULL,                         // Get Max Teams
+		NULL,                         // Is Room Highlighted?
+		NULL,                         // Highlight Room
+		NULL,                         // Never hooked into nor fired
+		NULL,                         // Read Save
+		NULL,                         // Write Save
+		NULL,                         // Handle Death
 	}, {
-		&g_HtmOptionsMenuDialog,
-		htmInit,
-		htmNumProps,
-		htmInitProps,
-		htmTick,
-		htmTickChr,
-		htmRenderHud,
-		htmCalculatePlayerScore,
-		htmRadarExtra,
-		htmRadarChr,
-		htmHighlightProp,
+		L_MPMENU_248,                 // "Hacker Central"
+		L_MPMENU_255,                 // "Hacker"
+		MPFEATURE_SCENARIO_HTM,       // Required Feature
+		false,                        // Team Only
+		&g_HtmOptionsMenuDialog,      // Options Dialog
+		htmInit,                      // Init Scenario
+		htmNumProps,                  // Number of Props
+		htmInitProps,                 // Init Props
+		htmTick,                      // Tick Scenario
+		htmTickChr,                   // Tick Chr
+		htmRenderHud,                 // Render HUD
+		htmCalculatePlayerScore,      // Calculate Player Score
+		htmRadarExtra,                // Radar Extra
+		htmRadarChr,                  // Radar Chr
+		htmHighlightProp,             // Highlight Prop
+		NULL,                         // Choose Spawn Location
+		NULL,                         // Get Max Teams
+		NULL,                         // Is Room Highlighted?
+		NULL,                         // Highlight Room
+		NULL,                         // Never hooked into nor fired
+		NULL,                         // Read Save
+		NULL,                         // Write Save
+		NULL,                         // Handle Death
 	}, {
-		&g_PacOptionsMenuDialog,
-		pacInit,
-		NULL,
-		pacInitProps,
-		pacTick,
-		NULL,
-		pacRenderHud,
-		pacCalculatePlayerScore,
-		pacRadarExtra,
-		pacRadarChr,
-		pacHighlightProp,
+		L_MPMENU_249,                 // "Pop a Cap"
+		L_MPMENU_256,                 // "Pop"
+		MPFEATURE_SCENARIO_PAC,       // Required Feature
+		false,                        // Team Only
+		&g_PacOptionsMenuDialog,      // Options Dialog
+		pacInit,                      // Init Scenario
+		NULL,                         // Number of Props
+		pacInitProps,                 // Init Props
+		pacTick,                      // Tick Scenario
+		NULL,                         // Tick Chr
+		pacRenderHud,                 // Render HUD
+		pacCalculatePlayerScore,      // Calculate Player Score
+		pacRadarExtra,                // Radar Extra
+		pacRadarChr,                  // Radar Chr
+		pacHighlightProp,             // Highlight Prop
+		NULL,                         // Choose Spawn Location
+		NULL,                         // Get Max Teams
+		NULL,                         // Is Room Highlighted?
+		NULL,                         // Highlight Room
+		NULL,                         // Never hooked into nor fired
+		NULL,                         // Read Save
+		NULL,                         // Write Save
+		pacHandleDeath,               // Handle Death
 	}, {
-		&g_KohOptionsMenuDialog,
-		kohInit,
-		NULL,
-		kohInitProps,
-		kohTick,
-		NULL,
-		kohRenderHud,
-		kohCalculatePlayerScore,
-		kohRadarExtra,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		kohIsRoomHighlighted,
-		kohHighlightRoom,
-		NULL,
-		kohReadSave,
-		kohWriteSave
+		L_MPMENU_250,                 // "King of the Hill"
+		L_MPMENU_257,                 // "Hill"
+		MPFEATURE_SCENARIO_KOH,       // Required Feature
+		true,                         // Team Only
+		&g_KohOptionsMenuDialog,      // Options Dialog
+		kohInit,                      // Init Scenario
+		NULL,                         // Number of Props
+		kohInitProps,                 // Init Props
+		kohTick,                      // Tick Scenario
+		NULL,                         // Tick Chr
+		kohRenderHud,                 // Render HUD
+		kohCalculatePlayerScore,      // Calculate Player Score
+		kohRadarExtra,                // Radar Extra
+		NULL,                         // Radar Chr
+		NULL,                         // Highlight Prop
+		NULL,                         // Choose Spawn Location
+		NULL,                         // Get Max Teams
+		kohIsRoomHighlighted,         // Is Room Highlighted?
+		kohHighlightRoom,             // Highlight Room
+		NULL,                         // Never hooked into nor fired
+		kohReadSave,                  // Read Save
+		kohWriteSave,                 // Write Save
+		NULL,                         // Handle Death
 	}, {
-		&g_CtcOptionsMenuDialog,
-		ctcInit,
-		ctcNumProps,
-		ctcInitProps,
-		ctcTick,
-		ctcTickChr,
-		NULL,
-		ctcCalculatePlayerScore,
-		ctcRadarExtra,
-		ctcRadarChr,
-		ctcHighlightProp,
-		ctcChooseSpawnLocation,
-		ctcGetMaxTeams,
-		ctcIsRoomHighlighted,
-		ctcHighlightRoom,
+		L_MPMENU_251,                 // "Capture the Case"
+		L_MPMENU_258,                 // "Capture"
+		MPFEATURE_SCENARIO_CTC,       // Required Feature
+		true,                         // Team Only
+		&g_CtcOptionsMenuDialog,      // Options Dialog
+		ctcInit,                      // Init Scenario
+		ctcNumProps,                  // Number of Props
+		ctcInitProps,                 // Init Props
+		ctcTick,                      // Tick Scenario
+		ctcTickChr,                   // Tick Chr
+		NULL,                         // Render HUD
+		ctcCalculatePlayerScore,      // Calculate Player Score
+		ctcRadarExtra,                // Radar Extra
+		ctcRadarChr,                  // Radar Chr
+		ctcHighlightProp,             // Highlight Prop
+		ctcChooseSpawnLocation,       // Choose Spawn Location
+		ctcGetMaxTeams,               // Get Max Teams
+		ctcIsRoomHighlighted,         // Is Room Highlighted?
+		ctcHighlightRoom,             // Highlight Room
+		NULL,                         // Never hooked into nor fired
+		NULL,                         // Read Save
+		NULL,                         // Write Save
+		NULL,                         // Handle Death
+	}, {
+		L_MPMENU_THEGOLDENGUN,        // "The Golden Gun"
+		L_MPMENU_GOLDENGUN,           // "Golden Gun"
+		0,                            // Required Feature
+		false,                        // Team Only
+		&g_MggOptionsMenuDialog,      // Options Dialog
+		mggInit,                      // Init Scenario
+		NULL,                         // Number of Props
+		NULL,                         // Init Props
+		mggTick,                      // Tick Scenario
+		NULL,                         // Tick Chr
+		NULL,                         // Render HUD
+		mggCalculatePlayerScore,      // Calculate Player Score
+		mggRadarExtra,                // Radar Extra
+		mggRadarChr,                  // Radar Chr
+		mggHighlightProp,             // Highlight Prop
+		NULL,                         // Choose Spawn Location
+		NULL,                         // Get Max Teams
+		NULL,                         // Is Room Highlighted?
+		NULL,                         // Highlight Room
+		NULL,                         // Never hooked into nor fired
+		mggReadSave,                  // Read Save
+		mggWriteSave,                 // Write Save
+		mggHandleDeath,               // Handle Death
 	},
-};
-
-struct mpscenariooverview g_MpScenarioOverviews[] = {
-	// name, short name, require feature, team only
-	{ L_MPMENU_246, L_MPMENU_253, 0,                      false }, // "Combat", "Combat"
-	{ L_MPMENU_247, L_MPMENU_254, MPFEATURE_SCENARIO_HTB, false }, // "Hold the Briefcase", "Briefcase"
-	{ L_MPMENU_248, L_MPMENU_255, MPFEATURE_SCENARIO_HTM, false }, // "Hacker Central", "Hacker"
-	{ L_MPMENU_249, L_MPMENU_256, MPFEATURE_SCENARIO_PAC, false }, // "Pop a Cap", "Pop"
-	{ L_MPMENU_250, L_MPMENU_257, MPFEATURE_SCENARIO_KOH, true  }, // "King of the Hill", "Hill"
-	{ L_MPMENU_251, L_MPMENU_258, MPFEATURE_SCENARIO_CTC, true  }, // "Capture the Case", "Capture"
 };
 
 /**
@@ -289,13 +336,13 @@ s32 mpOptionsMenuDialog(s32 operation, struct menudialogdef *dialogdef, union ha
 
 char *mpMenuTextScenarioShortName(struct menuitem *item)
 {
-	sprintf(g_StringPointer, "%s\n", langGet(g_MpScenarioOverviews[g_MpSetup.scenario].shortname));
+	sprintf(g_StringPointer, "%s\n", langGet(g_MpScenarios[g_MpSetup.scenario].shortname));
 	return g_StringPointer;
 }
 
 char *mpMenuTextScenarioName(struct menuitem *item)
 {
-	sprintf(g_StringPointer, "%s\n", langGet(g_MpScenarioOverviews[g_MpSetup.scenario].name));
+	sprintf(g_StringPointer, "%s\n", langGet(g_MpScenarios[g_MpSetup.scenario].name));
 	return g_StringPointer;
 }
 
@@ -307,8 +354,9 @@ struct scenariogroup {
 s32 scenarioScenarioMenuHandler(s32 operation, struct menuitem *item, union handlerdata *data)
 {
 	struct scenariogroup groups[] = {
-		{ 0, L_MPMENU_244 }, // "Free for All!"
-		{ 4, L_MPMENU_245 }, // "-Teamwork-"
+		{ MPSCENARIO_COMBAT,        L_MPMENU_244           }, // "Free for All!"
+		{ MPSCENARIO_KINGOFTHEHILL, L_MPMENU_245           }, // "-Teamwork-"
+		{ MPSCENARIO_GOLDENGUN,     L_OPTIONS_NEWGAMEMODES }, // "-New-"
 	};
 
 	s32 i;
@@ -323,9 +371,9 @@ s32 scenarioScenarioMenuHandler(s32 operation, struct menuitem *item, union hand
 
 	switch (operation) {
 	case MENUOP_GETOPTIONCOUNT:
-		for (i = 0; i < ARRAYCOUNT(g_MpScenarioOverviews); i++) {
-			if (challengeIsFeatureUnlocked(g_MpScenarioOverviews[i].requirefeature)
-					&& (teamgame || g_MpScenarioOverviews[i].teamonly == false)) {
+		for (i = 0; i < ARRAYCOUNT(g_MpScenarios); i++) {
+			if (challengeIsFeatureUnlocked(g_MpScenarios[i].requirefeature)
+					&& (teamgame || g_MpScenarios[i].teamonly == false)) {
 				count++;
 			}
 		}
@@ -333,11 +381,11 @@ s32 scenarioScenarioMenuHandler(s32 operation, struct menuitem *item, union hand
 		data->list.value = count;
 		break;
 	case MENUOP_GETOPTIONTEXT:
-		for (i = 0; i < ARRAYCOUNT(g_MpScenarioOverviews); i++) {
-			if (challengeIsFeatureUnlocked(g_MpScenarioOverviews[i].requirefeature)
-					&& (teamgame || g_MpScenarioOverviews[i].teamonly == false)) {
+		for (i = 0; i < ARRAYCOUNT(g_MpScenarios); i++) {
+			if (challengeIsFeatureUnlocked(g_MpScenarios[i].requirefeature)
+					&& (teamgame || g_MpScenarios[i].teamonly == false)) {
 				if (count == data->list.value) {
-					return (s32)langGet(g_MpScenarioOverviews[i].name);
+					return (s32)langGet(g_MpScenarios[i].name);
 				}
 
 				count++;
@@ -346,9 +394,9 @@ s32 scenarioScenarioMenuHandler(s32 operation, struct menuitem *item, union hand
 
 		break;
 	case MENUOP_SET:
-		for (i = 0; i < ARRAYCOUNT(g_MpScenarioOverviews); i++) {
-			if (challengeIsFeatureUnlocked(g_MpScenarioOverviews[i].requirefeature)
-					&& (teamgame || g_MpScenarioOverviews[i].teamonly == false)) {
+		for (i = 0; i < ARRAYCOUNT(g_MpScenarios); i++) {
+			if (challengeIsFeatureUnlocked(g_MpScenarios[i].requirefeature)
+					&& (teamgame || g_MpScenarios[i].teamonly == false)) {
 				if (count == data->list.value) {
 					g_MpSetup.scenario = i;
 					break;
@@ -361,9 +409,9 @@ s32 scenarioScenarioMenuHandler(s32 operation, struct menuitem *item, union hand
 		scenarioInit();
 		break;
 	case MENUOP_GETSELECTEDINDEX:
-		for (i = 0; i < ARRAYCOUNT(g_MpScenarioOverviews); i++) {
-			if (challengeIsFeatureUnlocked(g_MpScenarioOverviews[i].requirefeature)
-					&& (teamgame || g_MpScenarioOverviews[i].teamonly == false)) {
+		for (i = 0; i < ARRAYCOUNT(g_MpScenarios); i++) {
+			if (challengeIsFeatureUnlocked(g_MpScenarios[i].requirefeature)
+					&& (teamgame || g_MpScenarios[i].teamonly == false)) {
 				if (i == g_MpSetup.scenario) {
 					data->list.value = count;
 					break;
@@ -375,7 +423,7 @@ s32 scenarioScenarioMenuHandler(s32 operation, struct menuitem *item, union hand
 
 		break;
 	case MENUOP_GETOPTGROUPCOUNT:
-		data->list.value = 2;
+		data->list.value = ARRAYCOUNT(groups);
 
 		if (!teamgame || (!challengeIsFeatureUnlocked(MPFEATURE_SCENARIO_KOH) && !challengeIsFeatureUnlocked(MPFEATURE_SCENARIO_CTC))) {
 			data->list.value--;
@@ -385,8 +433,8 @@ s32 scenarioScenarioMenuHandler(s32 operation, struct menuitem *item, union hand
 		return (s32)langGet(groups[data->list.value].textid);
 	case MENUOP_GETGROUPSTARTINDEX:
 		for (i = 0; i < groups[data->list.value].startindex; i++) {
-			if (challengeIsFeatureUnlocked(g_MpScenarioOverviews[i].requirefeature)
-					&& (teamgame || g_MpScenarioOverviews[i].teamonly == false)) {
+			if (challengeIsFeatureUnlocked(g_MpScenarios[i].requirefeature)
+					&& (teamgame || g_MpScenarios[i].teamonly == false)) {
 				count++;
 			}
 		}
@@ -497,7 +545,7 @@ void scenarioCreateMatchStartHudmsgs(void)
 #endif
 	}
 
-	sprintf(scenarioname, "%s\n", langGet(g_MpScenarioOverviews[g_MpSetup.scenario].name));
+	sprintf(scenarioname, "%s\n", langGet(g_MpScenarios[g_MpSetup.scenario].name));
 
 	for (i = 0; i < g_MpNumChrs; i++) {
 		if (g_MpAllChrPtrs[i]->aibot == NULL) {
@@ -842,6 +890,9 @@ void scenarioReset(void)
 		htbReset();
 		break;
 	case MPSCENARIO_POPACAP:
+		break;
+	case MPSCENARIO_GOLDENGUN:
+		g_ScenarioData.mgg.goldengun = NULL;
 		break;
 	}
 
@@ -1464,6 +1515,47 @@ s32 scenarioPickUpUplink(struct chrdata *chr, struct prop *prop)
 }
 
 /**
+ * Handle a player or bot picking up the Golden Gun.
+ */
+void scenarioPickUpGoldenGun(struct chrdata *chr, struct prop *prop)
+{
+	s32 i;
+	char message[64];
+	struct mpchrconfig *mpchr;
+	u32 playernum;
+
+	g_ScenarioData.htm.uplink = chr->prop;
+
+	if (chr->aibot) {
+		mpchr = g_MpAllChrConfigPtrs[mpPlayerGetIndex(chr)];
+	} else {
+		mpchr = MPCHR(g_Vars.playerstats[g_Vars.currentplayernum].mpindex);
+	}
+
+	// "%s has the\n%s."
+	sprintf(message, langGet(L_MPWEAPONS_PLAYERHASTHEITEM), scenarioRemoveLineBreaks(mpchr->name, 0), scenarioRemoveLineBreaks(bgunGetShortName(g_Vars.mpmgg_weaponnum), 1));
+	playernum = g_Vars.currentplayernum;
+
+	for (i = 0; i < PLAYERCOUNT(); i++) {
+		if (chr->aibot || i != playernum) {
+			setCurrentPlayerNum(i);
+
+#if VERSION >= VERSION_JPN_FINAL
+			hudmsgCreateWithFlags(message, HUDMSGTYPE_MPSCENARIO, HUDMSGFLAG_ONLYIFALIVE | HUDMSGFLAG_NOWRAP);
+#else
+			hudmsgCreateWithFlags(message, HUDMSGTYPE_MPSCENARIO, HUDMSGFLAG_ONLYIFALIVE);
+#endif
+		}
+	}
+
+	setCurrentPlayerNum(playernum);
+
+	if (chr->aibot) {
+		chr->aibot->hasuplink = true;
+	}
+}
+
+/**
  * Handle a terminal being activated with the data uplink.
  */
 void scenarioHandleActivatedProp(struct chrdata *chr, struct prop *prop)
@@ -1480,5 +1572,15 @@ void scenarioHandleActivatedProp(struct chrdata *chr, struct prop *prop)
 				obj->hidden |= OBJHFLAG_ACTIVATED_BY_BOND;
 			}
 		}
+	}
+}
+
+/**
+ * Handle a player or bot dying.
+ */
+void scenarioHandleDeath(s32 aplayernum, s32 vplayernum, struct gset gset)
+{
+	if (g_MpScenarios[g_MpSetup.scenario].handledeathfunc) {
+		g_MpScenarios[g_MpSetup.scenario].handledeathfunc(aplayernum, vplayernum, gset);
 	}
 }
