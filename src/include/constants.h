@@ -388,7 +388,7 @@
 #define CHANNEL_9  9
 #define CHANNEL_10 10
 
-#include "../generated/common/cheats.h"
+#include "gen-cheats.h"
 
 enum cheatflag {
 	CHEATFLAG_TIMED = 0,

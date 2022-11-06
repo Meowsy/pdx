@@ -152,6 +152,7 @@ class TouchAverseFile:
             mode = 'w'
         self.destfilename = filename
         if (not os.path.exists(self.destfilename)):
+            mkpath(self.destfilename)
             self.file = open(self.destfilename, mode, encoding='utf-8')
             self.tempfilename = None
         else:

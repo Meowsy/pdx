@@ -2,6 +2,7 @@
 
 import assetmgr
 import json
+import os
 import sys
 
 def main():
@@ -11,7 +12,7 @@ def main():
 
     data = json.loads(data)
 
-    sourcefile = assetmgr.TouchAverseFile('src/generated/common/cheats.c')
+    sourcefile = assetmgr.TouchAverseFile('src/generated/%s/cheats.c' % os.environ['ROMID'])
     sourcefile.write('#include <ultra64.h>\n#include "constants.h"\n#include "game/cheats.h"\n#include "bss.h"\n#include "data.h"\n#include "types.h"\n\n#define TIME(mins, secs) (mins * 60 + secs)\n#define m\n#define s\n\n')
 
     
@@ -92,6 +93,6 @@ def main():
 
     sourcefile.close()
 
-    assetmgr.write_enums('cheatnum', ['CHEAT_NONE'] + cheatrows, 'cheats.h', 'NUM_CHEATS', start=-1, dir='common')
+    assetmgr.write_enums('cheatnum', ['CHEAT_NONE'] + cheatrows, 'gen-cheats.h', 'NUM_CHEATS', start=-1)
 
 main()
