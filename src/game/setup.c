@@ -26,6 +26,7 @@
 #include "game/propobj.h"
 #include "bss.h"
 #include "lib/args.h"
+#include "lib/dma.h"
 #include "lib/memp.h"
 #include "lib/model.h"
 #include "lib/path.h"
@@ -1277,6 +1278,27 @@ void setupLoadBriefing(s32 stagenum, u8 *buffer, s32 bufferlen, struct briefing 
 	}
 }
 
+extern u8 _setupdishasmSegmentStart;
+
+struct ailist *getStageAilists(void)
+{
+	if (g_StageIndex >= 0 && g_StageIndex < ARRAYCOUNT(g_Stages)) {
+		if (g_Stages[g_StageIndex].ailistsromstart) {
+			u8 *dst = &_setupdishasmSegmentStart;
+			u32 len = g_Stages[g_StageIndex].ailistsromend - g_Stages[g_StageIndex].ailistsromstart;
+
+			dmaExec(dst, (u32) g_Stages[g_StageIndex].ailistsromstart, len);
+
+			osInvalICache(0, ICACHE_SIZE);
+			osInvalDCache(0, DCACHE_SIZE);
+
+			return g_Stages[g_StageIndex].ailists;
+		}
+	}
+
+	return NULL;
+}
+
 void setupLoadFiles(s32 stagenum)
 {
 	s32 i;
@@ -1314,7 +1336,7 @@ void setupLoadFiles(s32 stagenum)
 		g_StageSetup.intro = (s32 *)((u32)setup + (u32)setup->intro);
 		g_StageSetup.props = (u32 *)((u32)setup + (u32)setup->props);
 		g_StageSetup.paths = (struct path *)((u32)setup + (u32)setup->paths);
-		g_StageSetup.ailists = (struct ailist *)((u32)setup + (u32)setup->ailists);
+		g_StageSetup.ailists = getStageAilists();
 
 		g_LoadType = LOADTYPE_PADS;
 
@@ -1323,13 +1345,6 @@ void setupLoadFiles(s32 stagenum)
 		g_StageSetup.waypoints = NULL;
 		g_StageSetup.waygroups = NULL;
 		g_StageSetup.cover = NULL;
-
-		// Convert ailist pointers from file-local to proper pointers
-		if (g_StageSetup.ailists) {
-			for (i = 0; g_StageSetup.ailists[i].list != NULL; i++) {
-				g_StageSetup.ailists[i].list = (u8 *)((u32)setup + (u32)g_StageSetup.ailists[i].list);
-			}
-		}
 
 		// Sort the global AI lists by ID asc
 		do {
@@ -1366,8 +1381,6 @@ void setupLoadFiles(s32 stagenum)
 		// Count the AI lists
 		for (g_NumGlobalAilists = 0; g_GlobalAilists[g_NumGlobalAilists].list != NULL; g_NumGlobalAilists++);
 		for (g_NumLvAilists = 0; g_StageSetup.ailists[g_NumLvAilists].list != NULL; g_NumLvAilists++);
-
-		ailistPreprocessFile(g_StageSetup.ailists, MEMPOOL_STAGE);
 
 		// Convert path pad pointers from file-local to proper pointers
 		// and calculate the path lengths
@@ -1803,35 +1816,6 @@ void setupCreateProps(s32 stagenum)
 						}
 					}
 					break;
-				case OBJTYPE_TRUCK:
-					if (withobjs && (obj->flags2 & diffflag) == 0) {
-						struct truckobj *truck = (struct truckobj *)obj;
-
-						setupCreateObject(obj, index);
-
-						if (obj->model) {
-							struct modelnode *node = modelGetPart(obj->model->filedata, 5);
-
-							if (node) {
-								union modelrwdata *rwdata = modelGetNodeRwData(obj->model, node);
-								rwdata->type05.unk00 = ((obj->flags & OBJFLAG_DEACTIVATED) == 0);
-							}
-						}
-
-						truck->speed = 0;
-						truck->wheelxrot = 0;
-						truck->wheelyrot = 0;
-						truck->speedaim = 0;
-						truck->speedtime60 = -1;
-						truck->turnrot60 = 0;
-						truck->roty = 0;
-						truck->ailist = ailistFindById((u32)truck->ailist);
-						truck->aioffset = truck->ailist;
-						truck->aireturnlist = -1;
-						truck->path = NULL;
-						truck->nextstep = 0;
-					}
-					break;
 				case OBJTYPE_HOVERCAR:
 					if (withhovercars && withobjs && (obj->flags2 & diffflag) == 0) {
 						struct hovercarobj *car = (struct hovercarobj *)obj;
@@ -1847,9 +1831,8 @@ void setupCreateProps(s32 stagenum)
 						car->roty = 0;
 						car->rotx = 0;
 						car->speedtime60 = -1;
-						car->ailist = ailistFindById((s32)car->ailist);
-						car->aioffset = car->ailist;
-						car->aireturnlist = -1;
+						car->aioffset = ailistFindById((s32)car->aioffset);
+						car->aireturnlist = NULL;
 						car->path = NULL;
 						car->nextstep = 0;
 
@@ -1876,9 +1859,8 @@ void setupCreateProps(s32 stagenum)
 						chopper->gunrotx = 0;
 						chopper->barrelrot = 0;
 						chopper->barrelrotspeed = 0;
-						chopper->ailist = ailistFindById((u32)chopper->ailist);
-						chopper->aioffset = chopper->ailist;
-						chopper->aireturnlist = -1;
+						chopper->aioffset = ailistFindById((u32)chopper->aioffset);
+						chopper->aireturnlist = NULL;
 						chopper->path = NULL;
 						chopper->nextstep = 0;
 						chopper->target = -1;
@@ -1907,27 +1889,6 @@ void setupCreateProps(s32 stagenum)
 						chopper->fireslotthing->unk10 = 0.2f;
 						chopper->fireslotthing->unk14 = 0;
 						chopper->dead = false;
-					}
-					break;
-				case OBJTYPE_HELI:
-					if (withobjs && (obj->flags2 & diffflag) == 0) {
-						struct heliobj *heli = (struct heliobj *)obj;
-
-						setupCreateObject(obj, index);
-
-						heli->speed = 0;
-						heli->speedaim = 0;
-						heli->rotoryrot = 0;
-						heli->rotoryspeed = 0;
-						heli->rotoryspeedaim = 0;
-						heli->yrot = 0;
-						heli->speedtime60 = -1;
-						heli->rotoryspeedtime = -1;
-						heli->ailist = ailistFindById((u32)heli->ailist);
-						heli->aioffset = heli->ailist;
-						heli->aireturnlist = -1;
-						heli->path = NULL;
-						heli->nextstep = 0;
 					}
 					break;
 				case OBJTYPE_TAG:

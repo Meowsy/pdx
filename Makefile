@@ -55,9 +55,9 @@ PAL = 0
 # If any value is not big enough, the build system will tell you which one needs
 # to be changed and what to change it to.
 
-ROMALLOCATION_DATA = 0x015000
-ROMALLOCATION_LIB  = 0x038800
-ROMALLOCATION_GAME = 0x100000
+ROMALLOCATION_DATA = 0x00e000
+ROMALLOCATION_LIB  = 0x024000
+ROMALLOCATION_GAME = 0x0d0000
 
 # ROM_SIZE - The desired ROM size in megabytes.
 #
@@ -67,6 +67,19 @@ ROMALLOCATION_GAME = 0x100000
 # "final link failed: memory exhausted"
 
 ROM_SIZE := 32
+
+# ANTIALIAS
+#
+# Enable (1) or disable (0) antialias
+
+ANTIALIAS = 0
+
+# PROFILING
+#
+# If enabled (1), press L to show frate stats followed by D-right to toggle
+# profiling information.
+
+PROFILING = 0
 
 ################################################################################
 
@@ -164,6 +177,14 @@ DEFINES := \
 C_DEFINES := $(foreach d,$(DEFINES),-D$(d))
 AS_DEFINES := $(foreach d,$(DEFINES),--defsym $(d)) --defsym _LANGUAGE_ASSEMBLY=1
 
+ifeq ($(ANTIALIAS),1)
+	C_DEFINES += -DANTIALIAS
+endif
+
+ifeq ($(PROFILING),1)
+	C_DEFINES += -DPROFILING
+endif
+
 A_DIR := src/assets/$(ROMID)
 B_DIR := build/$(ROMID)
 C_DIR := src/assets/common
@@ -230,6 +251,45 @@ O_FILES := \
 	$(LANG_O_FILES) \
 	$(PADS_O_FILES) \
 	$(TILES_O_FILES) \
+	$(B_DIR)/ailists/gailistsasm.o \
+	$(B_DIR)/ailists/setupdishasm.o \
+	$(B_DIR)/ailists/setupameasm.o \
+	$(B_DIR)/ailists/setupearasm.o \
+	$(B_DIR)/ailists/setuparkasm.o \
+	$(B_DIR)/ailists/setupeldasm.o \
+	$(B_DIR)/ailists/setuppeteasm.o \
+	$(B_DIR)/ailists/setupdepoasm.o \
+	$(B_DIR)/ailists/setuplueasm.o \
+	$(B_DIR)/ailists/setuplipasm.o \
+	$(B_DIR)/ailists/setuptraasm.o \
+	$(B_DIR)/ailists/setupcaveasm.o \
+	$(B_DIR)/ailists/setupritasm.o \
+	$(B_DIR)/ailists/setupaztasm.o \
+	$(B_DIR)/ailists/setupdamasm.o \
+	$(B_DIR)/ailists/setuppamasm.o \
+	$(B_DIR)/ailists/setupimpasm.o \
+	$(B_DIR)/ailists/setupleeasm.o \
+	$(B_DIR)/ailists/setupshoasm.o \
+	$(B_DIR)/ailists/setupwaxasm.o \
+	$(B_DIR)/ailists/setupsevasm.o \
+	$(B_DIR)/ailists/setupstatasm.o \
+	$(B_DIR)/ailists/setupateasm.o \
+	$(B_DIR)/ailists/mp_setuparecasm.o \
+	$(B_DIR)/ailists/mp_setupcradasm.o \
+	$(B_DIR)/ailists/mp_setupcrypasm.o \
+	$(B_DIR)/ailists/mp_setupjunasm.o \
+	$(B_DIR)/ailists/mp_setupmp1asm.o \
+	$(B_DIR)/ailists/mp_setupmp3asm.o \
+	$(B_DIR)/ailists/mp_setupmp4asm.o \
+	$(B_DIR)/ailists/mp_setupmp5asm.o \
+	$(B_DIR)/ailists/mp_setupmp9asm.o \
+	$(B_DIR)/ailists/mp_setupmp10asm.o \
+	$(B_DIR)/ailists/mp_setupmp11asm.o \
+	$(B_DIR)/ailists/mp_setupmp12asm.o \
+	$(B_DIR)/ailists/mp_setupmp13asm.o \
+	$(B_DIR)/ailists/mp_setupmp15asm.o \
+	$(B_DIR)/ailists/mp_setupoatasm.o \
+	$(B_DIR)/ailists/mp_setuprefasm.o \
 	$(B_DIR)/assets/animations.o \
 	$(B_DIR)/assets/copyrightZ.o \
 	$(B_DIR)/assets/files/list.o \
@@ -727,6 +787,18 @@ $(B_DIR)/assets/files/%.bin: $(B_DIR)/assets/files/%.elf
 	$(TOOLCHAIN)-objcopy $< $@ -O binary
 
 ################################################################################
+# AI lists
+
+$(B_DIR)/ailists/%.elf: $(B_DIR)/ailists/%.o
+	TOOLCHAIN=$(TOOLCHAIN) tools/mksimpleelf $< $@
+
+$(B_DIR)/ailists/%.bin: $(B_DIR)/ailists/%.elf
+	$(TOOLCHAIN)-objcopy $< $@ -O binary
+
+$(B_DIR)/ailists/%asm.s: $(B_DIR)/ailists/%.bin
+	tools/ai2asm/ai2asm.py $< > $@
+
+################################################################################
 # Miscellaneous
 
 $(B_DIR)/bootloader.o: $(E_DIR)/bootloader.bin
@@ -783,6 +855,9 @@ $(B_DIR)/generated/%.o: $(G_DIR)/%.c $(ASSETMGR_O_FILES) $(RECOMP_FILES)
 $(B_DIR)/%.o: src/%.s
 	@mkdir -p $(dir $@)
 	cpp -P -Wno-trigraphs -I include -I include/PR -I src/include $(C_DEFINES) -D_LANGUAGE_ASSEMBLY -D_MIPSEB $< | $(AS) $(ASFLAGS) -o $@
+
+$(B_DIR)/ailists/%.o: $(B_DIR)/ailists/%.s
+	cpp -P -Wno-trigraphs -I include -I include/PR -I src/include $(C_DEFINES) -D_LANGUAGE_ASSEMBLY -D_MIPSEB $< | $(AS) $(ASFLAGS) -G 0 -o $@
 
 $(B_DIR)/assets/%.o: $(A_DIR)/%.c $(RECOMP_FILES)
 	@mkdir -p $(dir $@)

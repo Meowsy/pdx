@@ -5082,7 +5082,7 @@ void chrDie(struct chrdata *chr, s32 aplayernum)
 		chr->act_die.thudframe2 = -1;
 		chr->act_die.timeextra = 0;
 
-		chr->ailist = ailistFindById(GAILIST_AIBOT_DEAD);
+		chr->ailist = &ailist_0028;
 		chr->aioffset = chr->ailist;
 
 		mpstatsRecordDeath(aplayernum, mpPlayerGetIndex(chr));
@@ -13170,8 +13170,8 @@ void chraTick(struct chrdata *chr)
 			if (chr->aimtesttimer60 < 1) {
 				chr->aimtesttimer60 = TICKS(30);
 
-				if (chr->aishootingatmelist >= 0
-						&& ailistFindById(chr->aishootingatmelist) != chr->ailist
+				if (chr->aishootingatmelist != NULL
+						&& chr->ailist != chr->aishootingatmelist
 						&& chrCanSeeTargetWithExtraCheck(chr)) {
 					chr->chrflags |= CHRCFLAG_CONSIDER_DODGE;
 				}
@@ -13182,36 +13182,10 @@ void chraTick(struct chrdata *chr)
 
 		// Consider setting darkroomlist
 		if (chr->prop
-				&& chr->aidarkroomlist >= 0
+				&& chr->aidarkroomlist != NULL
 				&& roomGetBrightness(chr->prop->rooms[0]) < 25
-				&& ailistFindById(chr->aidarkroomlist) != chr->ailist) {
+				&& chr->ailist != chr->aidarkroomlist) {
 			chr->darkroomthing = true;
-		}
-
-		// Consider setting playerdeadlist
-		if (chr->prop && chr->aiplayerdeadlist >= 0 && g_Vars.currentplayer->isdead) {
-			u32 prevplayernum = g_Vars.currentplayernum;
-			s32 i;
-			s32 playercount = PLAYERCOUNT();
-			bool alldead = true;
-
-			if (playercount >= 2) {
-				for (i = 0; i < playercount && alldead; i++) {
-					if (i != prevplayernum) {
-						setCurrentPlayerNum(i);
-
-						if (g_Vars.currentplayer->isdead == false) {
-							alldead = false;
-						}
-					}
-				}
-
-				setCurrentPlayerNum(prevplayernum);
-			}
-
-			if (alldead && ailistFindById(chr->aiplayerdeadlist) != chr->ailist) {
-				chr->playerdeadthing = true;
-			}
 		}
 
 		if (race == RACE_ROBOT) {
@@ -13297,7 +13271,7 @@ void cutsceneStart(u32 ailistid)
 
 	g_BgChrs[g_NumBgChrs - 1].ailist = ailistFindById(ailistid);
 	g_BgChrs[g_NumBgChrs - 1].aioffset = g_BgChrs[g_NumBgChrs - 1].ailist;
-	g_BgChrs[g_NumBgChrs - 1].aireturnlist = -1;
+	g_BgChrs[g_NumBgChrs - 1].aireturnlist = NULL;
 }
 
 /**
@@ -13410,7 +13384,7 @@ void chraTickBg(void)
 	}
 
 	// Run BG scripts
-	for (i = 0; i < g_NumBgChrs; i++) {
+	for (i = g_NumBgChrs - 1; i >= 0; i--) {
 		if (!g_Vars.autocutplaying || (g_BgChrs[i].hidden2 & CHRH2FLAG_TICKDURINGAUTOCUT)) {
 			chraTick(&g_BgChrs[i]);
 		}

@@ -91,6 +91,7 @@
 #include "lib/memp.h"
 #include "lib/mtx.h"
 #include "lib/music.h"
+#include "lib/profile.h"
 #include "lib/rng.h"
 #include "lib/sched.h"
 #include "lib/snd.h"
@@ -944,8 +945,8 @@ void lvFindThreats(void)
 	}
 }
 
-u8 g_LvShowRates = 0;
-u8 g_LvAntialias = 1;
+u8 g_LvShowStats = 0;
+u8 g_LvStatsPage = 0;
 u8 g_LvRateIndex = 59;
 u8 g_LvOom = 0;
 u32 g_LvOomSize = 0;
@@ -1015,6 +1016,9 @@ Gfx *lvPrintRateGraph(Gfx *gdl)
 	return gdl;
 }
 
+u32 g_LvBefore = 0;
+u32 g_LvAfter = 0;
+
 Gfx *lvPrintRateText(Gfx *gdl)
 {
 	if (g_FontHandelGothicXs) {
@@ -1061,9 +1065,6 @@ Gfx *lvPrintRateText(Gfx *gdl)
 		}
 
 		x = 10;
-		sprintf(buffer, "Antialias %s\n", g_LvAntialias ? "on" : "off");
-		gdl = textRender(gdl, &x, &y, buffer, g_CharsHandelGothicXs, g_FontHandelGothicXs, 0x00ff00a0, 0x000000a0, viGetWidth(), viGetHeight(), 0, 0);
-
 		sprintf(buffer, "mema free %d KB\n", memaGetLongestFree() / 1024);
 		gdl = textRender(gdl, &x, &y, buffer, g_CharsHandelGothicXs, g_FontHandelGothicXs, 0x00ff00a0, 0x000000a0, viGetWidth(), viGetHeight(), 0, 0);
 
@@ -1082,17 +1083,18 @@ Gfx *lvPrintRateText(Gfx *gdl)
 Gfx *lvPrint(Gfx *gdl)
 {
 	if (joyGetButtonsPressedThisFrame(0, L_TRIG)) {
-		g_LvShowRates = 1 - g_LvShowRates;
+		g_LvShowStats = 1 - g_LvShowStats;
 	}
 
-	if (joyGetButtonsPressedThisFrame(0, U_JPAD)) {
-		g_LvAntialias = 1 - g_LvAntialias;
-		viUpdateMode();
+#ifdef PROFILING
+	if (joyGetButtonsPressedThisFrame(0, R_JPAD)) {
+		g_LvStatsPage = (g_LvStatsPage + 1) % 2;
 	}
+#endif
 
 	lvRecordRate();
 
-	if (g_LvShowRates) {
+	if (g_LvShowStats && g_LvStatsPage == 0) {
 		g_ScaleX = g_ViRes == VIRES_HI ? 2 : 1;
 
 		gdl = text0f153628(gdl);
@@ -1295,6 +1297,7 @@ Gfx *lvRender(Gfx *gdl)
 				gSPDisplayList(gdl++, &var80061380);
 			}
 
+			profileStart(PROFILEMARKER_LVR_PREPARE);
 			viSetViewPosition(g_Vars.currentplayer->viewleft, g_Vars.currentplayer->viewtop);
 			viSetFovAspectAndSize(g_Vars.currentplayer->fovy, g_Vars.currentplayer->aspect,
 					g_Vars.currentplayer->viewwidth, g_Vars.currentplayer->viewheight);
@@ -1305,7 +1308,9 @@ Gfx *lvRender(Gfx *gdl)
 			gdl = vi0000b1d0(gdl);
 			gdl = currentPlayerScissorToViewport(gdl);
 			artifactsClear();
+			profileEnd(PROFILEMARKER_LVR_PREPARE);
 
+			profileStart(PROFILEMARKER_LVR_BONDGUN);
 			if ((g_Vars.stagenum != STAGE_CITRAINING || (var80087260 <= 0 && g_MenuData.root != MENUROOT_MPSETUP))
 					&& g_Vars.lvframenum <= 5
 					&& !g_Vars.normmplayerisrunning
@@ -1322,6 +1327,7 @@ Gfx *lvRender(Gfx *gdl)
 					&& var8009dfc0 == 0) {
 				g_Vars.currentplayer->gunctrl.unk1583_06 = bgun0f09eae4();
 			}
+			profileEnd(PROFILEMARKER_LVR_BONDGUN);
 
 			if (g_Vars.lockscreen) {
 				gdl = bviewDrawMotionBlur(gdl, 0xffffffff, 255);
@@ -1332,7 +1338,7 @@ Gfx *lvRender(Gfx *gdl)
 				mtx00016748(1);
 
 				if (g_Vars.currentplayer->menuisactive) {
-					gdl = menuRender(gdl);
+					PROFILE(PROFILEMARKER_LVR_MENU, gdl = menuRender(gdl));
 				}
 			} else {
 				if (var80075d60 == 2) {
@@ -1340,20 +1346,26 @@ Gfx *lvRender(Gfx *gdl)
 				}
 
 				gdl = viRenderViewportEdges(gdl);
-				gdl = skyRender(gdl);
-				bgTick();
-				lightsTick();
-				propsTickPlayer(islastplayer);
-				scenarioTickChr(NULL);
-				propsSort();
-				autoaimTick();
-				handsTickAttack();
+				PROFILE(PROFILEMARKER_LVR_SKY1, gdl = skyRender(gdl));
+				PROFILE(PROFILEMARKER_LVR_BGTICK, bgTick());
+				PROFILE(PROFILEMARKER_LVR_LIGHTS, lightsTick());
+				PROFILE(PROFILEMARKER_LVR_PROPS, propsTickPlayer(islastplayer));
+				PROFILE(PROFILEMARKER_LVR_SCENARIOCHR, scenarioTickChr(NULL));
+				PROFILE(PROFILEMARKER_LVR_PROPSSORT, propsSort());
+				PROFILE(PROFILEMARKER_LVR_AUTOAIM, autoaimTick());
+				PROFILE(PROFILEMARKER_LVR_HANDS, handsTickAttack());
 
 				// Calculate lookingatprop
-				if (PLAYERCOUNT() == 1
-						|| g_Vars.coopplayernum >= 0
-						|| g_Vars.antiplayernum >= 0
-						|| (weaponHasFlag(bgunGetWeaponNum(HAND_RIGHT), WEAPONFLAG_AIMTRACK) && bmoveIsInSightAimMode())) {
+				profileStart(PROFILEMARKER_LVR_LOOKINGAT);
+
+				// Only calculate lookingatprop if:
+				// we are using the R-aimer in solo missions (including coop/anti), or
+				// we are using the R-aimer in 1 player combat simulator, or
+				// we are using the R-aimer in 2+ player combat simulator with a gun that uses prop tracking, or
+				// we are playing Holo 1 (Looking Around), which uses lookingatprop
+				if ((bmoveIsInSightAimMode() && (
+								PLAYERCOUNT() == 1 || !g_Vars.normmplayerisrunning || weaponHasFlag(bgunGetWeaponNum(HAND_RIGHT), WEAPONFLAG_AIMTRACK)))
+						|| (g_Vars.stagenum == STAGE_CITRAINING && (g_StageFlags & 0x00040000))) {
 					g_Vars.currentplayer->lookingatprop.prop = func0f061d54(HAND_RIGHT, 0, 0);
 
 					if (g_Vars.currentplayer->lookingatprop.prop) {
@@ -1384,7 +1396,9 @@ Gfx *lvRender(Gfx *gdl)
 				} else {
 					g_Vars.currentplayer->lookingatprop.prop = NULL;
 				}
+				profileEnd(PROFILEMARKER_LVR_LOOKINGAT);
 
+				profileStart(PROFILEMARKER_LVR_TRACKEDPROPS);
 				if (gsetHasFunctionFlags(&g_Vars.currentplayer->hands[0].gset, FUNCFLAG_THREATDETECTOR)) {
 					lvFindThreats();
 				} else if (weaponHasFlag(bgunGetWeaponNum(HAND_RIGHT), WEAPONFLAG_AIMTRACK)) {
@@ -1405,6 +1419,7 @@ Gfx *lvRender(Gfx *gdl)
 						}
 					}
 				}
+				profileEnd(PROFILEMARKER_LVR_TRACKEDPROPS);
 
 				// Handle eyespy Z presses
 				if (g_Vars.currentplayer->eyespy
@@ -1451,20 +1466,20 @@ Gfx *lvRender(Gfx *gdl)
 					currentPlayerInteract(true);
 				}
 
-				propsTestForPickup();
-				gdl = bgRender(gdl);
+				PROFILE(PROFILEMARKER_LVR_PICKUP, propsTestForPickup());
+				PROFILE(PROFILEMARKER_LVR_BG, gdl = bgRender(gdl));
 				chr0f028498(var80075d68 == 15 || g_AnimHostEnabled);
-				gdl = propsRenderBeams(gdl);
-				gdl = shardsRender(gdl);
-				gdl = sparksRender(gdl);
-				gdl = weatherRender(gdl);
+				PROFILE(PROFILEMARKER_LVR_BEAMS, gdl = propsRenderBeams(gdl));
+				PROFILE(PROFILEMARKER_LVR_SHARDS, gdl = shardsRender(gdl));
+				PROFILE(PROFILEMARKER_LVR_SPARKS, gdl = sparksRender(gdl));
+				PROFILE(PROFILEMARKER_LVR_WEATHER, gdl = weatherRender(gdl));
 
 				if (g_NbombsActive) {
-					gdl = nbombsRender(gdl);
+					PROFILE(PROFILEMARKER_LVR_NBOMBS, gdl = nbombsRender(gdl));
 				}
 
 				if (var80075d60 == 2) {
-					gdl = playerRenderHud(gdl);
+					PROFILE(PROFILEMARKER_LVR_HUD, gdl = playerRenderHud(gdl));
 
 #if VERSION == VERSION_NTSC_BETA || VERSION == VERSION_PAL_BETA
 					gdl = lvRenderManPosIfEnabled(gdl);
@@ -1742,8 +1757,8 @@ Gfx *lvRender(Gfx *gdl)
 				}
 
 #if VERSION >= VERSION_NTSC_1_0
-				gdl = scenarioRenderHud(gdl);
-				gdl = lvRenderFade(gdl);
+				PROFILE(PROFILEMARKER_LVR_SCENARIO, gdl = scenarioRenderHud(gdl));
+				PROFILE(PROFILEMARKER_LVR_FADE, gdl = lvRenderFade(gdl));
 #else
 				gdl = lvRenderFade(gdl);
 				gdl = scenarioRenderHud(gdl);
@@ -1785,12 +1800,12 @@ Gfx *lvRender(Gfx *gdl)
 #endif
 				}
 
-				gdl = sky0f1274d8(gdl);
-				gdl = amRender(gdl);
+				PROFILE(PROFILEMARKER_LVR_SKY2, gdl = sky0f1274d8(gdl));
+				PROFILE(PROFILEMARKER_LVR_ACTIVEMENU, gdl = amRender(gdl));
 				mtx00016748(1);
 
 				if (g_Vars.currentplayer->menuisactive) {
-					gdl = menuRender(gdl);
+					PROFILE(PROFILEMARKER_LVR_MENU, gdl = menuRender(gdl));
 				}
 
 				mtx00016748(g_Vars.currentplayerstats->scale_bg2gfx);
@@ -1804,7 +1819,7 @@ Gfx *lvRender(Gfx *gdl)
 				}
 			}
 
-			artifactsTick();
+			PROFILE(PROFILEMARKER_LVR_ARTIFACTS, artifactsTick());
 
 			if ((g_Vars.coopplayernum >= 0 || g_Vars.antiplayernum >= 0)
 #if VERSION >= VERSION_NTSC_1_0
@@ -2274,7 +2289,7 @@ void lvTick(void)
 	g_Vars.lvupdate60freal = PALUPF(g_Vars.lvupdate60f);
 
 	bgunTickBoost();
-	hudmsgsTick();
+	PROFILE(PROFILEMARKER_LVT_HUDMSGS, hudmsgsTick());
 
 	if ((joyGetButtonsPressedThisFrame(0, 0xffff) != 0
 				|| joyGetStickX(0) > 10
@@ -2446,41 +2461,47 @@ void lvTick(void)
 		langTick();
 	} else {
 		lvUpdateCutsceneTime();
-		vtxstoreTick();
+		PROFILE(PROFILEMARKER_LVT_VTXSTORE, vtxstoreTick());
 		lvUpdateSoloHandicaps();
-		roomsTick();
+		PROFILE(PROFILEMARKER_LVT_ROOMS, roomsTick());
 		skyTick();
-		casingsTick();
-		shardsTick();
-		sparksTick();
-		wallhitsTick();
-		splatsTick();
+		PROFILE(PROFILEMARKER_LVT_CASINGS, casingsTick());
+		PROFILE(PROFILEMARKER_LVT_SHARDS, shardsTick());
+		PROFILE(PROFILEMARKER_LVT_SPARKS, sparksTick());
+		PROFILE(PROFILEMARKER_LVT_WALLHITS, wallhitsTick());
+		PROFILE(PROFILEMARKER_LVT_SPLATS, splatsTick());
 
+		profileStart(PROFILEMARKER_LVT_WEATHER);
 		if (g_WeatherActive) {
 			weatherTick();
 		}
+		profileEnd(PROFILEMARKER_LVT_WEATHER);
 
+		profileStart(PROFILEMARKER_LVT_NBOMBS);
 		if (g_NbombsActive) {
 			nbombsTick();
 		}
+		profileEnd(PROFILEMARKER_LVT_NBOMBS);
 
-		lvUpdateMiscSfx();
-		sndTick();
-		pakExecuteDebugOperations();
-		lightingTick();
-		modelmgrPrintCounts();
-		boltbeamsTick();
-		amTick();
-		menuTick();
-		scenarioTick();
+		PROFILE(PROFILEMARKER_LVT_MISCSFX, lvUpdateMiscSfx());
+		PROFILE(PROFILEMARKER_LVT_SND, sndTick());
+		PROFILE(PROFILEMARKER_LVT_PAK, pakExecuteDebugOperations());
+		PROFILE(PROFILEMARKER_LVT_LIGHTING, lightingTick());
+		PROFILE(PROFILEMARKER_LVT_MODELMGR, modelmgrPrintCounts());
+		PROFILE(PROFILEMARKER_LVT_BOLTBEAMS, boltbeamsTick());
+		PROFILE(PROFILEMARKER_LVT_ACTIVEMENU, amTick());
+		PROFILE(PROFILEMARKER_LVT_MENU, menuTick());
+		PROFILE(PROFILEMARKER_LVT_SCENARIO, scenarioTick());
 
+		profileStart(PROFILEMARKER_LVT_PROPS);
 		if (!g_MainIsEndscreen) {
 			propsTick();
 		}
+		profileEnd(PROFILEMARKER_LVT_PROPS);
 
-		musicTick();
+		PROFILE(PROFILEMARKER_LVT_MUSIC, musicTick());
 		langTick();
-		propsTickPadEffects();
+		PROFILE(PROFILEMARKER_LVT_PADEFFECTS, propsTickPadEffects());
 
 		if (mainGetStageNum() == STAGE_CITRAINING) {
 			struct trainingdata *trainingdata = dtGetData();
